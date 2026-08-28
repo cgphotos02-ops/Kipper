@@ -576,13 +576,29 @@
   @media (max-width: 700px) { .pauta-twocol { grid-template-columns: 1fr; } }
   .pauta-donut-wrap { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
   .pauta-donut-wrap svg { display: block; flex: 0 0 auto; }
-  .pauta-leg-list { display: flex; flex-direction: column; gap: 6px; font-size: 12px; min-width: 0; }
-  .pauta-leg { color: var(--ink-muted); }
-  .pauta-leg-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-  .pauta-leg b { color: var(--ink); }
+  .pauta-leg-list { display: flex; flex-direction: column; gap: 2px; font-size: 12px; min-width: 160px; flex: 1; }
+  .pauta-leg { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--border); color: var(--ink-muted); }
+  .pauta-leg:last-child { border-bottom: none; }
+  .pauta-leg .lg-name { display: flex; align-items: center; gap: 7px; }
+  .pauta-leg .lg-val { font-weight: 800; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .pauta-leg-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: 0 0 10px; }
 
   .pauta-table-ctr { display: inline-block; width: 46px; height: 6px; border-radius: 4px; background: var(--surface-2); overflow: hidden; vertical-align: middle; margin-right: 7px; }
   .pauta-table-ctr i { display: block; height: 100%; background: var(--accent); }
+
+  /* Pautas: estilo "reporte" — títulos centrados, tarjetas suaves, píldoras */
+  .pauta-softcard { background: var(--surface-2); border: 1px solid var(--border); border-radius: 18px; padding: 22px 24px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .pauta-section-title { text-align: center; font-size: 15px; font-weight: 800; color: var(--accent-strong); margin: 0 0 16px; letter-spacing: .01em; }
+  .pauta-pillrow { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .pauta-statpill { flex: 1 1 128px; max-width: 200px; border: 1.5px solid var(--accent); border-radius: 999px; padding: 10px 16px 12px; text-align: center; background: transparent; }
+  .pauta-statpill .sp-k { font-size: 10px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .05em; }
+  .pauta-statpill .sp-v { font-size: 18px; font-weight: 800; margin-top: 3px; font-variant-numeric: tabular-nums; color: var(--accent-soft-ink); }
+  .pauta-statpill.good { border-color: var(--good); } .pauta-statpill.good .sp-v { color: var(--good-ink); }
+  .pauta-statpill.blue { border-color: var(--vc-proyeccion); } .pauta-statpill.blue .sp-v { color: var(--vc-proyeccion-ink); }
+  .pauta-statpill.warn { border-color: var(--warn); } .pauta-statpill.warn .sp-v { color: var(--warn-ink); }
+  .pauta-statpill.crit { border-color: var(--crit); } .pauta-statpill.crit .sp-v { color: var(--crit-ink); }
+  .pauta-donut-center-n { font-size: 22px; font-weight: 800; }
+  .pauta-donut-center-s { font-size: 9.5px; fill: var(--ink-faint); }
 
   /* Constancia */
   .constancia-check-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; cursor: pointer; }
@@ -1564,47 +1580,63 @@
   function pautaCtrColor(ctr) { return ctr >= 3 ? 'var(--good)' : (ctr >= 1.5 ? 'var(--accent)' : 'var(--warn)'); }
   function pautaFreqColor(f) { return f > 2.8 ? 'var(--crit)' : (f > 2.3 ? 'var(--warn)' : 'var(--good)'); }
 
-  // Dona SVG compacta
-  function pautaDonut(segs, center) {
-    var size = 118, th = 20, r = (size - th) / 2, cx = size / 2, cy = size / 2, circ = 2 * Math.PI * r;
+  // Dona SVG con extremos redondeados, número central y leyenda alineada
+  function pautaDonut(segs, centerNum, centerSub) {
+    segs = segs.filter(function (s) { return s.value > 0; });
+    var size = 150, th = 24, r = (size - th) / 2, cx = size / 2, cy = size / 2, circ = 2 * Math.PI * r;
     var total = segs.reduce(function (s, x) { return s + x.value; }, 0) || 1, off = 0;
-    var arcs = segs.filter(function (s) { return s.value > 0; }).map(function (s) {
-      var dash = s.value / total * circ;
-      var c = '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + s.color + '" stroke-width="' + th + '" stroke-dasharray="' + dash.toFixed(2) + ' ' + (circ - dash).toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '" transform="rotate(-90 ' + cx + ' ' + cy + ')"></circle>';
-      off += dash; return c;
+    var gap = segs.length > 1 ? 5 : 0;
+    var arcs = segs.map(function (s) {
+      var full = s.value / total * circ;
+      var dash = Math.max(0.5, full - gap);
+      var c = '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + s.color + '" stroke-width="' + th + '" stroke-linecap="round" stroke-dasharray="' + dash.toFixed(2) + ' ' + (circ - dash).toFixed(2) + '" stroke-dashoffset="' + (-(off + gap / 2)).toFixed(2) + '" transform="rotate(-90 ' + cx + ' ' + cy + ')"></circle>';
+      off += full; return c;
     }).join('');
-    var svg = '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">' + arcs +
-      (center ? '<text x="' + cx + '" y="' + (cy + 5) + '" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">' + center + '</text>' : '') + '</svg>';
+    var center = centerNum
+      ? '<text x="' + cx + '" y="' + (cy + (centerSub ? 1 : 6)) + '" text-anchor="middle" class="pauta-donut-center-n" fill="var(--ink)">' + centerNum + '</text>' +
+        (centerSub ? '<text x="' + cx + '" y="' + (cy + 16) + '" text-anchor="middle" class="pauta-donut-center-s">' + centerSub + '</text>' : '')
+      : '';
+    var svg = '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">' + arcs + center + '</svg>';
     var legend = segs.map(function (s) {
-      return '<div class="pauta-leg"><span class="pauta-leg-dot" style="background:' + s.color + '"></span>' + s.label + ' <b>' + s.sub + '</b></div>';
+      return '<div class="pauta-leg"><span class="lg-name"><span class="pauta-leg-dot" style="background:' + s.color + '"></span>' + s.label + '</span><span class="lg-val">' + s.sub + '</span></div>';
     }).join('');
     return '<div class="pauta-donut-wrap"><div>' + svg + '</div><div class="pauta-leg-list">' + legend + '</div></div>';
   }
+  function fmtCOPshort(n) {
+    if (n == null || !isFinite(n)) return '—';
+    if (n >= 1e6) return '$' + (n / 1e6).toFixed(n >= 1e7 ? 1 : 2).replace('.', ',') + ' M';
+    if (n >= 1e3) return '$' + Math.round(n / 1e3) + ' k';
+    return '$' + Math.round(n);
+  }
 
-  // Sparkline de área (evolución de un costo en el tiempo)
+  // Gráfica de área (evolución de un costo en el tiempo) — estilo reporte
   function pautaSpark(points) {
-    var w = 480, h = 132, pad = 30;
+    var w = 520, h = 150, padX = 34, padT = 26, padB = 24;
     var vals = points.map(function (p) { return p.v; });
     var mx = Math.max.apply(null, vals), mn = Math.min.apply(null, vals.concat([mx]));
-    var lo = Math.min(mn, mx * 0.8);
-    var sx = points.length > 1 ? (w - pad * 2) / (points.length - 1) : 0;
-    var sy = function (v) { return h - pad - ((v - lo) / ((mx - lo) || 1)) * (h - pad * 2); };
-    var pts = points.map(function (p, i) { return [pad + i * sx, sy(p.v)]; });
+    var lo = Math.max(0, Math.min(mn, mx * 0.85) - (mx - mn) * 0.15);
+    var sx = points.length > 1 ? (w - padX * 2) / (points.length - 1) : 0;
+    var sy = function (v) { return h - padB - ((v - lo) / ((mx - lo) || 1)) * (h - padT - padB); };
+    var pts = points.map(function (p, i) { return [padX + i * sx, sy(p.v)]; });
     var d = pts.map(function (c, i) { return (i ? 'L' : 'M') + c[0].toFixed(1) + ',' + c[1].toFixed(1); }).join(' ');
-    var area = d + ' L' + pts[pts.length - 1][0].toFixed(1) + ',' + (h - pad) + ' L' + pts[0][0].toFixed(1) + ',' + (h - pad) + ' Z';
+    var area = d + ' L' + pts[pts.length - 1][0].toFixed(1) + ',' + (h - padB) + ' L' + pts[0][0].toFixed(1) + ',' + (h - padB) + ' Z';
     var avg = vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
     var ay = sy(avg).toFixed(1);
     var dots = pts.map(function (c, i) {
       var last = i === pts.length - 1;
-      return '<circle cx="' + c[0].toFixed(1) + '" cy="' + c[1].toFixed(1) + '" r="' + (last ? 4.5 : 3) + '" fill="' + (last ? 'var(--accent-strong)' : 'var(--accent)') + '"></circle>' +
-        '<text x="' + c[0].toFixed(1) + '" y="' + (c[1] - 9).toFixed(1) + '" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--ink)">' + points[i].t + '</text>' +
-        '<text x="' + c[0].toFixed(1) + '" y="' + (h - 9) + '" text-anchor="middle" font-size="9" fill="var(--ink-faint)">' + points[i].label + '</text>';
+      return '<circle cx="' + c[0].toFixed(1) + '" cy="' + c[1].toFixed(1) + '" r="' + (last ? 5 : 3.5) + '" fill="' + (last ? 'var(--good-ink)' : 'var(--good)') + '" stroke="var(--surface-2)" stroke-width="1.5"></circle>' +
+        '<text x="' + c[0].toFixed(1) + '" y="' + (c[1] - 10).toFixed(1) + '" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--ink)">' + points[i].t + '</text>' +
+        '<text x="' + c[0].toFixed(1) + '" y="' + (h - 7) + '" text-anchor="middle" font-size="9" fill="var(--ink-faint)">' + points[i].label + '</text>';
     }).join('');
     return '<div class="chart-line-wrap"><svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="xMidYMid meet">' +
-      '<path d="' + area + '" fill="var(--accent-soft)"></path>' +
-      '<line x1="' + pad + '" x2="' + (w - pad) + '" y1="' + ay + '" y2="' + ay + '" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="3 3"></line>' +
-      '<text x="' + (w - pad) + '" y="' + (ay - 4) + '" text-anchor="end" font-size="9" fill="var(--ink-faint)">prom. ' + fmtCOP(avg) + '</text>' +
-      '<path d="' + d + '" fill="none" stroke="var(--accent)" stroke-width="2.5"></path>' + dots + '</svg></div>';
+      '<path d="' + area + '" fill="var(--good-soft)"></path>' +
+      '<line x1="' + padX + '" x2="' + (w - padX) + '" y1="' + ay + '" y2="' + ay + '" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="4 4"></line>' +
+      '<text x="' + (w - padX) + '" y="' + (ay - 5) + '" text-anchor="end" font-size="9" fill="var(--ink-faint)">promedio ' + fmtCOP(avg) + '</text>' +
+      '<path d="' + d + '" fill="none" stroke="var(--good)" stroke-width="2.5" stroke-linejoin="round"></path>' + dots + '</svg></div>';
+  }
+
+  function pautaStatPill(k, v, cls) {
+    return '<div class="pauta-statpill ' + (cls || '') + '"><div class="sp-k">' + k + '</div><div class="sp-v">' + v + '</div></div>';
   }
 
   function renderPautaBigCard(p) {
@@ -1623,9 +1655,9 @@
       '<div class="p-brand">' + (p.brand === '—' ? 'Sin marca' : p.brand) + ' <span class="status-pill ' + p.status.cls + '" style="margin-left:4px">' + p.status.label + '</span></div>' +
       '<div class="p-name">' + p.name + '</div>' +
       '<div class="p-dates">' + (p.start ? p.start + (p.end ? ' → ' + p.end : '') : 'sin fechas') + '</div>' +
-      '<div class="pauta-hero">' +
-      '<div class="h-block"><div class="h-k">' + pautaResLabel(p.resInd) + '</div><div class="h-v">' + fmtNumCO(p.results) + '</div></div>' +
-      '<div class="h-block"><div class="h-k">Costo por resultado</div><div class="h-v accent">' + fmtCOP(p.cpr) + '</div></div>' +
+      '<div class="pauta-pillrow" style="justify-content:flex-start;margin-bottom:16px">' +
+      pautaStatPill(pautaResLabel(p.resInd), fmtNumCO(p.results), 'blue') +
+      pautaStatPill('Costo por resultado', fmtCOP(p.cpr), 'accent') +
       '</div>' +
       '<div class="pauta-meterrow">' + meters + '</div>' +
       '<div class="pauta-chips">' + chips + '</div>' +
@@ -1657,23 +1689,22 @@
     var periodTxt = parsed.period && (parsed.period.start || parsed.period.end)
       ? (parsed.period.start || '') + (parsed.period.end ? ' – ' + parsed.period.end : '') : '';
 
+    var palette = ['#29abc7', '#1f7fc4', '#9bc93c', '#f8be22'];
     var html = '';
 
     // ---- Resumen ----
-    html += '<div class="card">' +
-      (periodTxt ? '<p class="vc-note" style="margin-top:-2px">Informe de Meta · ' + periodTxt + '</p>' : '') +
-      '<div class="kpi-row" style="margin-bottom:10px">' +
-      '<div class="kpi-tile"><div class="kpi-label">Inversión total</div><div class="kpi-value" style="font-size:19px">' + fmtCOP(totalSpend) + '</div></div>' +
-      '<div class="kpi-tile"><div class="kpi-label">Pautas activas</div><div class="kpi-value" style="color:var(--good-ink)">' + activeCount + '<span style="font-size:13px;color:var(--ink-faint);font-weight:600"> / ' + rows.length + '</span></div></div>' +
-      realBrands.map(function (b) {
+    html += '<div class="pauta-softcard">' +
+      '<div class="pauta-section-title">Resumen del período' + (periodTxt ? ' · ' + periodTxt : '') + '</div>' +
+      '<div class="pauta-pillrow">' +
+      pautaStatPill('Inversión total', fmtCOP(totalSpend), 'accent') +
+      pautaStatPill('Pautas activas', activeCount + ' / ' + rows.length, 'good') +
+      realBrands.map(function (b, i) {
         var bd = byBrand[b];
-        return '<div class="kpi-tile"><div class="kpi-label">' + b + '</div><div class="kpi-value" style="font-size:16px">' + fmtCOP(bd.spend) + '</div><div class="kpi-sub">' + Math.round(bd.spend / (totalSpend || 1) * 100) + '% · ' + bd.active + ' activa(s)</div></div>';
+        return pautaStatPill(b, fmtCOPshort(bd.spend) + ' · ' + Math.round(bd.spend / (totalSpend || 1) * 100) + '%', i === 0 ? 'accent' : 'blue');
       }).join('') +
       '</div>';
-    // barra apilada de inversión por marca
-    if (realBrands.length) {
-      var palette = ['#29abc7', '#1f7fc4', '#9bc93c', '#f8be22'];
-      html += '<div class="pauta-split">' + realBrands.map(function (b, i) {
+    if (realBrands.length > 1) {
+      html += '<div class="pauta-split" style="margin-top:18px">' + realBrands.map(function (b, i) {
         var w = byBrand[b].spend / (totalSpend || 1) * 100;
         return '<div class="pauta-split-seg" style="width:' + w.toFixed(2) + '%;background:' + palette[i % palette.length] + '">' + (w > 12 ? Math.round(w) + '%' : '') + '</div>';
       }).join('') + '</div>' +
@@ -1686,7 +1717,7 @@
     // ---- Pautas activas ahora ----
     var actives = rows.filter(function (p) { return p.status.k === 'active'; })
       .sort(function (a, b) { return b.spend - a.spend; });
-    html += '<div class="card"><h2>🟢 Pautas activas ahora</h2>';
+    html += '<div class="pauta-softcard"><div class="pauta-section-title">Pautas activas ahora</div>';
     if (actives.length) {
       html += '<div class="pauta-active-grid">' + actives.map(renderPautaBigCard).join('') + '</div>';
       if (actives.length >= 2) {
@@ -1700,17 +1731,17 @@
     html += '</div>';
 
     // ---- En qué se fue la inversión ----
-    html += '<div class="card"><h2>🧭 En qué se fue la inversión</h2><div class="pauta-twocol">' +
+    html += '<div class="pauta-softcard"><div class="pauta-section-title">En qué se fue la inversión</div><div class="pauta-twocol">' +
       realBrands.map(function (b) {
         var bd = byBrand[b];
         var segs = Object.keys(bd.byInd).map(function (k) {
           var x = bd.byInd[k];
           return { label: k, value: x.spend, color: pautaObjColor(k), sub: fmtCOP(x.spend) + (x.results ? ' · ' + fmtCOP(x.spend / x.results) + ' c/u' : '') };
         }).filter(function (s) { return s.value > 0; }).sort(function (a, b2) { return b2.value - a.value; });
-        return '<div><div class="type-heading" style="margin:0 0 10px"><span class="type-dot tactica"></span>' + b + ' · ' + fmtCOP(bd.spend) + '</div>' +
-          pautaDonut(segs, '') + '</div>';
+        return '<div><div class="type-heading" style="margin:0 0 10px;justify-content:center"><span class="type-dot tactica"></span>' + b + '</div>' +
+          pautaDonut(segs, fmtCOPshort(bd.spend), 'gasto') + '</div>';
       }).join('') +
-      '</div><p class="vc-note" style="margin-top:10px">Reparto del gasto por objetivo de campaña, dentro de cada marca.</p></div>';
+      '</div><p class="vc-note" style="margin-top:10px;text-align:center">Reparto del gasto por objetivo de campaña, dentro de cada marca.</p></div>';
 
     // ---- Evolución del costo por conversación (si hay historia) ----
     var convHist = rows.filter(function (p) { return (p.resInd || '').indexOf('messaging') > -1 && p.results > 0 && p.start; })
@@ -1721,9 +1752,9 @@
         var months = { '01': 'ene', '02': 'feb', '03': 'mar', '04': 'abr', '05': 'may', '06': 'jun', '07': 'jul', '08': 'ago', '09': 'sep', '10': 'oct', '11': 'nov', '12': 'dic' };
         return { v: p.cpr, label: months[mm] || (p.start || '').slice(5, 10), t: fmtCOP(p.cpr).replace('$', '') };
       });
-      html += '<div class="card"><h2>📈 Costo por conversación de WhatsApp en el tiempo</h2>' +
+      html += '<div class="pauta-softcard"><div class="pauta-section-title">Costo por conversación de WhatsApp en el tiempo</div>' +
         pautaSpark(pts) +
-        '<p class="vc-note" style="margin-top:6px">Cada punto es una campaña de conversaciones, ordenadas por fecha de inicio. La línea punteada es el promedio del período.</p></div>';
+        '<p class="vc-note" style="margin-top:6px;text-align:center">Cada punto es una campaña de conversaciones, ordenadas por fecha de inicio. La línea punteada es el promedio del período.</p></div>';
     }
 
     // ---- Tabla completa ----
@@ -1732,7 +1763,7 @@
       return (order[a.status.k] - order[b.status.k]) || (b.spend - a.spend);
     });
     var maxCtr = Math.max.apply(null, rows.map(function (p) { return p.ctrLink; }).concat([1]));
-    html += '<div class="card"><h2>📄 Todas las pautas</h2><div class="simple-table-wrap"><table class="simple-table">' +
+    html += '<div class="pauta-softcard"><div class="pauta-section-title">Todas las pautas</div><div class="simple-table-wrap"><table class="simple-table">' +
       '<thead><tr><th>Marca</th><th>Campaña</th><th>Estado</th><th>Objetivo</th><th>Resultado</th><th>Costo/result.</th><th>Gasto</th><th>CTR</th><th>Frec.</th></tr></thead><tbody>' +
       sorted.map(function (p) {
         var objLabel = pautaResLabel(p.resInd);

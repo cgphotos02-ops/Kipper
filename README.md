@@ -22,6 +22,8 @@ Estas herramientas ya funcionan sin conexión de datos (todo se procesa en el na
 | Archivo | Qué es |
 | --- | --- |
 | `index.html` | El panel completo (HTML + CSS + JS en un solo archivo). |
+| `data/pautas.json` | Estado de las pautas de Meta que muestra la pestaña **Pautas**. Se genera desde el informe de Meta y se versiona en el repo (persiste entre visitas). |
+| `scripts/gen-pautas.js` | Convierte un informe de campañas de Meta (`.xlsx` o `.csv`) en `data/pautas.json`. |
 | `data/live-metrics.json` | Datos de Meta Ads por marca. Vacío hasta conectar. Lo reescribe el flujo de Actions. |
 | `scripts/refresh-meta-data.js` | Jala datos de la Graph API de Meta. Falta completar `AD_ACCOUNT_ID` y los IDs de campaña/conjunto de cada marca. |
 | `.github/workflows/refresh-meta-data.yml` | Ejecuta el script anterior. Programación en pausa; se dispara a mano (`workflow_dispatch`). |
@@ -32,6 +34,12 @@ Estas herramientas ya funcionan sin conexión de datos (todo se procesa en el na
 Publicado con **GitHub Pages** usando **GitHub Actions** como origen
 (`.github/workflows/deploy-pages.yml`). Cada push a `main` empaqueta la raíz del
 repo y la despliega. El propio workflow activa Pages la primera vez (`enablement: true`).
+
+## Actualizar la pestaña Pautas
+
+1. Descarga el informe de campañas de Meta (`.xlsx`).
+2. `node scripts/gen-pautas.js "ruta/al/informe.xlsx"` → reescribe `data/pautas.json`.
+3. `git add data/pautas.json && git commit -m "Actualiza pautas" && git push` → Pages se reconstruye y el panel muestra los nuevos datos.
 
 ## Conectar datos reales de Meta Ads
 

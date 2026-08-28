@@ -960,7 +960,14 @@
             <input type="number" id="p-publicos" min="1" max="6" value="3" />
           </div>
           <div class="form-group">
-            <label>&nbsp;</label>
+            <label for="p-reach">Alcance que quieres (personas)</label>
+            <input type="number" id="p-reach" min="1" step="500" placeholder="Ej: 20000" />
+          </div>
+          <div class="form-group">
+            <label for="p-freq">Frecuencia objetivo (impactos por persona)</label>
+            <input type="number" id="p-freq" min="1" max="10" step="0.1" placeholder="Ej: 2" />
+          </div>
+          <div class="form-group full">
             <div class="chip-check" id="p-otro-tipo-toggle" data-selected="false">También correré <span id="p-otro-tipo-label">Estratégica</span> en paralelo para esta marca</div>
           </div>
           <div class="form-group full">
@@ -978,6 +985,11 @@
         <div class="card">
           <h2>📋 Resumen del plan</h2>
           <p class="output-summary" id="output-summary"></p>
+        </div>
+
+        <div class="card" id="output-reach-card">
+          <h2>🎯 Alcance y frecuencia objetivo</h2>
+          <div id="output-reach"></div>
         </div>
 
         <div class="card">
@@ -1196,6 +1208,8 @@
     var leadsGoal = Math.max(1, parseInt(el('p-leads').value, 10) || 100);
     var budget = Math.max(1, parseInt(el('p-budget').value, 10) || 500);
     var numPublicos = Math.max(1, parseInt(el('p-publicos').value, 10) || 3);
+    var reachGoal = Math.max(0, parseInt(el('p-reach').value, 10) || 0);
+    var freqGoal = Math.max(0, parseFloat(String(el('p-freq').value || '').replace(',', '.')) || 0);
     var correOtro = el('p-otro-tipo-toggle').classList.contains('selected');
     var platforms = Array.prototype.slice.call(document.querySelectorAll('#camp-plan .platform-toggle .chip-check.selected')).map(function (c) { return c.dataset.platform; });
     var platformNames = platforms.map(function (p) { return p === 'ig' ? 'Instagram' : 'Facebook'; }).join(' y ') || 'tus redes';
@@ -1206,7 +1220,30 @@
     el('output-summary').innerHTML =
       'Para "<b>' + idea + '</b>" en <b>' + cuentaLabel + '</b> (' + tipoLabels[tipo] + '), con una meta de <b>' + leadsGoal +
       ' leads</b> y un presupuesto de <b>' + fmtMoney(budget) + '</b> en ' + platformNames + ', tu costo por lead objetivo es de <b>' +
-      fmtMoney(cpl) + '</b>. Aún no hay CPL histórico cargado para esta marca — vigila el CPL desde el día 2 y ajusta la segmentación si se dispara.';
+      fmtMoney(cpl) + '</b>.' +
+      (reachGoal && freqGoal ? ' Apuntas a alcanzar <b>' + fmtNumCO(reachGoal) + '</b> personas con una frecuencia de <b>' + String(freqGoal).replace('.', ',') + '</b>.' : '') +
+      ' Aún no hay CPL histórico cargado para esta marca — vigila el CPL desde el día 2 y ajusta la segmentación si se dispara.';
+
+    var reachEl = el('output-reach');
+    if (reachGoal && freqGoal) {
+      var imprNec = Math.round(reachGoal * freqGoal);
+      var cpmImpl = imprNec ? (budget / imprNec) * 1000 : 0;
+      var freqNote = freqGoal < 1.5
+        ? 'Frecuencia baja: la seguridad privada y electrónica se contrata tras varios impactos — apunta a 2–3 para que te recuerden al decidir.'
+        : (freqGoal <= 3
+          ? 'Frecuencia en el rango sano: recordación suficiente sin fatigar a la audiencia.'
+          : 'Frecuencia alta: vigila la fatiga y rota creativos cada 2–3 semanas para no quemar a la audiencia.');
+      reachEl.innerHTML =
+        '<div class="kpi-row" style="margin-bottom:12px">' +
+        '<div class="kpi-tile"><div class="kpi-label">Alcance objetivo</div><div class="kpi-value">' + fmtNumCO(reachGoal) + '</div><div class="kpi-sub">personas distintas</div></div>' +
+        '<div class="kpi-tile"><div class="kpi-label">Frecuencia objetivo</div><div class="kpi-value">' + String(freqGoal).replace('.', ',') + '</div><div class="kpi-sub">impactos por persona</div></div>' +
+        '<div class="kpi-tile"><div class="kpi-label">Impresiones necesarias</div><div class="kpi-value" style="font-size:17px">' + fmtNumCO(imprNec) + '</div><div class="kpi-sub">alcance × frecuencia</div></div>' +
+        '<div class="kpi-tile"><div class="kpi-label">CPM que te podrías permitir</div><div class="kpi-value" style="font-size:17px">' + fmtMoney(cpmImpl) + '</div><div class="kpi-sub">con ' + fmtMoney(budget) + ' de presupuesto</div></div>' +
+        '</div>' +
+        '<p class="vc-note">' + freqNote + ' Si el <b>CPM real</b> de tus pautas (lo ves en la pestaña <b>Pautas</b>) queda por encima de <b>' + fmtMoney(cpmImpl) + '</b>, no alcanzará el presupuesto para este objetivo: sube el presupuesto, o baja el alcance o la frecuencia.</p>';
+    } else {
+      reachEl.innerHTML = '<div class="leads-empty-state">Escribe arriba el <b>alcance</b> y la <b>frecuencia</b> que quieres para ver cuántas impresiones necesitas y el CPM máximo que te podrías permitir.</div>';
+    }
 
     var structureLines = [
       'Usa <b>1 sola campaña</b> con objetivo de <b>' + tipoObjective[tipo] + '</b>, y mete cada público o ángulo como un <b>conjunto de anuncios distinto</b> (' + numPublicos + ' en total) — así Meta reparte presupuesto (CBO) hacia el que mejor esté funcionando.',
@@ -1214,6 +1251,7 @@
       'No mezcles <b>' + tipoLabels[otroTipo] + '</b> en esta misma campaña: tiene un objetivo distinto en Meta (' + tipoObjective[otroTipo] + ') y mezclarlo confunde la optimización.'
     ];
     if (correOtro) structureLines.push('Como también vas a correr ' + tipoLabels[otroTipo] + ' para ' + cuentaLabel + ' al mismo tiempo, crea una <b>campaña aparte</b> para eso — misma cuenta publicitaria, campaña distinta.');
+    if (reachGoal && freqGoal) structureLines.push('Llegar a <b>' + fmtNumCO(reachGoal) + ' personas</b> con frecuencia <b>' + String(freqGoal).replace('.', ',') + '</b> es un objetivo de <b>alcance</b>: ponlo en ' + (tipo === 'estrategica' ? 'esta campaña' : (correOtro ? 'la campaña Estratégica que corres en paralelo' : 'una campaña Estratégica aparte')) + ' con objetivo de Reconocimiento/Alcance — no en la de conversiones, que Meta optimiza distinto.');
     structureLines.push('Cada marca (Proviser Seguridad y Nass Tecnología) maneja su propia página y su propia cuenta publicitaria, así que esta estructura aplica solo para ' + cuentaLabel + '.');
 
     setText('output-structure-headline', '1 campaña de ' + tipoLabels[tipo] + ' · ' + numPublicos + ' conjuntos de anuncios');

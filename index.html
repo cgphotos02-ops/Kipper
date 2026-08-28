@@ -1,0 +1,1471 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Panel · Kipper</title>
+<style>
+  @font-face {
+    font-family: "System Serif";
+    src: local("Georgia"), local("Iowan Old Style"), local("Times New Roman");
+  }
+
+  /*
+    Paleta de marca (única — el panel usa fondo negro siempre, por decisión de marca):
+    Cyan/Teal   C70 M0 Y15 K0  -> #29ABC7  (acento principal)
+    Azul pálido C40 M0 Y5 K0   -> #AEDEEA  (Infraestructura)
+    Azul medio  C76 M32 Y0 K0  -> #1F7FC4  (Proyección Internacional)
+    Naranja     C0 M50 Y90 K0  -> #F1812C  (Ambiente educativo / warn secundario)
+    Amarillo    C0 M25 Y94 K0  -> #F8BE22  (warn / score)
+    Rojo-teja   C0 M68 Y80 K0  -> #F15A38  (crítico)
+    Verde-lima  C40 M0 Y100 K0 -> #9BC93C  (éxito / bueno)
+  */
+  :root, :root[data-theme="dark"], :root[data-theme="light"] {
+    --bg: #0a0a0a;
+    --surface: #161616;
+    --surface-2: #1e1e1e;
+    --border: #2c2c2c;
+    --ink: #f4f4f4;
+    --ink-muted: #a8a8a8;
+    --ink-faint: #757575;
+    --accent: #29abc7;
+    --accent-strong: #3fc4e0;
+    --accent-soft: rgba(41,171,199,0.16);
+    --accent-soft-ink: #6ed4ec;
+    --good: #9bc93c;
+    --good-soft: rgba(155,201,60,0.16);
+    --good-ink: #b7de5e;
+    --warn: #f8be22;
+    --warn-soft: rgba(248,190,34,0.16);
+    --warn-ink: #f8be22;
+    --crit: #f15a38;
+    --crit-soft: rgba(241,90,56,0.16);
+    --crit-ink: #f68162;
+    --vc-ambiente: #f1812c;
+    --vc-ambiente-soft: rgba(241,129,44,0.16);
+    --vc-ambiente-ink: #f6a05e;
+    --vc-proyeccion: #1f7fc4;
+    --vc-proyeccion-soft: rgba(31,127,196,0.18);
+    --vc-proyeccion-ink: #5fa8dc;
+    --vc-infra: #aedeea;
+    --vc-infra-soft: rgba(174,222,234,0.16);
+    --vc-infra-ink: #aedeea;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 10px 24px -10px rgba(0,0,0,0.7);
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme]) {
+      --bg: #0a0a0a; --surface: #161616; --surface-2: #1e1e1e; --border: #2c2c2c;
+      --ink: #f4f4f4; --ink-muted: #a8a8a8; --ink-faint: #757575;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
+  body { display: flex; min-height: 100vh; }
+
+  .banner {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    background: var(--accent); color: #fff;
+    font-size: 12.5px; text-align: center; padding: 6px 12px;
+    letter-spacing: .01em;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar {
+    width: 236px; flex: 0 0 236px; background: var(--surface-2);
+    border-right: 1px solid var(--border);
+    padding: 40px 16px 16px; display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .profile { text-align: center; padding: 0 8px 16px; }
+  .avatar {
+    width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 20px; font-weight: 600;
+    box-shadow: var(--shadow);
+  }
+  .profile-name { font-weight: 700; font-size: 15px; }
+  .profile-updated { font-size: 11.5px; color: var(--ink-faint); margin-top: 2px; }
+  .score-pill {
+    margin-top: 10px; display: inline-flex; align-items: center; gap: 5px;
+    background: var(--warn-soft); color: var(--warn-ink);
+    border-radius: 999px; padding: 4px 12px; font-size: 12px; font-weight: 700;
+  }
+  .score-pill svg { width: 12px; height: 12px; }
+
+  nav { margin-top: 18px; display: flex; flex-direction: column; gap: 2px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border-radius: 10px; cursor: pointer;
+    font-size: 13.5px; color: var(--ink-muted); font-weight: 500;
+    border: none; background: none; text-align: left; width: 100%;
+  }
+  .nav-item svg { width: 17px; height: 17px; flex: 0 0 17px; opacity: .8; }
+  .nav-item:hover { background: var(--surface); color: var(--ink); }
+  .nav-item.active { background: var(--accent-soft); color: var(--accent-soft-ink); font-weight: 700; }
+  .nav-item.active svg { opacity: 1; }
+
+  .sidebar-footer {
+    margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--ink-faint);
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); flex: 0 0 6px; }
+
+  /* ---------- Main ---------- */
+  main { flex: 1; padding: 40px 40px 60px; max-width: 980px; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  h1.greeting { font-size: 26px; margin: 0 0 2px; letter-spacing: -0.01em; }
+  .date-sub { color: var(--ink-muted); font-size: 13.5px; margin-bottom: 20px; }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 20px; }
+  .tab {
+    padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
+    border: 1px solid var(--border); background: var(--surface); color: var(--ink-muted); cursor: pointer;
+  }
+  .tab.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px 20px; margin-bottom: 16px; box-shadow: var(--shadow);
+  }
+  .card h2 {
+    font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--ink-faint); margin: 0 0 12px; font-weight: 700;
+  }
+  .card h2 .icon { margin-right: 6px; }
+
+  .highlight-card { background: linear-gradient(135deg, var(--accent-soft), var(--surface)); border-color: var(--accent-soft); }
+  .highlight-card .label { font-size: 12.5px; font-weight: 700; color: var(--accent-soft-ink); display:flex; align-items:center; gap:6px; }
+  .highlight-card .stat { font-size: 24px; font-weight: 800; margin: 4px 0 2px; }
+  .highlight-card .sub { font-size: 12.5px; color: var(--ink-muted); }
+
+  .idea-card .quote { font-size: 12.5px; color: var(--ink-faint); font-style: italic; margin-bottom: 6px; }
+  .idea-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .tag {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .03em;
+    padding: 3px 9px; border-radius: 6px; text-transform: uppercase;
+  }
+  .tag.vlog { background: var(--accent-soft); color: var(--accent-soft-ink); }
+  .tag.story { background: var(--good-soft); color: var(--good-ink); }
+  .tag.reel { background: var(--warn-soft); color: var(--warn-ink); }
+
+  .agenda-item { display: flex; align-items: center; gap: 12px; }
+  .agenda-icon {
+    width: 34px; height: 34px; border-radius: 9px; background: var(--good-soft); color: var(--good-ink);
+    display: flex; align-items: center; justify-content: center; flex: 0 0 34px;
+  }
+  .agenda-title { font-weight: 700; font-size: 13.5px; }
+  .agenda-sub { font-size: 12px; color: var(--ink-muted); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .network-tile { display: flex; align-items: center; gap: 12px; }
+  .net-icon {
+    width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 15px; font-weight: 800; flex: 0 0 38px;
+  }
+  .net-icon.ig { background: linear-gradient(135deg,#29abc7,#1c7d94); }
+  .net-icon.tt { background: linear-gradient(135deg,#1f7fc4,#14568a); }
+  .net-followers { font-size: 20px; font-weight: 800; }
+  .net-label { font-size: 11.5px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; }
+  .net-delta { font-size: 11px; font-weight: 700; color: var(--good-ink); background: var(--good-soft); border-radius: 6px; padding: 1px 6px; display: inline-block; margin-top: 3px; }
+  .net-er { font-size: 12px; color: var(--ink-muted); margin-top: 3px; }
+
+  .hero-stat { display: flex; align-items: center; gap: 20px; }
+  .hero-number { font-size: 32px; font-weight: 800; color: var(--accent); }
+  .hero-sub { font-size: 12.5px; color: var(--ink-muted); }
+
+  /* Posts view */
+  .filter-row { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .hashtag-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+  .hashtag-row:last-child { border-bottom: none; }
+  .hashtag-name { width: 190px; font-size: 13px; font-weight: 600; flex: 0 0 190px; }
+  .hashtag-bar-track { flex: 1; height: 7px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+  .hashtag-bar-fill { height: 100%; border-radius: 4px; background: var(--accent); }
+  .hashtag-value { width: 62px; text-align: right; font-size: 12.5px; color: var(--ink-muted); flex: 0 0 62px; }
+
+  .series-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .series-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px; background: var(--surface-2); }
+  .series-tag { font-weight: 700; font-size: 13.5px; }
+  .series-meta { font-size: 12px; color: var(--ink-muted); margin: 4px 0 6px; }
+  .series-mult { font-size: 12px; font-weight: 700; color: var(--warn-ink); background: var(--warn-soft); border-radius: 6px; padding: 2px 7px; display: inline-block; }
+
+  .pattern-row { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 10px; }
+  .pattern-item .k { font-size: 11px; text-transform: uppercase; color: var(--ink-faint); letter-spacing: .05em; }
+  .pattern-item .v { font-size: 13.5px; font-weight: 700; margin-top: 2px; }
+  .theme-tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+  .theme-tag { background: var(--accent-soft); color: var(--accent-soft-ink); font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
+  .pattern-text { font-size: 13px; color: var(--ink-muted); line-height: 1.55; margin-top: 6px; }
+
+  /* Audience view */
+  .audience-desc { font-size: 14px; line-height: 1.6; color: var(--ink); margin-bottom: 4px; }
+  .sentiment-bar-track {
+    display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin: 14px 0 8px;
+    border: 1px solid var(--border);
+  }
+  .sentiment-seg.good { background: var(--good); }
+  .sentiment-seg.neutral { background: var(--ink-faint); }
+  .sentiment-seg.crit { background: var(--crit); }
+  .sentiment-legend { display: flex; gap: 16px; font-size: 12px; color: var(--ink-muted); flex-wrap: wrap; }
+  .sentiment-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  .content-idea { padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .content-idea:last-child { border-bottom: none; }
+
+  .keyword-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .keyword-tag { background: var(--surface-2); border: 1px solid var(--border); font-size: 12.5px; padding: 4px 10px; border-radius: 999px; color: var(--ink-muted); }
+
+  .action-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+  .btn {
+    font-size: 12.5px; font-weight: 700; padding: 8px 14px; border-radius: 9px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--surface); color: var(--ink); display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .comment-counts { display: flex; gap: 18px; margin-top: 14px; font-size: 12.5px; color: var(--ink-muted); }
+  .comment-counts b { color: var(--ink); }
+  .explore-link { margin-top: 10px; font-size: 12.5px; color: var(--accent); font-weight: 700; cursor: pointer; }
+
+  /* Campañas view */
+  .disclaimer-note {
+    display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-muted);
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 9px 14px; margin-bottom: 18px;
+  }
+  .disclaimer-note svg { width: 15px; height: 15px; flex: 0 0 15px; color: var(--ink-faint); }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .kpi-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); font-weight: 700; }
+  .kpi-value { font-size: 21px; font-weight: 800; margin-top: 4px; }
+  .kpi-sub { font-size: 11.5px; color: var(--ink-muted); margin-top: 2px; }
+
+  /* ---------- Mini gráficas (donut/línea/barras/pills/tabla) ---------- */
+  .metric-pill-grid { display: flex; flex-direction: column; gap: 8px; }
+  .metric-pill-header, .metric-pill-row { display: grid; grid-template-columns: 108px repeat(3, 1fr); gap: 8px; align-items: center; }
+  .metric-pill-header { font-size: 10.5px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; padding: 0 2px; }
+  .metric-pill-label { font-size: 12.5px; color: var(--ink-muted); font-weight: 700; }
+  .metric-pill { border-radius: 999px; padding: 9px 6px; text-align: center; font-weight: 800; font-size: 13px; }
+  .metric-pill.pill-good { background: var(--good-soft); color: var(--good-ink); }
+  .metric-pill.pill-accent { background: var(--accent-soft); color: var(--accent-soft-ink); }
+  .metric-pill.pill-warn { background: var(--warn-soft); color: var(--warn-ink); }
+
+  .charts-row { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start; }
+  .chart-card-mini { flex: 1 1 220px; min-width: 190px; }
+  .chart-card-mini h4 { font-size: 12px; font-weight: 800; color: var(--ink-muted); margin: 0 0 8px; text-align: center; text-transform: uppercase; letter-spacing: .03em; }
+  .chart-donut-wrap { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: center; }
+  .chart-donut-svg svg { display: block; }
+  .chart-legend { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
+  .chart-legend-item { display: flex; align-items: center; gap: 6px; color: var(--ink-muted); }
+  .chart-legend-item b { color: var(--ink); }
+  .chart-legend-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: 0 0 9px; }
+  .chart-line-wrap svg { display: block; width: 100%; height: auto; }
+  .chart-bar-wrap { display: flex; justify-content: center; }
+  .chart-bar-wrap svg { display: block; }
+
+  .share-table-wrap { overflow-x: auto; margin-top: 8px; }
+  .share-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .share-table th { text-align: left; padding: 6px 7px; color: var(--ink-faint); font-weight: 700; border-bottom: 1px solid var(--border); white-space: nowrap; font-size: 10.5px; text-transform: uppercase; letter-spacing: .03em; }
+  .share-table td { padding: 6px 7px; border-bottom: 1px solid var(--border); white-space: nowrap; font-size: 12px; }
+  .share-table tr.highlight-row td { background: var(--accent-soft); }
+  .share-table tr.total-row td { font-weight: 800; border-top: 2px solid var(--border); border-bottom: none; }
+  .share-bar-cell { min-width: 96px; }
+  .share-bar-track { position: relative; height: 16px; background: var(--surface-2); border-radius: 4px; overflow: hidden; min-width: 70px; }
+  .share-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--accent-soft); }
+  .share-bar-value { position: relative; z-index: 1; padding-left: 6px; font-size: 11.5px; line-height: 16px; color: var(--ink); }
+  .delta-cell { text-align: center; font-weight: 800; border-radius: 6px; }
+
+  .campaign-card { border: 1px solid var(--border); border-radius: 12px; padding: 16px; background: var(--surface-2); margin-bottom: 12px; }
+  .campaign-card:last-child { margin-bottom: 0; }
+  .campaign-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+  .campaign-name { font-weight: 700; font-size: 14px; }
+  .status-pill { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: .03em; }
+  .status-pill.good { background: var(--good-soft); color: var(--good-ink); }
+  .status-pill.warn { background: var(--warn-soft); color: var(--warn-ink); }
+  .status-pill.off { background: var(--surface); color: var(--ink-faint); border: 1px solid var(--border); }
+  .campaign-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 10px; }
+  .campaign-stats .k { font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; }
+  .campaign-stats .v { font-size: 15px; font-weight: 700; margin-top: 2px; }
+  .progress-track { height: 7px; border-radius: 4px; background: var(--surface); overflow: hidden; border: 1px solid var(--border); }
+  .progress-fill { height: 100%; border-radius: 4px; background: var(--accent); }
+  .progress-fill.good { background: var(--good); }
+  .progress-fill.warn { background: var(--warn); }
+  .progress-caption { font-size: 11.5px; color: var(--ink-muted); margin-top: 4px; }
+
+  .reco-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .reco-item:last-child { border-bottom: none; }
+  .reco-icon { flex: 0 0 26px; width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+  .reco-icon.warn { background: var(--warn-soft); }
+  .reco-icon.good { background: var(--good-soft); }
+  .reco-icon.crit { background: var(--crit-soft); }
+  .reco-title { font-weight: 700; font-size: 13.5px; }
+  .reco-text { font-size: 12.5px; color: var(--ink-muted); margin-top: 2px; line-height: 1.5; }
+
+  .camp-subtabs { display: flex; gap: 6px; margin-bottom: 20px; }
+  .camp-panel { display: none; }
+  .camp-panel.active { display: block; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group label { font-size: 12px; font-weight: 700; color: var(--ink-muted); }
+  .form-group input, .form-group textarea, .form-group select {
+    font: inherit; font-size: 13.5px; padding: 9px 12px; border-radius: 9px;
+    border: 1px solid var(--border); background: var(--surface); color: var(--ink);
+    resize: vertical;
+  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    outline: 2px solid var(--accent); outline-offset: 1px;
+  }
+  .platform-toggle { display: flex; gap: 8px; }
+  .chip-check {
+    display: flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px;
+    border: 1px solid var(--border); font-size: 12.5px; font-weight: 600; cursor: pointer; color: var(--ink-muted);
+    background: var(--surface);
+  }
+  .chip-check.selected { background: var(--accent-soft); color: var(--accent-soft-ink); border-color: var(--accent-soft); }
+
+  #plan-output { display: none; }
+  .output-summary { font-size: 14px; line-height: 1.6; margin-bottom: 4px; }
+  .output-summary b { color: var(--accent); }
+  .dist-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+  .dist-label { width: 190px; flex: 0 0 190px; font-size: 13px; font-weight: 600; }
+  .dist-track { flex: 1; height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+  .dist-fill { height: 100%; border-radius: 4px; background: var(--accent); }
+  .dist-value { width: 90px; flex: 0 0 90px; text-align: right; font-size: 12.5px; color: var(--ink-muted); }
+
+  .checklist-group { margin-bottom: 14px; }
+  .checklist-group:last-child { margin-bottom: 0; }
+  .checklist-group h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--accent-soft-ink); margin: 0 0 8px; font-weight: 800; }
+  .checklist-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; padding: 5px 0; color: var(--ink); }
+  .checklist-item svg { flex: 0 0 15px; width: 15px; height: 15px; margin-top: 2px; color: var(--good); }
+
+  .timeline-row { display: flex; gap: 14px; margin-top: 4px; }
+  .timeline-step { flex: 1; border-left: 2px solid var(--accent-soft); padding-left: 12px; }
+  .timeline-step .w { font-size: 11px; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: .04em; }
+  .timeline-step .t { font-size: 12.5px; color: var(--ink-muted); margin-top: 3px; line-height: 1.5; }
+
+  @media (max-width: 760px) {
+    .kpi-row, .campaign-stats, .form-grid { grid-template-columns: 1fr 1fr; }
+    .dist-label { width: 120px; flex-basis: 120px; }
+    .timeline-row { flex-direction: column; }
+  }
+  @media (max-width: 500px) {
+    .kpi-row, .campaign-stats { grid-template-columns: 1fr; }
+  }
+
+  /* Account/type filter + creative-level analysis */
+  .account-filter { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 18px; }
+  .account-filter .form-group { min-width: 220px; }
+  .type-section { margin-bottom: 16px; }
+  .type-heading { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; margin: 22px 0 10px; }
+  .type-heading:first-child { margin-top: 0; }
+  .type-heading .type-dot { width: 9px; height: 9px; border-radius: 50%; }
+  .type-dot.tactica { background: var(--accent); }
+  .type-dot.estrategica { background: var(--good); }
+
+  .creative-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .creative-row:last-child { border-bottom: none; }
+  .creative-fmt {
+    flex: 0 0 42px; width: 42px; height: 42px; border-radius: 10px; background: var(--surface-2);
+    border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+    font-size: 10.5px; font-weight: 800; color: var(--ink-faint); text-transform: uppercase;
+  }
+  .creative-main { flex: 1; min-width: 0; }
+  .creative-name { font-size: 13.5px; font-weight: 700; }
+  .creative-meta { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+  .creative-note { font-size: 12px; color: var(--ink-muted); margin-top: 4px; line-height: 1.5; }
+  .creative-metrics { flex: 0 0 auto; display: flex; gap: 16px; text-align: right; }
+  .creative-metrics .m .k { font-size: 10.5px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .03em; }
+  .creative-metrics .m .v { font-size: 13.5px; font-weight: 700; margin-top: 1px; }
+  .verdict-col { flex: 0 0 84px; text-align: center; }
+
+  .proposal-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px; background: var(--surface-2); margin-bottom: 10px; }
+  .proposal-card:last-child { margin-bottom: 0; }
+  .proposal-fmt { font-size: 11px; font-weight: 700; color: var(--accent-soft-ink); background: var(--accent-soft); border-radius: 6px; padding: 2px 8px; display: inline-block; margin-bottom: 6px; }
+  .proposal-title { font-weight: 700; font-size: 13.5px; margin-bottom: 4px; }
+  .proposal-why { font-size: 12.5px; color: var(--ink-muted); line-height: 1.5; }
+
+  .structure-headline { font-size: 16px; font-weight: 800; color: var(--accent); margin-bottom: 10px; line-height: 1.4; }
+  .structure-list { display: flex; flex-direction: column; gap: 10px; }
+  .structure-list li { font-size: 13px; line-height: 1.55; color: var(--ink); list-style: none; padding-left: 18px; position: relative; }
+  .structure-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+
+  /* Detailed creative briefs (video guion / carrusel slides / imagen) */
+  .brief-label { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); font-weight: 800; margin: 12px 0 6px; }
+  .brief-block:first-of-type .brief-label { margin-top: 10px; }
+  .guion-row { display: flex; gap: 12px; padding: 7px 0; border-bottom: 1px dashed var(--border); }
+  .guion-row:last-child { border-bottom: none; }
+  .guion-time { flex: 0 0 56px; font-size: 12px; font-weight: 700; color: var(--accent); }
+  .guion-text { font-size: 12.5px; line-height: 1.5; color: var(--ink); }
+  .guion-text b { font-weight: 700; }
+  .slide-item { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px dashed var(--border); }
+  .slide-item:last-child { border-bottom: none; }
+  .slide-num {
+    flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-soft-ink);
+    display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800;
+  }
+  .slide-visual { font-size: 12.5px; color: var(--ink-muted); }
+  .slide-text { font-size: 12.5px; font-style: italic; color: var(--ink); margin-top: 2px; }
+  .brief-note { font-size: 12.5px; color: var(--ink-muted); margin-top: 8px; line-height: 1.5; }
+  .needs-list .checklist-item { padding: 3px 0; }
+
+  .bullet-list { display: flex; flex-direction: column; gap: 10px; }
+  .bullet-item { display: flex; gap: 9px; align-items: flex-start; font-size: 13px; line-height: 1.55; color: var(--ink); }
+  .bullet-item .bicon { flex: 0 0 18px; }
+
+  .do-dont-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .do-dont-col h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; margin: 0 0 10px; font-weight: 800; }
+  .do-dont-col.do h3 { color: var(--good-ink); }
+  .do-dont-col.dont h3 { color: var(--crit-ink); }
+
+  @media (max-width: 760px) {
+    .do-dont-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Global account bar */
+  .account-bar {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 22px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 10px 14px; box-shadow: var(--shadow);
+  }
+  .account-bar label { font-size: 12px; font-weight: 700; color: var(--ink-muted); white-space: nowrap; }
+  .account-bar select {
+    flex: 1; max-width: 320px; font: inherit; font-size: 13.5px; padding: 7px 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--ink); font-weight: 700;
+  }
+
+  /* Variable Crítica chip */
+  .vc-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-right: 6px; }
+  .vc-chip.ambiente { background: var(--vc-ambiente-soft); color: var(--vc-ambiente-ink); }
+  .vc-chip.proyeccion { background: var(--vc-proyeccion-soft); color: var(--vc-proyeccion-ink); }
+  .vc-chip.infraestructura { background: var(--vc-infra-soft); color: var(--vc-infra-ink); }
+  .vc-chip.ninguna { background: var(--surface-2); color: var(--ink-faint); border: 1px solid var(--border); }
+  .vc-note { font-size: 12px; color: var(--ink-muted); margin: 4px 0 10px; line-height: 1.5; }
+
+  /* Visual mockups (storyboard-style previews) */
+  .mock-strip { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 12px; margin-bottom: 4px; }
+  .mock-slide-wrap { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 0 0 auto; }
+  .mock-slide-num { font-size: 10px; font-weight: 800; color: var(--ink-faint); }
+  .mock-time { font-size: 10px; font-weight: 700; color: var(--accent); }
+  .mock-arrow { align-self: center; color: var(--ink-faint); font-size: 16px; margin-top: -20px; }
+  .ig-mock {
+    position: relative; border-radius: 12px; overflow: hidden; color: #fff;
+    display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);
+  }
+  .ig-mock.sq { width: 96px; height: 96px; }
+  .ig-mock.tall { width: 84px; height: 132px; }
+  .ig-mock.big { width: min(220px, 100%); height: 220px; margin-bottom: 10px; }
+  .ig-mock-icon { font-size: 30px; opacity: .92; filter: drop-shadow(0 1px 2px rgba(0,0,0,.25)); }
+  .ig-mock.big .ig-mock-icon { font-size: 52px; }
+  .ig-mock-caption {
+    position: absolute; left: 0; right: 0; bottom: 0; background: linear-gradient(transparent, rgba(0,0,0,.68));
+    font-size: 9px; line-height: 1.25; padding: 14px 6px 6px; text-align: center; font-weight: 700;
+  }
+  .ig-mock.big .ig-mock-caption { font-size: 12px; padding: 20px 12px 10px; }
+
+  /* Calendario: posts semanales + parrilla de historias */
+  .weekly-posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .weekly-post-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px; background: var(--surface-2); }
+  .weekly-post-day { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-faint); margin-bottom: 8px; }
+  .weekly-post-title { font-weight: 700; font-size: 13.5px; margin: 8px 0 4px; }
+  .alumni-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; margin-top: 6px; }
+  .alumni-chip.yes { background: var(--vc-proyeccion-soft); color: var(--vc-proyeccion-ink); }
+  .alumni-chip.no { background: var(--surface); color: var(--ink-faint); border: 1px solid var(--border); }
+
+  .stories-week { margin-bottom: 18px; }
+  .stories-week:last-child { margin-bottom: 0; }
+  .stories-week h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--accent-soft-ink); margin: 0 0 8px; font-weight: 800; }
+  .story-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .story-row:last-child { border-bottom: none; }
+  .story-day { flex: 0 0 90px; font-size: 12.5px; font-weight: 700; }
+  .story-tema { flex: 1; font-size: 13px; color: var(--ink); }
+  .story-status { flex: 0 0 auto; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+  .story-status.lista { background: var(--good-soft); color: var(--good-ink); }
+  .story-status.evento { background: var(--warn-soft); color: var(--warn-ink); }
+
+  @media (max-width: 760px) {
+    .weekly-posts-grid { grid-template-columns: 1fr; }
+    .story-row { flex-wrap: wrap; }
+  }
+
+  /* Eventos del mes -> parrilla */
+  .events-form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+  .events-form textarea {
+    font: inherit; font-size: 13px; padding: 10px 12px; border-radius: 9px; min-height: 90px;
+    border: 1px solid var(--border); background: var(--surface); color: var(--ink); resize: vertical;
+  }
+  .events-form textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .events-overflow-note { font-size: 12px; color: var(--warn-ink); margin-top: 6px; }
+
+  /* Reparto con practicante */
+  .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 6px; }
+  .split-col h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; margin: 0 0 10px; font-weight: 800; color: var(--accent-soft-ink); }
+  .split-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .split-item:last-child { border-bottom: none; }
+  .split-empty { font-size: 12.5px; color: var(--ink-faint); font-style: italic; }
+  @media (max-width: 760px) { .split-grid { grid-template-columns: 1fr; } }
+
+  /* Seguimiento de leads */
+  .leads-textarea {
+    width: 100%; font: inherit; font-size: 12.5px; font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    padding: 12px; border-radius: 9px; min-height: 130px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--ink); resize: vertical; white-space: pre;
+  }
+  .leads-textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .sede-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .sede-row:last-child { border-bottom: none; }
+  .sede-name { width: 120px; flex: 0 0 120px; font-weight: 700; }
+  .sede-bar-track { flex: 1; height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+  .sede-bar-fill { height: 100%; border-radius: 4px; background: var(--crit); }
+  .sede-counts { width: 130px; flex: 0 0 130px; text-align: right; font-size: 12px; color: var(--ink-muted); }
+  .leads-empty-state { text-align: center; padding: 30px 10px; color: var(--ink-faint); font-size: 13px; }
+  .bar-fill-good { background: var(--good) !important; }
+  .bar-fill-accent { background: var(--accent) !important; }
+
+  /* Constancia */
+  .constancia-check-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; cursor: pointer; }
+  .constancia-check-row:last-child { border-bottom: none; }
+  .constancia-check-row input { width: 17px; height: 17px; accent-color: var(--accent); flex: 0 0 17px; }
+
+  /* Próximos: tabla genérica */
+  .simple-table-wrap { overflow-x: auto; }
+  .simple-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .simple-table th, .simple-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+  .simple-table th { color: var(--ink-muted); font-weight: 700; text-transform: uppercase; font-size: 10.5px; letter-spacing: .04em; }
+
+  /* Selector de periodo (calendario + accesos rápidos) */
+  .period-picker-wrap { position: relative; margin-bottom: 14px; }
+  .period-picker-label { font-size: 12px; font-weight: 700; color: var(--ink-muted); margin-bottom: 6px; }
+  .period-trigger {
+    display: flex; align-items: center; gap: 10px; font: inherit; font-size: 13.5px; font-weight: 700;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px;
+    color: var(--ink); cursor: pointer; box-shadow: var(--shadow);
+  }
+  .period-trigger:hover { border-color: var(--accent); }
+  .period-popover {
+    position: absolute; top: calc(100% + 8px); left: 0; z-index: 30; display: flex;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    box-shadow: var(--shadow); overflow: hidden; max-width: 96vw;
+  }
+  .period-popover[hidden] { display: none; }
+  .period-calendar { padding: 16px; border-right: 1px solid var(--border); overflow-x: auto; }
+  .period-calendar-months { display: flex; gap: 22px; }
+  .period-month-title { text-align: center; font-weight: 700; font-size: 12.5px; margin-bottom: 8px; color: var(--ink-muted); }
+  .period-month-grid { display: grid; grid-template-columns: repeat(7, 26px); gap: 3px; }
+  .period-month-grid .dow { font-size: 10px; color: var(--ink-faint); text-align: center; padding-bottom: 2px; }
+  .period-day { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 11.5px; border-radius: 6px; color: var(--ink-muted); }
+  .period-day.empty { visibility: hidden; }
+  .period-day.in-range { background: var(--surface-2); color: var(--ink); }
+  .period-day.range-edge { background: var(--ink); color: var(--bg); font-weight: 700; }
+  .period-day.today-mark { outline: 1px solid var(--accent); outline-offset: -1px; }
+  .period-quicklist { padding: 10px; min-width: 190px; display: flex; flex-direction: column; }
+  .period-quick-btn {
+    text-align: left; background: none; border: none; font: inherit; font-size: 13px; color: var(--ink);
+    padding: 9px 12px; border-radius: 8px; cursor: pointer;
+  }
+  .period-quick-btn:hover { background: var(--surface-2); }
+  .period-quick-btn.active { background: var(--accent-soft); color: var(--accent-soft-ink); font-weight: 700; }
+  @media (max-width: 700px) { .period-popover { flex-direction: column; } .period-calendar { border-right: none; border-bottom: 1px solid var(--border); } }
+
+  /* Placeholder view */
+  .placeholder { text-align: center; padding: 60px 20px; }
+  .placeholder .icon-wrap {
+    width: 56px; height: 56px; border-radius: 14px; background: var(--accent-soft); color: var(--accent-soft-ink);
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+  }
+  .placeholder h3 { font-size: 17px; margin: 0 0 6px; }
+  .placeholder p { font-size: 13.5px; color: var(--ink-muted); max-width: 380px; margin: 0 auto; line-height: 1.6; }
+
+  @media (max-width: 760px) {
+    body { flex-direction: column; }
+    .sidebar { width: 100%; flex: none; height: auto; position: static; padding: 16px; }
+    nav { flex-direction: row; flex-wrap: wrap; }
+    main { padding: 24px 16px 40px; }
+    .grid-2, .series-grid { grid-template-columns: 1fr; }
+    .hashtag-name { width: 120px; flex-basis: 120px; }
+  }
+</style>
+</head>
+<body>
+<div class="banner">📡 Panel de Kipper · aún no hay datos conectados — cada sección queda lista para cargar datos reales de Proviser Seguridad y Nass Tecnología.</div>
+
+<aside class="sidebar" style="margin-top:28px;">
+  <div class="profile">
+    <div class="avatar">K</div>
+    <div class="profile-name">Kipper</div>
+    <div class="profile-updated">Sin datos conectados</div>
+  </div>
+
+  <nav id="nav">
+    <button class="nav-item active" data-view="inicio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      Inicio
+    </button>
+    <button class="nav-item" data-view="posts">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="7" height="7"/><rect x="14" y="4" width="7" height="7"/><rect x="3" y="15" width="7" height="5"/><rect x="14" y="13" width="7" height="7"/></svg>
+      Posts
+    </button>
+    <button class="nav-item" data-view="constancia">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M12 19V5M20 19v-6"/></svg>
+      Constancia
+    </button>
+    <button class="nav-item" data-view="ideas">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M9 21h6M10 18h4"/></svg>
+      Ideas IA
+    </button>
+    <button class="nav-item" data-view="asistente">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="13" rx="2"/><path d="M8 21h8M9 8h.01M15 8h.01"/></svg>
+      Asistente
+    </button>
+    <button class="nav-item" data-view="audiencia">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Mi audiencia
+    </button>
+    <button class="nav-item" data-view="parrilla">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+      Parrilla
+    </button>
+    <button class="nav-item" data-view="tendencias">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>
+      Tendencias
+    </button>
+    <button class="nav-item" data-view="competencia">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20c0-3 2.5-5 6-5s6 2 6 5M14 20c0-2 1.8-3.5 4.5-3.5S23 18 23 20"/></svg>
+      Competencia
+    </button>
+    <button class="nav-item" data-view="leads">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+      Leads
+    </button>
+    <button class="nav-item" data-view="campanas">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l18-7-6 18-3-8-8-3z"/></svg>
+      Campañas
+    </button>
+  </nav>
+
+  <div class="sidebar-footer"><span class="dot"></span> Sin conexión de datos</div>
+</aside>
+
+<main>
+
+  <div class="account-bar">
+    <label for="global-cuenta">📍 Marca</label>
+    <select id="global-cuenta">
+      <option value="proviser">Proviser Seguridad</option>
+      <option value="nass">Nass Tecnología</option>
+    </select>
+  </div>
+
+  <!-- INICIO -->
+  <section class="view active" id="view-inicio">
+    <h1 class="greeting" id="home-greeting">Buenos días 👋</h1>
+    <div class="date-sub" id="today-date"></div>
+
+    <div class="tabs" id="home-network-tabs">
+      <div class="tab active" data-network="todo">Todo</div>
+      <div class="tab" data-network="ig">Instagram</div>
+      <div class="tab" data-network="fb">Facebook</div>
+    </div>
+
+    <div class="card highlight-card">
+      <div class="label">🔥 Tu último post</div>
+      <div class="leads-empty-state" id="home-lastpost">Aún no conectado. Cuando conectes la cuenta de esta marca, aquí aparece tu post más reciente y su rendimiento.</div>
+    </div>
+
+    <div class="card">
+      <h2>📊 Cumplimiento de metas</h2>
+      <div class="leads-empty-state" id="home-metas-pills">Aún no hay metas definidas ni datos conectados para esta marca.</div>
+    </div>
+
+    <div class="card idea-card">
+      <h2>⚡ Esto te toca hoy</h2>
+      <div class="leads-empty-state" id="home-idea">Aún no conectado. Las ideas del día aparecen aquí cuando haya datos de la cuenta.</div>
+    </div>
+
+    <div class="card">
+      <h2>📅 En tu agenda</h2>
+      <div class="leads-empty-state" id="home-agenda">Aún no conectado. Tu contenido agendado aparece aquí.</div>
+    </div>
+
+    <div class="grid-2" id="home-networks-grid">
+      <div class="card" id="home-ig-card">
+        <h2>📊 Mis redes</h2>
+        <div class="network-tile">
+          <div class="net-icon ig">IG</div>
+          <div class="leads-empty-state" id="home-ig-stats" style="text-align:left;padding:6px 0">Sin cuenta de Instagram conectada.</div>
+        </div>
+      </div>
+      <div class="card" id="home-fb-card">
+        <h2>&nbsp;</h2>
+        <div class="network-tile">
+          <div class="net-icon tt">FB</div>
+          <div class="leads-empty-state" id="home-fb-stats" style="text-align:left;padding:6px 0">Sin página de Facebook conectada.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>⏰ Mejor hora para publicar</h2>
+      <div class="leads-empty-state" id="home-besttime">Aún no conectado. Se calcula con la actividad real de tus seguidores.</div>
+    </div>
+  </section>
+
+  <!-- POSTS -->
+  <section class="view" id="view-posts">
+    <h1 class="greeting">Mis posts</h1>
+    <div class="date-sub">Análisis de todo tu contenido publicado</div>
+
+    <div class="filter-row">
+      <div class="tab active">Todos los tipos</div>
+      <div class="tab">Reels</div>
+      <div class="tab">Carruseles</div>
+      <div class="tab">Fotos</div>
+    </div>
+
+    <div class="card">
+      <h2>🎬 Mezcla de parrilla</h2>
+      <div class="leads-empty-state" id="posts-parrilla-donut">Aún no conectado. La distribución de piezas por formato aparece aquí cuando haya publicaciones cargadas.</div>
+    </div>
+
+    <div class="card">
+      <h2>🏷️ Hashtags que más engagement te traen</h2>
+      <div class="leads-empty-state" id="posts-hashtags">Aún no conectado.</div>
+    </div>
+
+    <div class="card">
+      <h2>📺 Series detectadas</h2>
+      <div class="leads-empty-state" id="posts-series">Aún no conectado.</div>
+    </div>
+
+    <div class="card">
+      <h2>🎬 Patrón de tus Reels/Carruseles</h2>
+      <div class="leads-empty-state" id="posts-pattern">Aún no conectado.</div>
+    </div>
+
+    <div class="card">
+      <h2>💡 Ideas de contenido orgánico</h2>
+      <div class="leads-empty-state" id="posts-organic-ideas">Aún no conectado. Las propuestas de contenido aparecen aquí cuando haya datos de la cuenta.</div>
+    </div>
+  </section>
+
+  <!-- MI AUDIENCIA -->
+  <section class="view" id="view-audiencia">
+    <h1 class="greeting">Mi audiencia</h1>
+    <div class="date-sub" id="audiencia-period">Quién te sigue y cuándo está más activa</div>
+
+    <div class="card">
+      <h2>📊 Cumplimiento vs. meta</h2>
+      <div class="leads-empty-state" id="audiencia-marzo-kpis">Aún no hay metas definidas ni datos conectados para esta marca.</div>
+    </div>
+
+    <div class="card">
+      <h2>⚥ Sexo</h2>
+      <div class="leads-empty-state" id="audiencia-gender">Todavía no tenemos el desglose de sexo/edad/país para esta cuenta. Conéctala y aparece aquí.</div>
+    </div>
+    <div class="card">
+      <h2>🎂 Rango de edad</h2>
+      <div class="leads-empty-state" id="audiencia-age">Aún no conectado.</div>
+    </div>
+    <div class="card">
+      <h2>🌎 Principales países</h2>
+      <div class="leads-empty-state" id="audiencia-places">Aún no conectado.</div>
+    </div>
+    <div class="card">
+      <h2>⏰ Cuándo está más activa tu audiencia</h2>
+      <div class="leads-empty-state" id="audiencia-besttime">Aún no conectado. Se calcula con la actividad de tus seguidores en Instagram.</div>
+    </div>
+  </section>
+
+  <!-- CONSTANCIA -->
+  <section class="view" id="view-constancia">
+    <h1 class="greeting">Constancia</h1>
+    <div class="date-sub">Tu meta: 3 posts por semana (lunes, miércoles, viernes)</div>
+
+    <div class="card">
+      <h2>✅ Esta semana</h2>
+      <div id="constancia-week"></div>
+    </div>
+
+    <div class="card">
+      <h2>🔥 Racha</h2>
+      <div class="hero-stat">
+        <div class="hero-number" id="constancia-streak"></div>
+        <div class="hero-sub" id="constancia-streak-sub"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📊 Últimas semanas</h2>
+      <div id="constancia-history"></div>
+    </div>
+
+    <p class="vc-note">La racha se cuenta desde que empieces a marcar aquí — no hay forma de ver automáticamente lo que publicaste antes de usar esta herramienta. Se guarda solo en este navegador.</p>
+  </section>
+
+  <!-- IDEAS IA -->
+  <section class="view" id="view-ideas">
+    <div class="placeholder"><div class="icon-wrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M9 21h6M10 18h4"/></svg></div><h3>Ideas IA</h3><p>Un banco de ideas de contenido generadas a partir de tus comentarios, tendencias y lo que mejor te funciona. Se activa cuando conectes datos reales.</p></div>
+  </section>
+
+  <!-- ASISTENTE -->
+  <section class="view" id="view-asistente">
+    <div class="placeholder"><div class="icon-wrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="13" rx="2"/><path d="M8 21h8M9 8h.01M15 8h.01"/></svg></div><h3>Asistente</h3><p>Un chat para pedir guiones, respuestas a comentarios o ajustes de estrategia, con el contexto de tu cuenta ya cargado. Se activa cuando conectes datos reales.</p></div>
+  </section>
+
+  <!-- PARRILLA -->
+  <section class="view" id="view-parrilla">
+    <h1 class="greeting">Parrilla</h1>
+    <div class="date-sub">Tu cronograma de posts y lo que entregas cada semana</div>
+
+    <div class="card">
+      <h2>📋 Pega tu cronograma</h2>
+      <p class="vc-note" style="margin-top:-4px">Copia las filas de tu Excel de programación (con encabezado) y pégalas aquí. Se muestran tal cual, con las columnas que tú uses.</p>
+      <textarea class="leads-textarea" id="proximos-input" placeholder="Pega aquí las filas copiadas de tu Excel de cronograma…"></textarea>
+      <div class="action-row" style="margin-top:10px">
+        <button class="btn primary" id="show-proximos-btn">📆 Mostrar cronograma</button>
+      </div>
+    </div>
+
+    <div id="proximos-output">
+      <div class="card"><div class="leads-empty-state">Pega tu cronograma y dale a "Mostrar cronograma" para verlo aquí.</div></div>
+    </div>
+
+    <div class="card">
+      <h2>📋 Posts de esta semana — listos para programar</h2>
+      <div class="leads-empty-state" id="calendario-posts">Aún no conectado. Cuando cargues tu parrilla, los posts de la semana aparecen aquí.</div>
+    </div>
+
+    <div class="card">
+      <h2>🗂️ Parrilla de historias <span style="text-transform:none;font-weight:400;color:var(--ink-faint)">— 3 días por semana, entregada con 3 semanas de anticipación</span></h2>
+      <p class="vc-note" style="margin-top:-4px">La parrilla planea el <b>tema y el día</b>, no siempre la pieza final — muchas historias se graban el día del evento.</p>
+
+      <div class="events-form">
+        <label class="brief-label" style="margin:0">Eventos del mes (uno por línea — dime qué viene y yo organizo el plan)</label>
+        <textarea id="events-input" placeholder="Feria de seguridad&#10;Capacitación a clientes&#10;Lanzamiento de servicio&#10;Visita a instalación"></textarea>
+        <div>
+          <button class="btn primary" id="generate-stories-btn">🗓️ Generar parrilla con estos eventos</button>
+          <span class="events-overflow-note" id="events-overflow-note"></span>
+        </div>
+      </div>
+
+      <div id="calendario-stories"></div>
+    </div>
+
+    <div class="card">
+      <h2>🎨 Reparto de contenidos con tu equipo de diseño</h2>
+      <p class="vc-note" style="margin-top:-4px">El reparto respeta un tope semanal — lo que no cabe, lo produces tú directo.</p>
+      <div class="form-grid" style="margin-bottom:10px">
+        <div class="form-group">
+          <label for="intern-cap">Máximo de piezas para diseño esta semana</label>
+          <input type="number" id="intern-cap" min="0" max="10" value="2" />
+        </div>
+      </div>
+      <button class="btn primary" id="split-intern-btn">⚖️ Repartir esta semana</button>
+      <div class="split-grid" id="split-output" style="margin-top:14px"></div>
+    </div>
+  </section>
+
+  <!-- TENDENCIAS -->
+  <section class="view" id="view-tendencias">
+    <div class="placeholder"><div class="icon-wrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></div><h3>Tendencias</h3><p>Audios, formatos y temas que están creciendo ahora mismo en tu nicho de seguridad. Se activa cuando conectes datos reales.</p></div>
+  </section>
+
+  <!-- COMPETENCIA -->
+  <section class="view" id="view-competencia">
+    <h1 class="greeting">Competencia</h1>
+    <div class="date-sub">Tu competencia directa en Cali — seguidores, engagement y share of voice</div>
+
+    <div class="card">
+      <h2 id="referentes-competencia-title">🏢 Tu competencia directa en Cali</h2>
+      <div class="leads-empty-state" id="referentes-competencia">Aún no has cargado competidores. Cuando agregues cuentas de empresas de seguridad privada y seguridad electrónica de Cali, aparecen aquí con sus seguidores y engagement.</div>
+    </div>
+
+    <div class="card">
+      <h2>🥇 Share of voice en Cali</h2>
+      <p class="vc-note" style="margin-top:-4px">Tus marcas frente a cada competidor — % del total de seguidores entre las cuentas comparadas.</p>
+      <div class="leads-empty-state" id="referentes-share">Aún no conectado. Se calcula al cargar los competidores.</div>
+    </div>
+  </section>
+
+  <!-- LEADS -->
+  <section class="view" id="view-leads">
+    <h1 class="greeting">Leads</h1>
+    <div class="date-sub">Todos tus leads — pagados de Meta Ads + orgánicos de Instagram, por marca</div>
+
+    <div class="card">
+      <h2>🎯 Todos tus leads — pagados + orgánicos, por marca</h2>
+      <div class="leads-empty-state" id="referentes-leads-table">Aún no conectado. Cuando cargues datos reales de Meta Ads y de Instagram, aquí verás Proviser Seguridad y Nass Tecnología lado a lado.</div>
+    </div>
+  </section>
+
+  <!-- CAMPAÑAS -->
+  <section class="view" id="view-campanas">
+    <h1 class="greeting">Campañas</h1>
+    <div class="date-sub">Análisis de tus campañas en Meta Ads y planeación de las próximas</div>
+
+    <div class="disclaimer-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5h.01"/></svg>
+      Este panel solo analiza y sugiere — no hace cambios en Meta Ads. Los ajustes los aplicas tú o tu equipo.
+    </div>
+
+    <div class="camp-subtabs">
+      <div class="tab active" data-camp="analisis">Análisis y recomendaciones</div>
+      <div class="tab" data-camp="plan">Planear campaña nueva</div>
+      <div class="tab" data-camp="leads">Seguimiento de leads</div>
+    </div>
+
+    <!-- ANÁLISIS -->
+    <div class="camp-panel active" id="camp-analisis">
+      <p class="date-sub" style="margin-top:-8px">Mostrando datos de la marca seleccionada arriba ⤴</p>
+      <div class="disclaimer-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5h.01"/></svg>
+        📡 Aún no hay datos de Meta Ads conectados. Cuando configures el acceso a la cuenta publicitaria de cada marca, aquí verás leads, CPL, alcance y gasto de las campañas Táctica y Estratégica.
+      </div>
+      <p class="vc-note" id="live-data-note"></p>
+
+      <div id="analysis-kpis" class="leads-empty-state">Aún no conectado.</div>
+
+      <div class="card">
+        <h2>📣 Campañas de esta marca</h2>
+        <div class="leads-empty-state" id="analysis-campaigns">Aún no conectado.</div>
+      </div>
+
+      <div class="card">
+        <h2>🔍 Análisis por creatividad</h2>
+        <div class="leads-empty-state" id="analysis-creatives">Aún no conectado.</div>
+      </div>
+
+      <div class="card">
+        <h2>💡 Propuesta de creatividades para potenciar</h2>
+        <div class="leads-empty-state" id="analysis-proposals">Aún no conectado.</div>
+      </div>
+
+      <div class="card">
+        <h2>🕵️ Qué está haciendo la competencia</h2>
+        <div class="leads-empty-state" id="analysis-competencia">Aún no conectado.</div>
+      </div>
+
+      <div class="card">
+        <h2>✅🚫 Qué hacer y qué no hacer</h2>
+        <div class="leads-empty-state" id="analysis-dodont">Aún no conectado.</div>
+      </div>
+
+      <div class="card">
+        <h2>🔮 Predicciones de tendencias</h2>
+        <div class="leads-empty-state" id="analysis-tendencias">Aún no conectado.</div>
+      </div>
+
+      <div class="card">
+        <h2>🎯 Recomendaciones puntuales</h2>
+        <div class="leads-empty-state" id="analysis-recos">Aún no conectado.</div>
+      </div>
+    </div>
+
+    <!-- PLANEAR CAMPAÑA -->
+    <div class="camp-panel" id="camp-plan">
+      <div class="card">
+        <h2>🗒️ Cuéntame la idea de tu próxima campaña</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="p-cuenta">Marca</label>
+            <select id="p-cuenta">
+              <option value="proviser">Proviser Seguridad</option>
+              <option value="nass">Nass Tecnología</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="p-tipo">Tipo de comunicación</label>
+            <select id="p-tipo">
+              <option value="tactica">Táctica (leads / conversiones)</option>
+              <option value="estrategica">Estratégica (conocimiento de marca)</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label for="p-idea">¿Cuál es la idea de la campaña?</label>
+            <textarea id="p-idea" rows="2" placeholder="Ej: Captar empresas que necesitan vigilancia para sus instalaciones"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="p-leads">Meta de leads on target</label>
+            <input type="number" id="p-leads" min="1" placeholder="150" />
+          </div>
+          <div class="form-group">
+            <label for="p-budget">Presupuesto disponible (USD)</label>
+            <input type="number" id="p-budget" min="1" placeholder="900" />
+          </div>
+          <div class="form-group">
+            <label for="p-publicos">Públicos o ángulos distintos a probar</label>
+            <input type="number" id="p-publicos" min="1" max="6" value="3" />
+          </div>
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <div class="chip-check" id="p-otro-tipo-toggle" data-selected="false">También correré <span id="p-otro-tipo-label">Estratégica</span> en paralelo para esta marca</div>
+          </div>
+          <div class="form-group full">
+            <label>Dónde la vas a correr</label>
+            <div class="platform-toggle">
+              <div class="chip-check selected" data-platform="ig">Instagram</div>
+              <div class="chip-check selected" data-platform="fb">Facebook</div>
+            </div>
+          </div>
+        </div>
+        <button class="btn primary" id="generate-plan-btn">✨ Generar plan de campaña</button>
+      </div>
+
+      <div id="plan-output">
+        <div class="card">
+          <h2>📋 Resumen del plan</h2>
+          <p class="output-summary" id="output-summary"></p>
+        </div>
+
+        <div class="card">
+          <h2>🧩 Estructura de campaña recomendada</h2>
+          <div class="structure-headline" id="output-structure-headline"></div>
+          <ul class="structure-list" id="output-structure-list"></ul>
+        </div>
+
+        <div class="card">
+          <h2>💰 Distribución sugerida del presupuesto</h2>
+          <div id="output-distribution"></div>
+        </div>
+
+        <div class="card">
+          <h2>🎬 Piezas que debes producir</h2>
+          <div class="checklist-group" id="output-pieces"></div>
+        </div>
+
+        <div class="card">
+          <h2>👥 Qué pedirle a tu equipo</h2>
+          <div id="output-team"></div>
+        </div>
+
+        <div class="card">
+          <h2>📆 Cronograma sugerido</h2>
+          <div class="timeline-row">
+            <div class="timeline-step"><div class="w">Semana 1</div><div class="t">Producción de piezas y configuración de tracking (pixel + UTMs) con tu equipo.</div></div>
+            <div class="timeline-step"><div class="w">Semana 2</div><div class="t">Lanzamiento con presupuesto reducido (20%) para probar qué conjunto de anuncios funciona mejor.</div></div>
+            <div class="timeline-step"><div class="w">Semana 3–4</div><div class="t">Escalar presupuesto en el conjunto ganador y pausar el de peor CPL.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEGUIMIENTO DE LEADS -->
+    <div class="camp-panel" id="camp-leads">
+      <div class="card">
+        <h2>📋 Pega aquí el archivo semanal de leads</h2>
+        <p class="vc-note" style="margin-top:-4px">Copia las columnas directo de tu Excel (por ejemplo: Marca, Fecha, Campaña, Origen, Nombre, Correo, Teléfono, Estado, Leads de calidad, Razones de la pérdida, Observaciones) y pégalas aquí cada semana.</p>
+        <textarea class="leads-textarea" id="leads-input" placeholder="Pega aquí las filas copiadas de Excel (incluyendo el encabezado)…"></textarea>
+        <div class="action-row" style="margin-top:10px">
+          <button class="btn primary" id="analyze-leads-btn">📊 Analizar leads</button>
+        </div>
+      </div>
+
+      <div id="leads-output">
+        <div class="card"><div class="leads-empty-state">Pega tu archivo y dale a "Analizar leads" para ver el reporte aquí.</div></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var accountLabels = { proviser: 'Proviser Seguridad', nass: 'Nass Tecnología' };
+  var tipoLabels = { tactica: 'Comunicación Táctica', estrategica: 'Comunicación Estratégica' };
+  var tipoObjective = { tactica: 'Clientes potenciales / Conversiones (leads)', estrategica: 'Reconocimiento de marca / Interacción' };
+  var checkIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>';
+
+  function el(id) { return document.getElementById(id); }
+  function setText(id, t) { var e = el(id); if (e) e.textContent = t; }
+  function fmtMoney(n) { return '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
+
+  var td = el('today-date');
+  if (td) td.textContent = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  // ---------- Navegación entre vistas ----------
+  document.querySelectorAll('.nav-item').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.nav-item').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
+      btn.classList.add('active');
+      var v = el('view-' + btn.dataset.view);
+      if (v) v.classList.add('active');
+    });
+  });
+
+  // ---------- Campañas: subtabs ----------
+  document.querySelectorAll('.camp-subtabs .tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('.camp-subtabs .tab').forEach(function (t) { t.classList.remove('active'); });
+      document.querySelectorAll('.camp-panel').forEach(function (p) { p.classList.remove('active'); });
+      tab.classList.add('active');
+      var p = el('camp-' + tab.dataset.camp);
+      if (p) p.classList.add('active');
+    });
+  });
+
+  // ---------- Chips (plataformas / toggle) ----------
+  document.querySelectorAll('.chip-check').forEach(function (chip) {
+    chip.addEventListener('click', function () { chip.classList.toggle('selected'); });
+  });
+
+  // ---------- Inicio: filtro Todo / Instagram / Facebook ----------
+  document.querySelectorAll('#home-network-tabs .tab').forEach(function (tabEl) {
+    tabEl.addEventListener('click', function () {
+      document.querySelectorAll('#home-network-tabs .tab').forEach(function (t) { t.classList.remove('active'); });
+      tabEl.classList.add('active');
+      var network = tabEl.getAttribute('data-network');
+      var igCard = el('home-ig-card'), fbCard = el('home-fb-card');
+      if (!igCard || !fbCard) return;
+      igCard.style.display = (network === 'fb') ? 'none' : '';
+      fbCard.style.display = (network === 'ig') ? 'none' : '';
+      igCard.style.gridColumn = (network === 'ig') ? '1 / -1' : '';
+      fbCard.style.gridColumn = (network === 'fb') ? '1 / -1' : '';
+    });
+  });
+
+  // ---------- Selector de marca ----------
+  var cuentaSel = el('global-cuenta');
+  function currentAccount() { return cuentaSel ? cuentaSel.value : 'proviser'; }
+  function refreshAccount() {
+    setText('home-greeting', 'Buenos días 👋 — ' + accountLabels[currentAccount()]);
+    renderConstancia(currentAccount());
+  }
+  if (cuentaSel) cuentaSel.addEventListener('change', refreshAccount);
+
+  // ---------- Constancia (racha marcada por ti · se guarda solo en este navegador) ----------
+  var CONSTANCIA_DAYS = ['Lunes', 'Miércoles', 'Viernes'];
+  function getMondayKey(date) {
+    var d = (typeof date === 'string') ? new Date(date + 'T00:00:00') : new Date(date);
+    var day = d.getDay(), diff = (day === 0 ? -6 : 1 - day);
+    d.setDate(d.getDate() + diff); d.setHours(0, 0, 0, 0);
+    var m = d.getMonth() + 1, dd = d.getDate();
+    return d.getFullYear() + '-' + (m < 10 ? '0' + m : m) + '-' + (dd < 10 ? '0' + dd : dd);
+  }
+  function loadConstancia() { try { return JSON.parse(localStorage.getItem('kipper_constancia') || '{}'); } catch (e) { return {}; } }
+  function saveConstancia(data) { try { localStorage.setItem('kipper_constancia', JSON.stringify(data)); } catch (e) {} }
+  function renderConstancia(account) {
+    var weekEl = el('constancia-week');
+    if (!weekEl) return;
+    var data = loadConstancia();
+    if (!data[account]) data[account] = {};
+    var todayKey = getMondayKey(new Date());
+    var weekLog = data[account][todayKey] || {};
+
+    weekEl.innerHTML = CONSTANCIA_DAYS.map(function (day) {
+      var checked = !!weekLog[day];
+      return '<label class="constancia-check-row"><input type="checkbox" data-day="' + day + '" ' + (checked ? 'checked' : '') + '/> <span>' + day + ' — publiqué</span></label>';
+    }).join('');
+
+    weekEl.querySelectorAll('input[type=checkbox]').forEach(function (cb) {
+      cb.addEventListener('change', function () {
+        var d = loadConstancia();
+        if (!d[account]) d[account] = {};
+        if (!d[account][todayKey]) d[account][todayKey] = {};
+        d[account][todayKey][cb.dataset.day] = cb.checked;
+        saveConstancia(d);
+        renderConstancia(account);
+      });
+    });
+
+    var streak = 0, cursor = new Date(todayKey + 'T00:00:00');
+    cursor.setDate(cursor.getDate() - 7);
+    while (true) {
+      var wk = data[account][getMondayKey(cursor)];
+      if (wk && CONSTANCIA_DAYS.every(function (dd) { return wk[dd]; })) { streak++; cursor.setDate(cursor.getDate() - 7); }
+      else break;
+    }
+    setText('constancia-streak', streak + (streak === 1 ? ' semana' : ' semanas'));
+    setText('constancia-streak-sub', streak > 0
+      ? 'Semanas seguidas cumpliendo tus 3 posts, antes de esta semana en curso.'
+      : 'Aún no completas una semana entera marcada — empieza marcando tus posts de esta semana.');
+
+    var hc = new Date(todayKey + 'T00:00:00'), rows = [];
+    for (var i = 0; i < 6; i++) {
+      var key2 = getMondayKey(hc), wk2 = data[account][key2] || {};
+      var count = CONSTANCIA_DAYS.filter(function (dd) { return wk2[dd]; }).length;
+      rows.push({ label: (i === 0 ? 'Esta semana' : 'Semana') + ' (desde ' + key2 + ')', count: count });
+      hc.setDate(hc.getDate() - 7);
+    }
+    var hist = el('constancia-history');
+    if (hist) hist.innerHTML = rows.map(function (r) {
+      var pct = Math.round((r.count / 3) * 100);
+      return '<div class="sede-row"><div class="sede-name">' + r.label + '</div>' +
+        '<div class="sede-bar-track"><div class="sede-bar-fill bar-fill-good" style="width:' + pct + '%"></div></div>' +
+        '<div class="sede-counts">' + r.count + '/3</div></div>';
+    }).join('');
+  }
+
+  // ---------- Parrilla: pega tu cronograma de Excel ----------
+  function parseGenericTable(text) {
+    var lines = text.split(/\r?\n/).filter(function (l) { return l.trim() !== ''; });
+    if (lines.length < 2) return null;
+    var delim = lines[0].indexOf('\t') >= 0 ? '\t' : ',';
+    var headers = lines[0].split(delim).map(function (h) { return h.trim(); });
+    var rows = lines.slice(1).map(function (line) { return line.split(delim).map(function (c) { return c.trim(); }); });
+    return { headers: headers, rows: rows };
+  }
+  function renderProximos(parsed) {
+    var out = el('proximos-output');
+    if (!out) return;
+    if (!parsed) {
+      out.innerHTML = '<div class="card"><div class="leads-empty-state">No pude leer esas filas — asegúrate de incluir el encabezado y pegar directo desde Excel.</div></div>';
+      return;
+    }
+    var thead = '<tr>' + parsed.headers.map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr>';
+    var body = parsed.rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('');
+    out.innerHTML = '<div class="card"><div class="simple-table-wrap"><table class="simple-table"><thead>' + thead +
+      '</thead><tbody>' + body + '</tbody></table></div><p class="vc-note">' + parsed.rows.length + ' filas cargadas.</p></div>';
+  }
+  var proxBtn = el('show-proximos-btn');
+  if (proxBtn) proxBtn.addEventListener('click', function () { renderProximos(parseGenericTable(el('proximos-input').value)); });
+
+  // ---------- Parrilla de historias a partir de eventos ----------
+  var recurringStoryThemes = ['Bienvenida de la semana', 'Recordatorio institucional', 'Tip de seguridad para los clientes', 'Resumen de la semana', 'Detrás de cámaras del día a día', 'Pregunta a la comunidad'];
+  function buildStoriesPlanFromEvents(events) {
+    var days = ['Lunes', 'Miércoles', 'Viernes'], weeks = [[], [], []], queue = events.slice(), ri = 0;
+    for (var w = 0; w < 3; w++) {
+      for (var d = 0; d < 3; d++) {
+        if (queue.length) { weeks[w].push([days[d], queue.shift(), 'evento']); }
+        else { weeks[w].push([days[d], recurringStoryThemes[ri % recurringStoryThemes.length], 'lista']); ri++; }
+      }
+    }
+    return { weeks: weeks, leftover: queue.length };
+  }
+  function renderStories(weeks) {
+    var c = el('calendario-stories');
+    if (!c) return;
+    c.innerHTML = weeks.map(function (week, i) {
+      var rows = week.map(function (s) {
+        var label = s[2] === 'lista' ? '✅ Lista para programar' : '🎥 Se graba el día del evento';
+        return '<div class="story-row"><div class="story-day">' + s[0] + '</div><div class="story-tema">' + s[1] +
+          '</div><div class="story-status ' + s[2] + '">' + label + '</div></div>';
+      }).join('');
+      return '<div class="stories-week"><h3>Semana ' + (i + 1) + '</h3>' + rows + '</div>';
+    }).join('');
+  }
+  var genStoriesBtn = el('generate-stories-btn');
+  if (genStoriesBtn) genStoriesBtn.addEventListener('click', function () {
+    var note = el('events-overflow-note');
+    var events = el('events-input').value.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+    if (!events.length) { if (note) note.textContent = 'Escribe al menos un evento para generar la parrilla.'; return; }
+    var built = buildStoriesPlanFromEvents(events);
+    renderStories(built.weeks);
+    if (note) note.textContent = built.leftover > 0
+      ? 'Tienes ' + built.leftover + ' evento(s) sin espacio en estas 3 semanas — pásalos a la siguiente tanda.'
+      : '';
+  });
+
+  // ---------- Reparto con diseño (se activa al cargar la parrilla) ----------
+  var splitBtn = el('split-intern-btn');
+  if (splitBtn) splitBtn.addEventListener('click', function () {
+    var out = el('split-output');
+    if (out) out.innerHTML = '<div class="leads-empty-state">Aún no hay parrilla de la semana cargada. Pega tu cronograma o genera la parrilla de historias arriba y el reparto aparece aquí.</div>';
+  });
+
+  // ---------- Campañas: planear campaña nueva ----------
+  function syncOtroTipoLabel() {
+    var t = el('p-tipo');
+    if (!t) return;
+    setText('p-otro-tipo-label', t.value === 'tactica' ? 'Estratégica' : 'Táctica');
+  }
+  var pTipo = el('p-tipo');
+  if (pTipo) { pTipo.addEventListener('change', syncOtroTipoLabel); syncOtroTipoLabel(); }
+
+  var genPlanBtn = el('generate-plan-btn');
+  if (genPlanBtn) genPlanBtn.addEventListener('click', function () {
+    var cuenta = el('p-cuenta').value;
+    var tipo = el('p-tipo').value;
+    var idea = el('p-idea').value.trim() || 'tu próxima campaña';
+    var leadsGoal = Math.max(1, parseInt(el('p-leads').value, 10) || 100);
+    var budget = Math.max(1, parseInt(el('p-budget').value, 10) || 500);
+    var numPublicos = Math.max(1, parseInt(el('p-publicos').value, 10) || 3);
+    var correOtro = el('p-otro-tipo-toggle').classList.contains('selected');
+    var platforms = Array.prototype.slice.call(document.querySelectorAll('#camp-plan .platform-toggle .chip-check.selected')).map(function (c) { return c.dataset.platform; });
+    var platformNames = platforms.map(function (p) { return p === 'ig' ? 'Instagram' : 'Facebook'; }).join(' y ') || 'tus redes';
+    var cpl = budget / leadsGoal;
+    var cuentaLabel = accountLabels[cuenta];
+    var otroTipo = tipo === 'tactica' ? 'estrategica' : 'tactica';
+
+    el('output-summary').innerHTML =
+      'Para "<b>' + idea + '</b>" en <b>' + cuentaLabel + '</b> (' + tipoLabels[tipo] + '), con una meta de <b>' + leadsGoal +
+      ' leads</b> y un presupuesto de <b>' + fmtMoney(budget) + '</b> en ' + platformNames + ', tu costo por lead objetivo es de <b>' +
+      fmtMoney(cpl) + '</b>. Aún no hay CPL histórico cargado para esta marca — vigila el CPL desde el día 2 y ajusta la segmentación si se dispara.';
+
+    var structureLines = [
+      'Usa <b>1 sola campaña</b> con objetivo de <b>' + tipoObjective[tipo] + '</b>, y mete cada público o ángulo como un <b>conjunto de anuncios distinto</b> (' + numPublicos + ' en total) — así Meta reparte presupuesto (CBO) hacia el que mejor esté funcionando.',
+      'Necesitas que cada conjunto acumule ~50 conversiones para salir de la fase de aprendizaje. Con ' + numPublicos + ' conjuntos y ' + fmtMoney(budget) + ' de presupuesto, vigila que ninguno quede con muy poco gasto para aprender.',
+      'No mezcles <b>' + tipoLabels[otroTipo] + '</b> en esta misma campaña: tiene un objetivo distinto en Meta (' + tipoObjective[otroTipo] + ') y mezclarlo confunde la optimización.'
+    ];
+    if (correOtro) structureLines.push('Como también vas a correr ' + tipoLabels[otroTipo] + ' para ' + cuentaLabel + ' al mismo tiempo, crea una <b>campaña aparte</b> para eso — misma cuenta publicitaria, campaña distinta.');
+    structureLines.push('Cada marca (Proviser Seguridad y Nass Tecnología) maneja su propia página y su propia cuenta publicitaria, así que esta estructura aplica solo para ' + cuentaLabel + '.');
+
+    setText('output-structure-headline', '1 campaña de ' + tipoLabels[tipo] + ' · ' + numPublicos + ' conjuntos de anuncios');
+    el('output-structure-list').innerHTML = structureLines.map(function (l) { return '<li>' + l + '</li>'; }).join('');
+
+    var dist = tipo === 'tactica'
+      ? [{ label: 'Reels / video ads', pct: 0.45 }, { label: 'Carrusel + estáticos', pct: 0.30 }, { label: 'Retargeting (quien ya interactuó)', pct: 0.25 }]
+      : [{ label: 'Reels de alcance', pct: 0.50 }, { label: 'Video testimonios / marca', pct: 0.30 }, { label: 'Carrusel de diferenciales', pct: 0.20 }];
+    el('output-distribution').innerHTML = dist.map(function (d) {
+      return '<div class="dist-row"><div class="dist-label">' + d.label + '</div>' +
+        '<div class="dist-track"><div class="dist-fill" style="width:' + Math.round(d.pct * 100) + '%"></div></div>' +
+        '<div class="dist-value">' + fmtMoney(budget * d.pct) + '</div></div>';
+    }).join('');
+
+    var pieces = tipo === 'tactica'
+      ? [numPublicos + ' Reels cortos (15–30 seg), uno por público, con el gancho: "' + idea + '"', '2 Carruseles explicando el beneficio principal, con CTA claro a dejar sus datos', '1 Story destacada tipo testimonio o detrás de cámaras', 'Copy corto para el formulario de leads (3 variantes para probar)']
+      : [numPublicos + ' Reels de alcance mostrando el día a día, uno por público objetivo', '1 Video testimonio de clientes', '1 Carrusel de diferenciales del servicio', 'Copy corto orientado a marca (sin CTA de venta directa)'];
+    el('output-pieces').innerHTML = pieces.map(function (p) { return '<div class="checklist-item">' + checkIcon + '<span>' + p + '</span></div>'; }).join('');
+
+    var team = {
+      'Diseño': tipo === 'tactica' ? ['Portada del formulario de leads', 'Piezas estáticas para el carrusel'] : ['Piezas estáticas para el carrusel de diferenciales'],
+      'Edición / video': ['Cortes de los reels según el guion, uno por conjunto de anuncios', 'Subtítulos y música con derechos'],
+      'Copywriting': ['Un ángulo de copy por conjunto de anuncios para probar', 'Textos cortos para cada plataforma seleccionada'],
+      'Data / tracking': tipo === 'tactica'
+        ? ['Pixel de Meta activo en la página de destino', 'UTMs para cada pieza', 'Evento de conversión "Lead" configurado']
+        : ['Pixel de Meta activo para medir alcance/frecuencia', 'UTMs para cada pieza']
+    };
+    el('output-team').innerHTML = Object.keys(team).map(function (role) {
+      return '<div class="checklist-group"><h3>' + role + '</h3>' +
+        team[role].map(function (t2) { return '<div class="checklist-item">' + checkIcon + '<span>' + t2 + '</span></div>'; }).join('') +
+        '</div>';
+    }).join('');
+
+    el('plan-output').style.display = 'block';
+    el('plan-output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // ---------- Campañas: seguimiento de leads (analizador genérico del Excel semanal) ----------
+  function findCol(headers, keyword) { for (var i = 0; i < headers.length; i++) if (headers[i].indexOf(keyword) !== -1) return i; return -1; }
+  function parseLeadsText(text) {
+    var lines = text.split(/\r?\n/).filter(function (l) { return l.trim() !== ''; });
+    if (lines.length < 2) return null;
+    var delim = lines[0].indexOf('\t') >= 0 ? '\t' : ',';
+    var headers = lines[0].split(delim).map(function (h) { return h.trim().toLowerCase(); });
+    var iSede = findCol(headers, 'marca');
+    if (iSede === -1) iSede = headers.indexOf('sede');
+    var iEstado = -1, iCambio = -1;
+    for (var i = 0; i < headers.length; i++) {
+      if (headers[i].indexOf('cambio') !== -1) iCambio = i;
+      else if (headers[i].indexOf('estado') !== -1) iEstado = i;
+    }
+    var iCalidad = findCol(headers, 'calidad');
+    var iRazones = -1;
+    for (var j = 0; j < headers.length; j++) if (headers[j].indexOf('razon') !== -1) { iRazones = j; break; }
+    var rows = [];
+    for (var r = 1; r < lines.length; r++) {
+      var cells = lines[r].split(delim);
+      rows.push({
+        sede: (iSede >= 0 ? cells[iSede] : '').trim() || 'Sin marca',
+        estado: (iEstado >= 0 ? cells[iEstado] : '').trim(),
+        sedeCambio: (iCambio >= 0 ? cells[iCambio] : '').trim(),
+        calidad: (iCalidad >= 0 ? cells[iCalidad] : '').trim(),
+        razones: (iRazones >= 0 ? cells[iRazones] : '').trim()
+      });
+    }
+    return rows;
+  }
+  function classifyLead(row) {
+    if (row.calidad && row.calidad.toLowerCase() === 'no') return 'Marcado como no calificado';
+    if (/repetido/i.test(row.estado)) return 'Lead repetido / ya en CRM';
+    if (/cambio/i.test(row.estado)) return 'Pide otra marca / servicio' + (row.sedeCambio ? ' (' + row.sedeCambio + ')' : '');
+    if (row.razones) return 'Otras razones de pérdida';
+    return null;
+  }
+  function analyzeLeads(rows) {
+    var offTarget = [], onTarget = [], reasonCounts = {}, sedeCounts = {};
+    rows.forEach(function (row) {
+      var reason = classifyLead(row);
+      sedeCounts[row.sede] = sedeCounts[row.sede] || { total: 0, off: 0 };
+      sedeCounts[row.sede].total++;
+      if (reason) { offTarget.push(row); reasonCounts[reason] = (reasonCounts[reason] || 0) + 1; sedeCounts[row.sede].off++; }
+      else onTarget.push(row);
+    });
+    var reasonList = Object.keys(reasonCounts).map(function (k) { return { reason: k, count: reasonCounts[k] }; }).sort(function (a, b) { return b.count - a.count; });
+    var sedeList = Object.keys(sedeCounts).map(function (k) { return { sede: k, total: sedeCounts[k].total, off: sedeCounts[k].off }; }).sort(function (a, b) { return b.off - a.off; });
+    return { total: rows.length, onTarget: onTarget.length, offTarget: offTarget.length, reasonList: reasonList, sedeList: sedeList };
+  }
+  function buildLeadsInterpretation(a) {
+    if (!a.total) return '';
+    var pctOff = Math.round((a.offTarget / a.total) * 100);
+    var text = 'De los ' + a.total + ' leads cargados, <b>' + a.offTarget + ' (' + pctOff + '%) no son on target</b>.';
+    var topReason = a.reasonList[0], topSede = a.sedeList[0];
+    if (topReason) {
+      var pctReason = Math.round((topReason.count / a.total) * 100);
+      text += ' La razón más frecuente es "' + topReason.reason + '" (' + topReason.count + ' leads, ' + pctReason + '% del total)';
+      text += (topSede && topSede.off > 0) ? ', concentrada sobre todo en <b>' + topSede.sede + '</b> (' + topSede.off + ' de ' + topSede.total + ').' : '.';
+    }
+    return text;
+  }
+  function buildLeadsRecommendation(a) {
+    if (!a.reasonList.length) return 'Todos los leads están on target — buen momento para escalar presupuesto en la campaña que los generó.';
+    var top = a.reasonList[0].reason;
+    if (/otra marca|servicio/i.test(top)) return 'Revisa la segmentación de la campaña de la marca más afectada — puede estar atrayendo demanda del otro servicio.';
+    if (/repetido/i.test(top)) return 'Pide al equipo de contacto que marque el lead repetido apenas lo detecte en el CRM, y revisa públicos superpuestos entre campañas.';
+    if (/no calificado/i.test(top)) return 'Agrega una pregunta de calificación al formulario de leads en Meta Ads para filtrar antes estos contactos.';
+    return 'Revisa con el equipo de contacto el detalle de "Razones de la pérdida" — son casos particulares que conviene mirar uno por uno antes de tocar la pauta.';
+  }
+  function renderLeadsReport(a) {
+    var out = el('leads-output');
+    if (!out) return;
+    var maxOff = Math.max.apply(null, a.sedeList.map(function (s) { return s.off; }).concat([1]));
+    var html = '<div class="kpi-row">' +
+      '<div class="kpi-tile"><div class="kpi-label">Leads cargados</div><div class="kpi-value">' + a.total + '</div></div>' +
+      '<div class="kpi-tile"><div class="kpi-label">On target</div><div class="kpi-value" style="color:var(--good-ink)">' + a.onTarget + '</div><div class="kpi-sub">' + Math.round((a.onTarget / a.total) * 100) + '%</div></div>' +
+      '<div class="kpi-tile"><div class="kpi-label">No on target</div><div class="kpi-value" style="color:var(--crit-ink)">' + a.offTarget + '</div><div class="kpi-sub">' + Math.round((a.offTarget / a.total) * 100) + '%</div></div>' +
+      '<div class="kpi-tile"><div class="kpi-label">Marca más afectada</div><div class="kpi-value" style="font-size:16px">' + (a.sedeList[0] ? a.sedeList[0].sede : '—') + '</div></div></div>';
+    html += '<div class="card"><h2>🚩 Por qué no son on target</h2>' + (a.reasonList.length ? a.reasonList.map(function (r) {
+      var pct = Math.round((r.count / a.total) * 100);
+      return '<div class="sede-row"><div class="sede-name">' + r.reason + '</div><div class="sede-bar-track"><div class="sede-bar-fill" style="width:' + pct + '%"></div></div><div class="sede-counts">' + r.count + ' leads · ' + pct + '%</div></div>';
+    }).join('') : '<div class="leads-empty-state">No hay leads fuera de target en esta carga.</div>') + '</div>';
+    html += '<div class="card"><h2>📍 Por marca</h2>' + a.sedeList.map(function (s) {
+      var pct = Math.round((s.off / maxOff) * 100);
+      return '<div class="sede-row"><div class="sede-name">' + s.sede + '</div><div class="sede-bar-track"><div class="sede-bar-fill" style="width:' + pct + '%"></div></div><div class="sede-counts">' + s.off + ' fuera / ' + s.total + ' total</div></div>';
+    }).join('') + '</div>';
+    html += '<div class="card"><h2>🔎 Qué interpreto</h2><p class="audience-desc">' + buildLeadsInterpretation(a) + '</p></div>';
+    html += '<div class="card"><h2>✅ Recomendación realizable</h2><p class="audience-desc">' + buildLeadsRecommendation(a) + '</p></div>';
+    out.innerHTML = html;
+  }
+  var analyzeBtn = el('analyze-leads-btn');
+  if (analyzeBtn) analyzeBtn.addEventListener('click', function () {
+    var rows = parseLeadsText(el('leads-input').value);
+    if (!rows || !rows.length) {
+      el('leads-output').innerHTML = '<div class="card"><div class="leads-empty-state">No pude leer filas válidas — pega el encabezado + al menos una fila, separados por tabulaciones (copiados directo de Excel).</div></div>';
+      return;
+    }
+    renderLeadsReport(analyzeLeads(rows));
+  });
+
+  // ---------- Datos reales de Meta Ads (los escribe el robot de GitHub Actions en data/live-metrics.json) ----------
+  fetch('data/live-metrics.json', { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (live) {
+      var note = el('live-data-note');
+      if (!note) return;
+      var hasData = live && live.accounts && Object.keys(live.accounts).some(function (k) {
+        var a = live.accounts[k] || {};
+        return (a.tactica && a.tactica.periods && Object.keys(a.tactica.periods).length) ||
+               (a.estrategica && a.estrategica.periods && Object.keys(a.estrategica.periods).length);
+      });
+      note.textContent = hasData
+        ? 'Datos cargados: ' + (live.generatedAt ? new Date(live.generatedAt).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' }) : '—')
+        : 'Aún no hay datos de Meta Ads conectados.';
+    })
+    .catch(function () {});
+
+  // init
+  refreshAccount();
+})();
+</script>
+</body>
+</html>

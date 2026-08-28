@@ -1,0 +1,15 @@
+{
+  "generatedAt": null,
+  "source": "sin-conectar",
+  "note": "Aún no conectado. El flujo de GitHub Actions (.github/workflows/refresh-meta-data.yml) escribirá aquí los datos reales de Meta Ads cuando se configure el secreto META_ACCESS_TOKEN del repo y los IDs de campaña/conjunto de cada marca en scripts/refresh-meta-data.js.",
+  "accounts": {
+    "proviser": {
+      "tactica": { "periods": {} },
+      "estrategica": { "periods": {} }
+    },
+    "nass": {
+      "tactica": { "periods": {} },
+      "estrategica": { "periods": {} }
+    }
+  }
+}

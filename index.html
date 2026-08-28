@@ -952,8 +952,8 @@
             <input type="number" id="p-leads" min="1" placeholder="150" />
           </div>
           <div class="form-group">
-            <label for="p-budget">Presupuesto disponible (USD)</label>
-            <input type="number" id="p-budget" min="1" placeholder="900" />
+            <label for="p-budget">Presupuesto disponible (COP)</label>
+            <input type="number" id="p-budget" min="1" step="50000" placeholder="Ej: 3000000" />
           </div>
           <div class="form-group">
             <label for="p-publicos">Públicos o ángulos distintos a probar</label>
@@ -1069,7 +1069,7 @@
 
   function el(id) { return document.getElementById(id); }
   function setText(id, t) { var e = el(id); if (e) e.textContent = t; }
-  function fmtMoney(n) { return '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
+  function fmtMoney(n) { return '$' + Number(n).toLocaleString('es-CO', { maximumFractionDigits: 0 }); }
 
   var td = el('today-date');
   if (td) td.textContent = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -1206,7 +1206,7 @@
     var tipo = el('p-tipo').value;
     var idea = el('p-idea').value.trim() || 'tu próxima campaña';
     var leadsGoal = Math.max(1, parseInt(el('p-leads').value, 10) || 100);
-    var budget = Math.max(1, parseInt(el('p-budget').value, 10) || 500);
+    var budget = Math.max(1, parseInt(el('p-budget').value, 10) || 3000000);
     var numPublicos = Math.max(1, parseInt(el('p-publicos').value, 10) || 3);
     var reachGoal = Math.max(0, parseInt(el('p-reach').value, 10) || 0);
     var freqGoal = Math.max(0, parseFloat(String(el('p-freq').value || '').replace(',', '.')) || 0);

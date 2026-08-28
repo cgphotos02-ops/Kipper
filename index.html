@@ -530,20 +530,6 @@
   .bar-fill-good { background: var(--good) !important; }
   .bar-fill-accent { background: var(--accent) !important; }
 
-  /* Pautas: zona para soltar el archivo */
-  .pautas-drop {
-    border: 1.5px dashed var(--border); border-radius: 12px; padding: 30px 20px;
-    text-align: center; cursor: pointer; background: var(--surface-2);
-    transition: border-color .15s ease, background .15s ease;
-  }
-  .pautas-drop:hover, .pautas-drop:focus-visible, .pautas-drop.drag {
-    border-color: var(--accent); background: var(--accent-soft); outline: none;
-  }
-  .pautas-drop svg { width: 26px; height: 26px; color: var(--ink-faint); margin-bottom: 8px; }
-  .pautas-drop.drag svg, .pautas-drop:hover svg { color: var(--accent-soft-ink); }
-  .pautas-drop-main { font-size: 14px; font-weight: 700; }
-  .pautas-drop-sub { font-size: 12px; color: var(--ink-muted); margin-top: 4px; }
-
   /* Pautas: resultados visuales */
   .pauta-split { display: flex; height: 26px; border-radius: 7px; overflow: hidden; border: 1px solid var(--border); margin: 10px 0 8px; }
   .pauta-split-seg { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #0a0a0a; white-space: nowrap; min-width: 2px; }
@@ -1101,20 +1087,8 @@
       Cada marca se mide con su propio resultado: <b>Nass</b> por conversaciones de WhatsApp iniciadas, <b>Proviser</b> por clics al enlace. El panel muestra el resultado tal como viene de cada campaña.
     </div>
 
-    <div class="card">
-      <h2>📄 Carga el informe de Meta</h2>
-      <p class="vc-note" style="margin-top:-4px">Suelta aquí el archivo del informe de campañas tal como lo descargas de Meta (<b>.xlsx</b>) o su versión <b>.csv</b>. El panel reconoce las columnas por su nombre — no importa el orden ni que sobren columnas. Todo se procesa en tu navegador; el archivo no se sube a ningún lado.</p>
-      <div id="pautas-drop" class="pautas-drop" tabindex="0" role="button" aria-label="Cargar informe de Meta">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>
-        <div class="pautas-drop-main">Arrastra aquí el informe de Meta</div>
-        <div class="pautas-drop-sub">Archivo <b>.xlsx</b> o <b>.csv</b> — o haz clic para elegirlo</div>
-        <input type="file" id="pautas-file" accept=".xlsx,.csv,.tsv,.txt" hidden />
-      </div>
-      <div id="pautas-fileinfo" class="vc-note" style="margin-top:8px"></div>
-    </div>
-
     <div id="pautas-output">
-      <div class="card"><div class="leads-empty-state">Aún no conectado. Carga el informe de Meta arriba para ver el estado de las pautas aquí.</div></div>
+      <div class="card"><div class="leads-empty-state">Aún no hay datos cargados.</div></div>
     </div>
   </section>
 
@@ -1426,29 +1400,7 @@
     renderLeadsReport(analyzeLeads(rows));
   });
 
-  // ---------- Pautas: pega el informe de campañas de Meta y muestra el estado ----------
-  function pautaNum(v) {
-    if (v == null) return 0;
-    v = String(v).trim().replace(/\s/g, '').replace(/\$/g, '').replace(/COP/gi, '').replace(/%/g, '');
-    if (v === '' || v === '-' || v === '—' || /^n\/?a$/i.test(v)) return 0;
-    if (/^-?\d{1,3}(\.\d{3})+,\d+$/.test(v)) v = v.replace(/\./g, '').replace(',', '.');        // 1.234.567,89  (es-CO decimal)
-    else if (/^-?\d{1,3}(,\d{3})+\.\d+$/.test(v)) v = v.replace(/,/g, '');                        // 1,234,567.89  (en-US decimal)
-    else if (/^-?\d{1,3}(\.\d{3})+$/.test(v)) v = v.replace(/\./g, '');                           // 1.234.567     (dot-grouped int)
-    else if (/^-?\d{1,3}(,\d{3})+$/.test(v)) v = v.replace(/,/g, '');                             // 1,234,567     (comma-grouped int)
-    else if (/^-?\d+,\d+$/.test(v)) v = v.replace(',', '.');                                      // 1234,56       (comma decimal)
-    var n = parseFloat(v);
-    return isFinite(n) ? n : 0;
-  }
-  function pautaSplitCsvLine(line) {
-    var out = [], cur = '', q = false;
-    for (var i = 0; i < line.length; i++) {
-      var c = line[i];
-      if (q) { if (c === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
-      else { if (c === '"') q = true; else if (c === ',') { out.push(cur); cur = ''; } else cur += c; }
-    }
-    out.push(cur);
-    return out;
-  }
+  // ---------- Pautas: los datos vienen de data/pautas.json (los genero yo desde el informe de Meta) ----------
   var PAUTA_RES_LABEL = {
     'total_profile_visits': 'Visitas al perfil de IG',
     'actions:onsite_conversion.messaging_conversation_started_7d': 'Conversaciones de WhatsApp',
@@ -1479,85 +1431,6 @@
   function fmtPct2(n) { return (n == null || !isFinite(n)) ? '—' : (Math.round(n * 100) / 100).toString().replace('.', ',') + '%'; }
   function fmtFreq(n) { return (n == null || !isFinite(n)) ? '—' : (Math.round(n * 100) / 100).toString().replace('.', ','); }
 
-  function parsePautas(text) {
-    var lines = text.split(/\r?\n/).filter(function (l) { return l.trim() !== ''; });
-    if (lines.length < 2) return null;
-    var tab = lines[0].indexOf('\t') > -1;
-    var splitLine = tab ? function (l) { return l.split('\t'); } : pautaSplitCsvLine;
-    var headers = splitLine(lines[0]).map(function (h) { return h.trim().toLowerCase(); });
-    function findH() {
-      var cands = Array.prototype.slice.call(arguments);
-      for (var pass = 0; pass < 3; pass++) {
-        for (var i = 0; i < headers.length; i++) {
-          for (var j = 0; j < cands.length; j++) {
-            var h = headers[i], c = cands[j];
-            if (pass === 0 && h === c) return i;
-            if (pass === 1 && h.indexOf(c) === 0) return i;
-            if (pass === 2 && h.indexOf(c) > -1) return i;
-          }
-        }
-      }
-      return -1;
-    }
-    var C = {
-      name: findH('nombre de la campaña', 'campaign name', 'nombre de la campa'),
-      status: findH('entrega de la campaña', 'entrega del conjunto de anuncios', 'delivery', 'entrega'),
-      start: findH('inicio'),
-      end: findH('finalización', 'finalizacion', 'ends'),
-      reach: findH('alcance', 'reach'),
-      freq: findH('frecuencia', 'frequency'),
-      impr: findH('impresiones', 'impressions'),
-      results: findH('resultados', 'results'),
-      resInd: findH('indicador de resultado', 'result indicator'),
-      cpr: findH('costo por resultados', 'costo por resultado', 'cost per results', 'cost per result'),
-      budget: findH('presupuesto del conjunto de anuncios', 'ad set budget'),
-      budgetType: findH('tipo de presupuesto del conjunto de anuncios', 'ad set budget type'),
-      spend: findH('importe gastado', 'amount spent'),
-      cpm: findH('cpm (costo por mil', 'cpm'),
-      linkClicks: findH('clics en el enlace', 'link clicks'),
-      cpcLink: findH('cpc (costo por clic en el enlace', 'cpc (cost per link click'),
-      ctrLink: findH('ctr (porcentaje de clics en el enlace', 'ctr (link click-through rate'),
-      igVisits: findH('visitas al perfil de instagram', 'instagram profile visits'),
-      igFollows: findH('seguimientos de instagram', 'instagram follows'),
-      interactions: findH('interacciones', 'post engagements'),
-      repStart: findH('inicio del informe', 'reporting starts'),
-      repEnd: findH('fin del informe', 'reporting ends')
-    };
-    if (C.name < 0) return { error: 'no-name' };
-    var period = null;
-    var rows = [];
-    for (var r = 1; r < lines.length; r++) {
-      var cells = splitLine(lines[r]);
-      var get = function (i) { return i >= 0 && i < cells.length ? String(cells[i]).trim() : ''; };
-      var name = get(C.name);
-      if (!name) continue;
-      if (!period && (get(C.repStart) || get(C.repEnd))) period = { start: get(C.repStart), end: get(C.repEnd) };
-      rows.push({
-        name: name,
-        brand: pautaBrand(name),
-        status: pautaStatus(get(C.status)),
-        statusRaw: get(C.status),
-        start: get(C.start), end: get(C.end),
-        reach: pautaNum(get(C.reach)),
-        freq: pautaNum(get(C.freq)),
-        impr: pautaNum(get(C.impr)),
-        results: pautaNum(get(C.results)),
-        resInd: get(C.resInd),
-        cpr: pautaNum(get(C.cpr)),
-        budget: pautaNum(get(C.budget)),
-        budgetType: get(C.budgetType),
-        spend: pautaNum(get(C.spend)),
-        cpm: pautaNum(get(C.cpm)),
-        linkClicks: pautaNum(get(C.linkClicks)),
-        cpcLink: pautaNum(get(C.cpcLink)),
-        ctrLink: pautaNum(get(C.ctrLink)),
-        igVisits: pautaNum(get(C.igVisits)),
-        igFollows: pautaNum(get(C.igFollows)),
-        interactions: pautaNum(get(C.interactions))
-      });
-    }
-    return { rows: rows, cols: C, period: period };
-  }
 
   var PAUTA_OBJ_COLOR = {
     'Conversaciones de WhatsApp': '#29abc7',
@@ -1667,8 +1540,8 @@
   function renderPautas(parsed) {
     var out = el('pautas-output');
     if (!out) return;
-    if (!parsed || parsed.error === 'no-name' || !parsed.rows || !parsed.rows.length) {
-      out.innerHTML = '<div class="card"><div class="leads-empty-state">No pude leer el informe. Asegúrate de que el archivo tenga la <b>fila de encabezados</b> de Meta (con "Nombre de la campaña") y al menos una campaña.</div></div>';
+    if (!parsed || !parsed.rows || !parsed.rows.length) {
+      out.innerHTML = '<div class="card"><div class="leads-empty-state">Aún no hay datos cargados.</div></div>';
       return;
     }
     var rows = parsed.rows;
@@ -1695,6 +1568,7 @@
     // ---- Resumen ----
     html += '<div class="pauta-softcard">' +
       '<div class="pauta-section-title">Resumen del período' + (periodTxt ? ' · ' + periodTxt : '') + '</div>' +
+      (parsed.updatedAt ? '<p class="vc-note" style="margin-top:-8px;text-align:center">Datos actualizados: ' + new Date(parsed.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }) + (parsed.source ? ' · ' + parsed.source : '') + '</p>' : '') +
       '<div class="pauta-pillrow">' +
       pautaStatPill('Inversión total', fmtCOP(totalSpend), 'accent') +
       pautaStatPill('Pautas activas', activeCount + ' / ' + rows.length, 'good') +
@@ -1785,125 +1659,11 @@
     out.innerHTML = html;
   }
 
-  // ---- Lectura de .xlsx en el navegador (ZIP + inflate nativo, sin librerías) ----
-  function pautaXmlUnescape(s) {
-    return String(s).replace(/&#x([0-9a-fA-F]+);/g, function (_, h) { return String.fromCodePoint(parseInt(h, 16)); })
-      .replace(/&#(\d+);/g, function (_, d) { return String.fromCodePoint(+d); })
-      .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
-  }
-  function pautaColIdx(ref) {
-    var s = ref.replace(/[0-9]+/g, ''), n = 0;
-    for (var i = 0; i < s.length; i++) n = n * 26 + (s.charCodeAt(i) - 64);
-    return n - 1;
-  }
-  async function pautaInflateRaw(u8) {
-    if (typeof DecompressionStream === 'undefined') throw new Error('tu navegador no puede descomprimir .xlsx — usa el .csv');
-    var stream = new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
-    return new Uint8Array(await new Response(stream).arrayBuffer());
-  }
-  async function pautaUnzip(buf) {
-    var dv = new DataView(buf), u8 = new Uint8Array(buf), n = buf.byteLength;
-    // localizar el "End of Central Directory"
-    var eocd = -1;
-    for (var i = n - 22; i >= 0 && i >= n - 22 - 65536; i--) {
-      if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
-    }
-    if (eocd < 0) throw new Error('no parece un .xlsx válido');
-    var count = dv.getUint16(eocd + 10, true);
-    var cdOff = dv.getUint32(eocd + 16, true);
-    var files = {}, p = cdOff;
-    for (var c = 0; c < count; c++) {
-      if (dv.getUint32(p, true) !== 0x02014b50) break;
-      var method = dv.getUint16(p + 10, true);
-      var compSize = dv.getUint32(p + 20, true);
-      var nameLen = dv.getUint16(p + 28, true);
-      var extraLen = dv.getUint16(p + 30, true);
-      var commLen = dv.getUint16(p + 32, true);
-      var lho = dv.getUint32(p + 42, true);
-      var name = new TextDecoder('utf-8').decode(u8.subarray(p + 46, p + 46 + nameLen));
-      files[name] = { method: method, compSize: compSize, lho: lho };
-      p += 46 + nameLen + extraLen + commLen;
-    }
-    async function read(name) {
-      var f = files[name];
-      if (!f) return null;
-      var lNameLen = dv.getUint16(f.lho + 26, true);
-      var lExtraLen = dv.getUint16(f.lho + 28, true);
-      var start = f.lho + 30 + lNameLen + lExtraLen;
-      var data = u8.subarray(start, start + f.compSize);
-      var out = f.method === 0 ? data : await pautaInflateRaw(data);
-      return new TextDecoder('utf-8').decode(out);
-    }
-    return { names: Object.keys(files), read: read };
-  }
-  async function pautaXlsxToTsv(buf) {
-    var zip = await pautaUnzip(buf);
-    var ssXml = (await zip.read('xl/sharedStrings.xml')) || '';
-    var strs = [];
-    var si; var reSi = /<si>([\s\S]*?)<\/si>/g;
-    while ((si = reSi.exec(ssXml))) {
-      var parts = si[1].match(/<t[^>]*>([\s\S]*?)<\/t>/g) || [];
-      strs.push(parts.map(function (t) { return pautaXmlUnescape(t.replace(/<[^>]+>/g, '')); }).join(''));
-    }
-    var sheetName = zip.names.filter(function (x) { return /^xl\/worksheets\/sheet\d+\.xml$/.test(x); }).sort()[0] || 'xl/worksheets/sheet1.xml';
-    var shXml = (await zip.read(sheetName)) || '';
-    var rowsXml = shXml.match(/<row[^>]*>[\s\S]*?<\/row>/g) || [];
-    var grid = [], maxW = 0;
-    rowsXml.forEach(function (rx) {
-      var arr = [];
-      var cm; var reC = /<c r="([A-Z]+\d+)"(?:[^>]*?t="([^"]+)")?[^>]*>(?:<v>([\s\S]*?)<\/v>|<is>[\s\S]*?<t[^>]*>([\s\S]*?)<\/t>[\s\S]*?<\/is>)?<\/c>/g;
-      while ((cm = reC.exec(rx))) {
-        var ci = pautaColIdx(cm[1]), val = '';
-        if (cm[2] === 's') val = strs[+cm[3]] || '';
-        else if (cm[3] != null) val = pautaXmlUnescape(cm[3]);
-        else if (cm[4] != null) val = pautaXmlUnescape(cm[4]);
-        arr[ci] = val;
-      }
-      if (arr.length > maxW) maxW = arr.length;
-      grid.push(arr);
-    });
-    return grid.map(function (r) {
-      var rr = []; for (var i = 0; i < maxW; i++) rr.push((r[i] == null ? '' : String(r[i])).replace(/\t/g, ' ').replace(/\r?\n/g, ' '));
-      return rr.join('\t');
-    }).join('\n');
-  }
-
-  // ---- Zona de carga de la pestaña Pautas ----
-  var pautasDrop = el('pautas-drop'), pautasFile = el('pautas-file'), pautasInfo = el('pautas-fileinfo');
-  async function handlePautasFile(file) {
-    if (!file) return;
-    if (pautasInfo) pautasInfo.textContent = 'Leyendo ' + file.name + '…';
-    try {
-      var tsv;
-      if (/\.xlsx$/i.test(file.name)) tsv = await pautaXlsxToTsv(await file.arrayBuffer());
-      else tsv = (await file.text()).replace(/^﻿/, '');
-      var parsed = parsePautas(tsv);
-      if (!parsed || parsed.error || !parsed.rows || !parsed.rows.length) {
-        if (pautasInfo) pautasInfo.textContent = '';
-        renderPautas(parsed || null);
-        return;
-      }
-      if (pautasInfo) pautasInfo.innerHTML = '📎 <b>' + file.name + '</b> · ' + parsed.rows.length + ' campañas cargadas — <a href="#" id="pautas-clear" style="color:var(--accent)">cargar otro</a>';
-      var clr = el('pautas-clear');
-      if (clr) clr.addEventListener('click', function (e) { e.preventDefault(); pautasFile.value = ''; pautasInfo.textContent = ''; el('pautas-output').innerHTML = '<div class="card"><div class="leads-empty-state">Aún no conectado. Carga el informe de Meta arriba para ver el estado de las pautas aquí.</div></div>'; });
-      renderPautas(parsed);
-    } catch (err) {
-      if (pautasInfo) pautasInfo.textContent = '';
-      el('pautas-output').innerHTML = '<div class="card"><div class="leads-empty-state">No pude leer el archivo (' + (err && err.message ? err.message : 'formato no reconocido') + '). Prueba con el .xlsx tal cual lo descargaste de Meta, o expórtalo a CSV.</div></div>';
-    }
-  }
-  if (pautasDrop && pautasFile) {
-    pautasDrop.addEventListener('click', function () { pautasFile.click(); });
-    pautasDrop.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pautasFile.click(); } });
-    ['dragenter', 'dragover'].forEach(function (ev) { pautasDrop.addEventListener(ev, function (e) { e.preventDefault(); pautasDrop.classList.add('drag'); }); });
-    ['dragleave', 'dragend'].forEach(function (ev) { pautasDrop.addEventListener(ev, function () { pautasDrop.classList.remove('drag'); }); });
-    pautasDrop.addEventListener('drop', function (e) {
-      e.preventDefault(); pautasDrop.classList.remove('drag');
-      var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-      if (f) handlePautasFile(f);
-    });
-    pautasFile.addEventListener('change', function () { if (pautasFile.files && pautasFile.files[0]) handlePautasFile(pautasFile.files[0]); });
-  }
+  // ---------- Pautas: carga los datos guardados en data/pautas.json ----------
+  fetch('data/pautas.json', { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) { if (data && data.rows && data.rows.length) renderPautas(data); })
+    .catch(function () { /* sin archivo de datos: se queda el estado vacío */ });
 
   // ---------- Datos reales de Meta Ads (los escribe el robot de GitHub Actions en data/live-metrics.json) ----------
   fetch('data/live-metrics.json', { cache: 'no-store' })

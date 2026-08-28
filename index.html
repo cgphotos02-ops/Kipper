@@ -613,10 +613,6 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="7" height="7"/><rect x="14" y="4" width="7" height="7"/><rect x="3" y="15" width="7" height="5"/><rect x="14" y="13" width="7" height="7"/></svg>
       Posts
     </button>
-    <button class="nav-item" data-view="constancia">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M12 19V5M20 19v-6"/></svg>
-      Constancia
-    </button>
     <button class="nav-item" data-view="audiencia">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       Mi audiencia
@@ -774,32 +770,6 @@
       <h2>⏰ Cuándo está más activa tu audiencia</h2>
       <div class="leads-empty-state" id="audiencia-besttime">Aún no conectado. Se calcula con la actividad de tus seguidores en Instagram.</div>
     </div>
-  </section>
-
-  <!-- CONSTANCIA -->
-  <section class="view" id="view-constancia">
-    <h1 class="greeting">Constancia</h1>
-    <div class="date-sub">Tu meta: 3 posts por semana (lunes, miércoles, viernes)</div>
-
-    <div class="card">
-      <h2>✅ Esta semana</h2>
-      <div id="constancia-week"></div>
-    </div>
-
-    <div class="card">
-      <h2>🔥 Racha</h2>
-      <div class="hero-stat">
-        <div class="hero-number" id="constancia-streak"></div>
-        <div class="hero-sub" id="constancia-streak-sub"></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>📊 Últimas semanas</h2>
-      <div id="constancia-history"></div>
-    </div>
-
-    <p class="vc-note">La racha se cuenta desde que empieces a marcar aquí — no hay forma de ver automáticamente lo que publicaste antes de usar esta herramienta. Se guarda solo en este navegador.</p>
   </section>
 
   <!-- PARRILLA -->
@@ -1121,72 +1091,8 @@
   function currentAccount() { return cuentaSel ? cuentaSel.value : 'proviser'; }
   function refreshAccount() {
     setText('home-greeting', 'Buenos días 👋 — ' + accountLabels[currentAccount()]);
-    renderConstancia(currentAccount());
   }
   if (cuentaSel) cuentaSel.addEventListener('change', refreshAccount);
-
-  // ---------- Constancia (racha marcada por ti · se guarda solo en este navegador) ----------
-  var CONSTANCIA_DAYS = ['Lunes', 'Miércoles', 'Viernes'];
-  function getMondayKey(date) {
-    var d = (typeof date === 'string') ? new Date(date + 'T00:00:00') : new Date(date);
-    var day = d.getDay(), diff = (day === 0 ? -6 : 1 - day);
-    d.setDate(d.getDate() + diff); d.setHours(0, 0, 0, 0);
-    var m = d.getMonth() + 1, dd = d.getDate();
-    return d.getFullYear() + '-' + (m < 10 ? '0' + m : m) + '-' + (dd < 10 ? '0' + dd : dd);
-  }
-  function loadConstancia() { try { return JSON.parse(localStorage.getItem('kipper_constancia') || '{}'); } catch (e) { return {}; } }
-  function saveConstancia(data) { try { localStorage.setItem('kipper_constancia', JSON.stringify(data)); } catch (e) {} }
-  function renderConstancia(account) {
-    var weekEl = el('constancia-week');
-    if (!weekEl) return;
-    var data = loadConstancia();
-    if (!data[account]) data[account] = {};
-    var todayKey = getMondayKey(new Date());
-    var weekLog = data[account][todayKey] || {};
-
-    weekEl.innerHTML = CONSTANCIA_DAYS.map(function (day) {
-      var checked = !!weekLog[day];
-      return '<label class="constancia-check-row"><input type="checkbox" data-day="' + day + '" ' + (checked ? 'checked' : '') + '/> <span>' + day + ' — publiqué</span></label>';
-    }).join('');
-
-    weekEl.querySelectorAll('input[type=checkbox]').forEach(function (cb) {
-      cb.addEventListener('change', function () {
-        var d = loadConstancia();
-        if (!d[account]) d[account] = {};
-        if (!d[account][todayKey]) d[account][todayKey] = {};
-        d[account][todayKey][cb.dataset.day] = cb.checked;
-        saveConstancia(d);
-        renderConstancia(account);
-      });
-    });
-
-    var streak = 0, cursor = new Date(todayKey + 'T00:00:00');
-    cursor.setDate(cursor.getDate() - 7);
-    while (true) {
-      var wk = data[account][getMondayKey(cursor)];
-      if (wk && CONSTANCIA_DAYS.every(function (dd) { return wk[dd]; })) { streak++; cursor.setDate(cursor.getDate() - 7); }
-      else break;
-    }
-    setText('constancia-streak', streak + (streak === 1 ? ' semana' : ' semanas'));
-    setText('constancia-streak-sub', streak > 0
-      ? 'Semanas seguidas cumpliendo tus 3 posts, antes de esta semana en curso.'
-      : 'Aún no completas una semana entera marcada — empieza marcando tus posts de esta semana.');
-
-    var hc = new Date(todayKey + 'T00:00:00'), rows = [];
-    for (var i = 0; i < 6; i++) {
-      var key2 = getMondayKey(hc), wk2 = data[account][key2] || {};
-      var count = CONSTANCIA_DAYS.filter(function (dd) { return wk2[dd]; }).length;
-      rows.push({ label: (i === 0 ? 'Esta semana' : 'Semana') + ' (desde ' + key2 + ')', count: count });
-      hc.setDate(hc.getDate() - 7);
-    }
-    var hist = el('constancia-history');
-    if (hist) hist.innerHTML = rows.map(function (r) {
-      var pct = Math.round((r.count / 3) * 100);
-      return '<div class="sede-row"><div class="sede-name">' + r.label + '</div>' +
-        '<div class="sede-bar-track"><div class="sede-bar-fill bar-fill-good" style="width:' + pct + '%"></div></div>' +
-        '<div class="sede-counts">' + r.count + '/3</div></div>';
-    }).join('');
-  }
 
   // ---------- Parrilla: pega tu cronograma de Excel ----------
   function parseGenericTable(text) {

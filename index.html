@@ -530,6 +530,20 @@
   .bar-fill-good { background: var(--good) !important; }
   .bar-fill-accent { background: var(--accent) !important; }
 
+  /* Pautas: zona para soltar el archivo */
+  .pautas-drop {
+    border: 1.5px dashed var(--border); border-radius: 12px; padding: 30px 20px;
+    text-align: center; cursor: pointer; background: var(--surface-2);
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .pautas-drop:hover, .pautas-drop:focus-visible, .pautas-drop.drag {
+    border-color: var(--accent); background: var(--accent-soft); outline: none;
+  }
+  .pautas-drop svg { width: 26px; height: 26px; color: var(--ink-faint); margin-bottom: 8px; }
+  .pautas-drop.drag svg, .pautas-drop:hover svg { color: var(--accent-soft-ink); }
+  .pautas-drop-main { font-size: 14px; font-weight: 700; }
+  .pautas-drop-sub { font-size: 12px; color: var(--ink-muted); margin-top: 4px; }
+
   /* Constancia */
   .constancia-check-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; cursor: pointer; }
   .constancia-check-row:last-child { border-bottom: none; }
@@ -1032,16 +1046,19 @@
     </div>
 
     <div class="card">
-      <h2>📋 Pega el informe de Meta</h2>
-      <p class="vc-note" style="margin-top:-4px">Exporta (o copia) el informe de campañas de Meta y pega las filas aquí <b>con la fila de encabezados</b>. El panel reconoce las columnas por su nombre — no importa el orden ni que sobren columnas. Acepta separado por tabulaciones (copiar/pegar) o por comas (CSV).</p>
-      <textarea class="leads-textarea" id="pautas-input" placeholder="Pega aquí las filas del informe de Meta (encabezado + campañas)…"></textarea>
-      <div class="action-row" style="margin-top:10px">
-        <button class="btn primary" id="analyze-pautas-btn">📊 Analizar pautas</button>
+      <h2>📄 Carga el informe de Meta</h2>
+      <p class="vc-note" style="margin-top:-4px">Suelta aquí el archivo del informe de campañas tal como lo descargas de Meta (<b>.xlsx</b>) o su versión <b>.csv</b>. El panel reconoce las columnas por su nombre — no importa el orden ni que sobren columnas. Todo se procesa en tu navegador; el archivo no se sube a ningún lado.</p>
+      <div id="pautas-drop" class="pautas-drop" tabindex="0" role="button" aria-label="Cargar informe de Meta">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>
+        <div class="pautas-drop-main">Arrastra aquí el informe de Meta</div>
+        <div class="pautas-drop-sub">Archivo <b>.xlsx</b> o <b>.csv</b> — o haz clic para elegirlo</div>
+        <input type="file" id="pautas-file" accept=".xlsx,.csv,.tsv,.txt" hidden />
       </div>
+      <div id="pautas-fileinfo" class="vc-note" style="margin-top:8px"></div>
     </div>
 
     <div id="pautas-output">
-      <div class="card"><div class="leads-empty-state">Aún no conectado. Pega el informe de Meta y dale a "Analizar pautas" para ver el estado aquí.</div></div>
+      <div class="card"><div class="leads-empty-state">Aún no conectado. Carga el informe de Meta arriba para ver el estado de las pautas aquí.</div></div>
     </div>
   </section>
 
@@ -1589,10 +1606,125 @@
     out.innerHTML = html;
   }
 
-  var pautasBtn = el('analyze-pautas-btn');
-  if (pautasBtn) pautasBtn.addEventListener('click', function () {
-    renderPautas(parsePautas(el('pautas-input').value));
-  });
+  // ---- Lectura de .xlsx en el navegador (ZIP + inflate nativo, sin librerías) ----
+  function pautaXmlUnescape(s) {
+    return String(s).replace(/&#x([0-9a-fA-F]+);/g, function (_, h) { return String.fromCodePoint(parseInt(h, 16)); })
+      .replace(/&#(\d+);/g, function (_, d) { return String.fromCodePoint(+d); })
+      .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+  }
+  function pautaColIdx(ref) {
+    var s = ref.replace(/[0-9]+/g, ''), n = 0;
+    for (var i = 0; i < s.length; i++) n = n * 26 + (s.charCodeAt(i) - 64);
+    return n - 1;
+  }
+  async function pautaInflateRaw(u8) {
+    if (typeof DecompressionStream === 'undefined') throw new Error('tu navegador no puede descomprimir .xlsx — usa el .csv');
+    var stream = new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  }
+  async function pautaUnzip(buf) {
+    var dv = new DataView(buf), u8 = new Uint8Array(buf), n = buf.byteLength;
+    // localizar el "End of Central Directory"
+    var eocd = -1;
+    for (var i = n - 22; i >= 0 && i >= n - 22 - 65536; i--) {
+      if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    }
+    if (eocd < 0) throw new Error('no parece un .xlsx válido');
+    var count = dv.getUint16(eocd + 10, true);
+    var cdOff = dv.getUint32(eocd + 16, true);
+    var files = {}, p = cdOff;
+    for (var c = 0; c < count; c++) {
+      if (dv.getUint32(p, true) !== 0x02014b50) break;
+      var method = dv.getUint16(p + 10, true);
+      var compSize = dv.getUint32(p + 20, true);
+      var nameLen = dv.getUint16(p + 28, true);
+      var extraLen = dv.getUint16(p + 30, true);
+      var commLen = dv.getUint16(p + 32, true);
+      var lho = dv.getUint32(p + 42, true);
+      var name = new TextDecoder('utf-8').decode(u8.subarray(p + 46, p + 46 + nameLen));
+      files[name] = { method: method, compSize: compSize, lho: lho };
+      p += 46 + nameLen + extraLen + commLen;
+    }
+    async function read(name) {
+      var f = files[name];
+      if (!f) return null;
+      var lNameLen = dv.getUint16(f.lho + 26, true);
+      var lExtraLen = dv.getUint16(f.lho + 28, true);
+      var start = f.lho + 30 + lNameLen + lExtraLen;
+      var data = u8.subarray(start, start + f.compSize);
+      var out = f.method === 0 ? data : await pautaInflateRaw(data);
+      return new TextDecoder('utf-8').decode(out);
+    }
+    return { names: Object.keys(files), read: read };
+  }
+  async function pautaXlsxToTsv(buf) {
+    var zip = await pautaUnzip(buf);
+    var ssXml = (await zip.read('xl/sharedStrings.xml')) || '';
+    var strs = [];
+    var si; var reSi = /<si>([\s\S]*?)<\/si>/g;
+    while ((si = reSi.exec(ssXml))) {
+      var parts = si[1].match(/<t[^>]*>([\s\S]*?)<\/t>/g) || [];
+      strs.push(parts.map(function (t) { return pautaXmlUnescape(t.replace(/<[^>]+>/g, '')); }).join(''));
+    }
+    var sheetName = zip.names.filter(function (x) { return /^xl\/worksheets\/sheet\d+\.xml$/.test(x); }).sort()[0] || 'xl/worksheets/sheet1.xml';
+    var shXml = (await zip.read(sheetName)) || '';
+    var rowsXml = shXml.match(/<row[^>]*>[\s\S]*?<\/row>/g) || [];
+    var grid = [], maxW = 0;
+    rowsXml.forEach(function (rx) {
+      var arr = [];
+      var cm; var reC = /<c r="([A-Z]+\d+)"(?:[^>]*?t="([^"]+)")?[^>]*>(?:<v>([\s\S]*?)<\/v>|<is>[\s\S]*?<t[^>]*>([\s\S]*?)<\/t>[\s\S]*?<\/is>)?<\/c>/g;
+      while ((cm = reC.exec(rx))) {
+        var ci = pautaColIdx(cm[1]), val = '';
+        if (cm[2] === 's') val = strs[+cm[3]] || '';
+        else if (cm[3] != null) val = pautaXmlUnescape(cm[3]);
+        else if (cm[4] != null) val = pautaXmlUnescape(cm[4]);
+        arr[ci] = val;
+      }
+      if (arr.length > maxW) maxW = arr.length;
+      grid.push(arr);
+    });
+    return grid.map(function (r) {
+      var rr = []; for (var i = 0; i < maxW; i++) rr.push((r[i] == null ? '' : String(r[i])).replace(/\t/g, ' ').replace(/\r?\n/g, ' '));
+      return rr.join('\t');
+    }).join('\n');
+  }
+
+  // ---- Zona de carga de la pestaña Pautas ----
+  var pautasDrop = el('pautas-drop'), pautasFile = el('pautas-file'), pautasInfo = el('pautas-fileinfo');
+  async function handlePautasFile(file) {
+    if (!file) return;
+    if (pautasInfo) pautasInfo.textContent = 'Leyendo ' + file.name + '…';
+    try {
+      var tsv;
+      if (/\.xlsx$/i.test(file.name)) tsv = await pautaXlsxToTsv(await file.arrayBuffer());
+      else tsv = (await file.text()).replace(/^﻿/, '');
+      var parsed = parsePautas(tsv);
+      if (!parsed || parsed.error || !parsed.rows || !parsed.rows.length) {
+        if (pautasInfo) pautasInfo.textContent = '';
+        renderPautas(parsed || null);
+        return;
+      }
+      if (pautasInfo) pautasInfo.innerHTML = '📎 <b>' + file.name + '</b> · ' + parsed.rows.length + ' campañas cargadas — <a href="#" id="pautas-clear" style="color:var(--accent)">cargar otro</a>';
+      var clr = el('pautas-clear');
+      if (clr) clr.addEventListener('click', function (e) { e.preventDefault(); pautasFile.value = ''; pautasInfo.textContent = ''; el('pautas-output').innerHTML = '<div class="card"><div class="leads-empty-state">Aún no conectado. Carga el informe de Meta arriba para ver el estado de las pautas aquí.</div></div>'; });
+      renderPautas(parsed);
+    } catch (err) {
+      if (pautasInfo) pautasInfo.textContent = '';
+      el('pautas-output').innerHTML = '<div class="card"><div class="leads-empty-state">No pude leer el archivo (' + (err && err.message ? err.message : 'formato no reconocido') + '). Prueba con el .xlsx tal cual lo descargaste de Meta, o expórtalo a CSV.</div></div>';
+    }
+  }
+  if (pautasDrop && pautasFile) {
+    pautasDrop.addEventListener('click', function () { pautasFile.click(); });
+    pautasDrop.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pautasFile.click(); } });
+    ['dragenter', 'dragover'].forEach(function (ev) { pautasDrop.addEventListener(ev, function (e) { e.preventDefault(); pautasDrop.classList.add('drag'); }); });
+    ['dragleave', 'dragend'].forEach(function (ev) { pautasDrop.addEventListener(ev, function () { pautasDrop.classList.remove('drag'); }); });
+    pautasDrop.addEventListener('drop', function (e) {
+      e.preventDefault(); pautasDrop.classList.remove('drag');
+      var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (f) handlePautasFile(f);
+    });
+    pautasFile.addEventListener('change', function () { if (pautasFile.files && pautasFile.files[0]) handlePautasFile(pautasFile.files[0]); });
+  }
 
   // ---------- Datos reales de Meta Ads (los escribe el robot de GitHub Actions en data/live-metrics.json) ----------
   fetch('data/live-metrics.json', { cache: 'no-store' })

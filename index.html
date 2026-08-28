@@ -633,6 +633,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l18-7-6 18-3-8-8-3z"/></svg>
       Campañas
     </button>
+    <button class="nav-item" data-view="pautas">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M2 20h20"/></svg>
+      Pautas
+    </button>
   </nav>
 
   <div class="sidebar-footer"><span class="dot"></span> Sin conexión de datos</div>
@@ -1017,6 +1021,30 @@
     </div>
   </section>
 
+  <!-- PAUTAS -->
+  <section class="view" id="view-pautas">
+    <h1 class="greeting">Pautas</h1>
+    <div class="date-sub">Estado de tus pautas en Meta Ads — Proviser Seguridad y Nass Tecnología</div>
+
+    <div class="disclaimer-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5h.01"/></svg>
+      Cada marca se mide con su propio resultado: <b>Nass</b> por conversaciones de WhatsApp iniciadas, <b>Proviser</b> por clics al enlace. El panel muestra el resultado tal como viene de cada campaña.
+    </div>
+
+    <div class="card">
+      <h2>📋 Pega el informe de Meta</h2>
+      <p class="vc-note" style="margin-top:-4px">Exporta (o copia) el informe de campañas de Meta y pega las filas aquí <b>con la fila de encabezados</b>. El panel reconoce las columnas por su nombre — no importa el orden ni que sobren columnas. Acepta separado por tabulaciones (copiar/pegar) o por comas (CSV).</p>
+      <textarea class="leads-textarea" id="pautas-input" placeholder="Pega aquí las filas del informe de Meta (encabezado + campañas)…"></textarea>
+      <div class="action-row" style="margin-top:10px">
+        <button class="btn primary" id="analyze-pautas-btn">📊 Analizar pautas</button>
+      </div>
+    </div>
+
+    <div id="pautas-output">
+      <div class="card"><div class="leads-empty-state">Aún no conectado. Pega el informe de Meta y dale a "Analizar pautas" para ver el estado aquí.</div></div>
+    </div>
+  </section>
+
 </main>
 
 <script>
@@ -1323,6 +1351,247 @@
       return;
     }
     renderLeadsReport(analyzeLeads(rows));
+  });
+
+  // ---------- Pautas: pega el informe de campañas de Meta y muestra el estado ----------
+  function pautaNum(v) {
+    if (v == null) return 0;
+    v = String(v).trim().replace(/\s/g, '').replace(/\$/g, '').replace(/COP/gi, '').replace(/%/g, '');
+    if (v === '' || v === '-' || v === '—' || /^n\/?a$/i.test(v)) return 0;
+    if (/^-?\d{1,3}(\.\d{3})+,\d+$/.test(v)) v = v.replace(/\./g, '').replace(',', '.');        // 1.234.567,89  (es-CO decimal)
+    else if (/^-?\d{1,3}(,\d{3})+\.\d+$/.test(v)) v = v.replace(/,/g, '');                        // 1,234,567.89  (en-US decimal)
+    else if (/^-?\d{1,3}(\.\d{3})+$/.test(v)) v = v.replace(/\./g, '');                           // 1.234.567     (dot-grouped int)
+    else if (/^-?\d{1,3}(,\d{3})+$/.test(v)) v = v.replace(/,/g, '');                             // 1,234,567     (comma-grouped int)
+    else if (/^-?\d+,\d+$/.test(v)) v = v.replace(',', '.');                                      // 1234,56       (comma decimal)
+    var n = parseFloat(v);
+    return isFinite(n) ? n : 0;
+  }
+  function pautaSplitCsvLine(line) {
+    var out = [], cur = '', q = false;
+    for (var i = 0; i < line.length; i++) {
+      var c = line[i];
+      if (q) { if (c === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+      else { if (c === '"') q = true; else if (c === ',') { out.push(cur); cur = ''; } else cur += c; }
+    }
+    out.push(cur);
+    return out;
+  }
+  var PAUTA_RES_LABEL = {
+    'total_profile_visits': 'Visitas al perfil de IG',
+    'actions:onsite_conversion.messaging_conversation_started_7d': 'Conversaciones de WhatsApp',
+    'actions:onsite_conversion.total_messaging_connection': 'Conversaciones de WhatsApp',
+    'actions:post_engagement': 'Interacción con publicación',
+    'actions:link_click': 'Clics en el enlace',
+    'actions:landing_page_view': 'Visitas a la página',
+    'reach': 'Alcance'
+  };
+  function pautaResLabel(v) { return PAUTA_RES_LABEL[v] || (v && v.replace(/^actions:/, '')) || '—'; }
+  function pautaBrand(name) {
+    var n = (name || '').toUpperCase();
+    if (n.indexOf('PROVISER') > -1) return 'Proviser Seguridad';
+    if (n.indexOf('NASS') > -1) return 'Nass Tecnología';
+    return '—';
+  }
+  function pautaStatus(s) {
+    s = (s || '').toLowerCase();
+    if (s.indexOf('not_deliv') > -1 || s.indexOf('no se est') > -1 || s.indexOf('no entrega') > -1) return { k: 'nodeliv', label: 'No entrega', cls: 'warn' };
+    if (s.indexOf('activ') > -1) return { k: 'active', label: 'Activa', cls: 'good' };
+    if (s.indexOf('paus') > -1) return { k: 'paused', label: 'Pausada', cls: 'warn' };
+    if (s.indexOf('complet') > -1 || s.indexOf('finaliz') > -1) return { k: 'done', label: 'Finalizada', cls: 'off' };
+    if (s.indexOf('archiv') > -1) return { k: 'archived', label: 'Archivada', cls: 'off' };
+    return { k: 'other', label: s || '—', cls: 'off' };
+  }
+  function fmtCOP(n) { return (n == null || !isFinite(n)) ? '—' : '$' + Math.round(n).toLocaleString('es-CO'); }
+  function fmtNumCO(n) { return (n == null || !isFinite(n)) ? '—' : Math.round(n).toLocaleString('es-CO'); }
+  function fmtPct2(n) { return (n == null || !isFinite(n)) ? '—' : (Math.round(n * 100) / 100).toString().replace('.', ',') + '%'; }
+  function fmtFreq(n) { return (n == null || !isFinite(n)) ? '—' : (Math.round(n * 100) / 100).toString().replace('.', ','); }
+
+  function parsePautas(text) {
+    var lines = text.split(/\r?\n/).filter(function (l) { return l.trim() !== ''; });
+    if (lines.length < 2) return null;
+    var tab = lines[0].indexOf('\t') > -1;
+    var splitLine = tab ? function (l) { return l.split('\t'); } : pautaSplitCsvLine;
+    var headers = splitLine(lines[0]).map(function (h) { return h.trim().toLowerCase(); });
+    function findH() {
+      var cands = Array.prototype.slice.call(arguments);
+      for (var pass = 0; pass < 3; pass++) {
+        for (var i = 0; i < headers.length; i++) {
+          for (var j = 0; j < cands.length; j++) {
+            var h = headers[i], c = cands[j];
+            if (pass === 0 && h === c) return i;
+            if (pass === 1 && h.indexOf(c) === 0) return i;
+            if (pass === 2 && h.indexOf(c) > -1) return i;
+          }
+        }
+      }
+      return -1;
+    }
+    var C = {
+      name: findH('nombre de la campaña', 'campaign name', 'nombre de la campa'),
+      status: findH('entrega de la campaña', 'entrega del conjunto de anuncios', 'delivery', 'entrega'),
+      start: findH('inicio'),
+      end: findH('finalización', 'finalizacion', 'ends'),
+      reach: findH('alcance', 'reach'),
+      freq: findH('frecuencia', 'frequency'),
+      impr: findH('impresiones', 'impressions'),
+      results: findH('resultados', 'results'),
+      resInd: findH('indicador de resultado', 'result indicator'),
+      cpr: findH('costo por resultados', 'costo por resultado', 'cost per results', 'cost per result'),
+      budget: findH('presupuesto del conjunto de anuncios', 'ad set budget'),
+      budgetType: findH('tipo de presupuesto del conjunto de anuncios', 'ad set budget type'),
+      spend: findH('importe gastado', 'amount spent'),
+      cpm: findH('cpm (costo por mil', 'cpm'),
+      linkClicks: findH('clics en el enlace', 'link clicks'),
+      cpcLink: findH('cpc (costo por clic en el enlace', 'cpc (cost per link click'),
+      ctrLink: findH('ctr (porcentaje de clics en el enlace', 'ctr (link click-through rate'),
+      igVisits: findH('visitas al perfil de instagram', 'instagram profile visits'),
+      igFollows: findH('seguimientos de instagram', 'instagram follows'),
+      interactions: findH('interacciones', 'post engagements')
+    };
+    if (C.name < 0) return { error: 'no-name' };
+    var rows = [];
+    for (var r = 1; r < lines.length; r++) {
+      var cells = splitLine(lines[r]);
+      var get = function (i) { return i >= 0 && i < cells.length ? String(cells[i]).trim() : ''; };
+      var name = get(C.name);
+      if (!name) continue;
+      rows.push({
+        name: name,
+        brand: pautaBrand(name),
+        status: pautaStatus(get(C.status)),
+        statusRaw: get(C.status),
+        start: get(C.start), end: get(C.end),
+        reach: pautaNum(get(C.reach)),
+        freq: pautaNum(get(C.freq)),
+        impr: pautaNum(get(C.impr)),
+        results: pautaNum(get(C.results)),
+        resInd: get(C.resInd),
+        cpr: pautaNum(get(C.cpr)),
+        budget: pautaNum(get(C.budget)),
+        budgetType: get(C.budgetType),
+        spend: pautaNum(get(C.spend)),
+        cpm: pautaNum(get(C.cpm)),
+        linkClicks: pautaNum(get(C.linkClicks)),
+        cpcLink: pautaNum(get(C.cpcLink)),
+        ctrLink: pautaNum(get(C.ctrLink)),
+        igVisits: pautaNum(get(C.igVisits)),
+        igFollows: pautaNum(get(C.igFollows)),
+        interactions: pautaNum(get(C.interactions))
+      });
+    }
+    return { rows: rows, cols: C };
+  }
+
+  function pautaSupportStats(p) {
+    var isConv = (p.resInd || '').indexOf('messaging') > -1;
+    var convRate = (isConv && p.linkClicks) ? (p.results / p.linkClicks) * 100 : null;
+    return '<div class="campaign-stats">' +
+      '<div><div class="k">CTR (enlace)</div><div class="v">' + fmtPct2(p.ctrLink) + '</div></div>' +
+      '<div><div class="k">CPC (enlace)</div><div class="v">' + fmtCOP(p.cpcLink) + '</div></div>' +
+      '<div><div class="k">CPM</div><div class="v">' + fmtCOP(p.cpm) + '</div></div>' +
+      '<div><div class="k">Frecuencia</div><div class="v"' + (p.freq > 2.5 ? ' style="color:var(--warn-ink)"' : '') + '>' + fmtFreq(p.freq) + '</div></div>' +
+      '<div><div class="k">Alcance</div><div class="v">' + fmtNumCO(p.reach) + '</div></div>' +
+      (isConv ? '<div><div class="k">Conv. ÷ clics</div><div class="v">' + (convRate == null ? '—' : fmtPct2(convRate)) + '</div></div>' : '') +
+      '</div>';
+  }
+
+  function renderPautaCard(p) {
+    var pctBudget = (p.budget && p.spend) ? Math.min(100, Math.round((p.spend / p.budget) * 100)) : null;
+    var budgetLine = p.budget
+      ? '<div class="progress-track"><div class="progress-fill' + (pctBudget >= 90 ? ' warn' : '') + '" style="width:' + (pctBudget || 0) + '%"></div></div>' +
+        '<div class="progress-caption">Presupuesto ' + (p.budgetType ? p.budgetType.toLowerCase() + ' ' : '') + fmtCOP(p.budget) + ' · gastado ' + fmtCOP(p.spend) + (pctBudget != null ? ' (' + pctBudget + '%)' : '') + '</div>'
+      : '<div class="progress-caption">Gastado ' + fmtCOP(p.spend) + (p.budget ? '' : ' · sin presupuesto en el informe') + '</div>';
+    return '<div class="campaign-card">' +
+      '<div class="campaign-top"><div class="campaign-name">' + p.name + '</div>' +
+      '<span class="status-pill ' + p.status.cls + '">' + p.status.label + '</span></div>' +
+      '<div class="vc-note" style="margin:-4px 0 10px">' + p.brand + (p.start ? ' · ' + p.start + (p.end ? ' → ' + p.end : '') : '') + '</div>' +
+      '<div class="campaign-stats">' +
+      '<div><div class="k">' + pautaResLabel(p.resInd) + '</div><div class="v">' + fmtNumCO(p.results) + '</div></div>' +
+      '<div><div class="k">Costo por resultado</div><div class="v">' + fmtCOP(p.cpr) + '</div></div>' +
+      '<div><div class="k">Gasto</div><div class="v">' + fmtCOP(p.spend) + '</div></div>' +
+      '</div>' +
+      pautaSupportStats(p) +
+      budgetLine + '</div>';
+  }
+
+  function renderPautas(parsed) {
+    var out = el('pautas-output');
+    if (!out) return;
+    if (!parsed || parsed.error === 'no-name' || !parsed.rows || !parsed.rows.length) {
+      out.innerHTML = '<div class="card"><div class="leads-empty-state">No pude leer el informe. Asegúrate de pegar la <b>fila de encabezados</b> de Meta (que incluya "Nombre de la campaña") y al menos una campaña.</div></div>';
+      return;
+    }
+    var rows = parsed.rows;
+    var totalSpend = 0, activeCount = 0;
+    var byBrand = {};
+    rows.forEach(function (p) {
+      totalSpend += p.spend;
+      if (p.status.k === 'active') activeCount++;
+      var b = byBrand[p.brand] = byBrand[p.brand] || { spend: 0, active: 0, byInd: {} };
+      b.spend += p.spend;
+      if (p.status.k === 'active') b.active++;
+      var key = p.resInd || '(sin resultado)';
+      var bi = b.byInd[key] = b.byInd[key] || { results: 0, spend: 0, n: 0 };
+      bi.results += p.results; bi.spend += p.spend; bi.n++;
+    });
+
+    var html = '';
+    html += '<div class="kpi-row">' +
+      '<div class="kpi-tile"><div class="kpi-label">Pautas en el informe</div><div class="kpi-value">' + rows.length + '</div></div>' +
+      '<div class="kpi-tile"><div class="kpi-label">Activas ahora</div><div class="kpi-value" style="color:var(--good-ink)">' + activeCount + '</div></div>' +
+      '<div class="kpi-tile"><div class="kpi-label">Inversión total del informe</div><div class="kpi-value" style="font-size:17px">' + fmtCOP(totalSpend) + '</div></div>' +
+      '<div class="kpi-tile"><div class="kpi-label">Marcas</div><div class="kpi-value" style="font-size:16px">' + Object.keys(byBrand).filter(function (b) { return b !== '—'; }).length + '</div></div>' +
+      '</div>';
+
+    // Por marca
+    html += '<div class="card"><h2>🏷️ Por marca</h2>';
+    Object.keys(byBrand).sort().forEach(function (b) {
+      var bd = byBrand[b];
+      var indLines = Object.keys(bd.byInd).map(function (k) {
+        var x = bd.byInd[k];
+        var cpr = x.results ? x.spend / x.results : null;
+        return '<div class="sede-row"><div class="sede-name" style="width:220px;flex-basis:220px">' + pautaResLabel(k) + '</div>' +
+          '<div class="sede-counts" style="width:auto;flex:1;text-align:left">' + fmtNumCO(x.results) + ' · ' + (cpr == null ? '—' : fmtCOP(cpr) + ' c/u') + ' · ' + x.n + ' pauta(s)</div></div>';
+      }).join('');
+      html += '<div style="margin-bottom:12px"><div class="type-heading" style="margin:6px 0 6px"><span class="type-dot tactica"></span>' + b + ' — ' + fmtCOP(bd.spend) + ' · ' + bd.active + ' activa(s)</div>' + indLines + '</div>';
+    });
+    html += '</div>';
+
+    // Activas
+    var actives = rows.filter(function (p) { return p.status.k === 'active'; });
+    html += '<div class="card"><h2>🟢 Pautas activas ahora</h2>';
+    html += actives.length ? actives.map(renderPautaCard).join('') : '<div class="leads-empty-state">Ninguna pauta con entrega activa en este informe.</div>';
+    html += '</div>';
+
+    // Tabla completa
+    var order = { active: 0, nodeliv: 1, paused: 2, done: 3, archived: 4, other: 5 };
+    var sorted = rows.slice().sort(function (a, b) {
+      return (order[a.status.k] - order[b.status.k]) || (b.spend - a.spend);
+    });
+    html += '<div class="card"><h2>📄 Todas las pautas</h2><div class="simple-table-wrap"><table class="simple-table">' +
+      '<thead><tr><th>Marca</th><th>Campaña</th><th>Estado</th><th>Objetivo</th><th>Resultado</th><th>Costo/result.</th><th>Gasto</th><th>CTR</th><th>Frec.</th></tr></thead><tbody>' +
+      sorted.map(function (p) {
+        return '<tr>' +
+          '<td>' + (p.brand === '—' ? '—' : p.brand.split(' ')[0]) + '</td>' +
+          '<td>' + p.name + '</td>' +
+          '<td><span class="status-pill ' + p.status.cls + '">' + p.status.label + '</span></td>' +
+          '<td>' + pautaResLabel(p.resInd) + '</td>' +
+          '<td>' + fmtNumCO(p.results) + '</td>' +
+          '<td>' + fmtCOP(p.cpr) + '</td>' +
+          '<td>' + fmtCOP(p.spend) + '</td>' +
+          '<td>' + fmtPct2(p.ctrLink) + '</td>' +
+          '<td' + (p.freq > 2.5 ? ' style="color:var(--warn-ink)"' : '') + '>' + fmtFreq(p.freq) + '</td>' +
+          '</tr>';
+      }).join('') + '</tbody></table></div>' +
+      '<p class="vc-note" style="margin-top:8px">El "Resultado" y su costo se muestran según el objetivo de cada campaña (conversaciones, clics, visitas al perfil…), no se suman entre objetivos distintos. Frecuencia en <span style="color:var(--warn-ink)">ámbar</span> = por encima de 2,5 (posible saturación).</p>' +
+      '</div>';
+
+    out.innerHTML = html;
+  }
+
+  var pautasBtn = el('analyze-pautas-btn');
+  if (pautasBtn) pautasBtn.addEventListener('click', function () {
+    renderPautas(parsePautas(el('pautas-input').value));
   });
 
   // ---------- Datos reales de Meta Ads (los escribe el robot de GitHub Actions en data/live-metrics.json) ----------

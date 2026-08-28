@@ -544,6 +544,46 @@
   .pautas-drop-main { font-size: 14px; font-weight: 700; }
   .pautas-drop-sub { font-size: 12px; color: var(--ink-muted); margin-top: 4px; }
 
+  /* Pautas: resultados visuales */
+  .pauta-split { display: flex; height: 26px; border-radius: 7px; overflow: hidden; border: 1px solid var(--border); margin: 10px 0 8px; }
+  .pauta-split-seg { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #0a0a0a; white-space: nowrap; min-width: 2px; }
+  .pauta-splitleg { display: flex; gap: 18px; font-size: 12px; color: var(--ink-muted); flex-wrap: wrap; }
+  .pauta-splitleg span { display: inline-flex; align-items: center; gap: 6px; }
+  .pauta-dot { width: 9px; height: 9px; border-radius: 3px; display: inline-block; flex: 0 0 9px; }
+
+  .pauta-active-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 820px) { .pauta-active-grid { grid-template-columns: 1fr; } }
+  .pauta-bigcard { border: 1px solid var(--border); border-radius: 14px; padding: 18px; background: var(--surface-2); }
+  .pauta-bigcard .p-brand { font-size: 11px; font-weight: 800; color: var(--accent-soft-ink); text-transform: uppercase; letter-spacing: .04em; }
+  .pauta-bigcard .p-name { font-size: 14px; font-weight: 700; margin: 4px 0 1px; line-height: 1.3; }
+  .pauta-bigcard .p-dates { font-size: 11.5px; color: var(--ink-faint); margin-bottom: 14px; }
+  .pauta-hero { display: flex; gap: 18px; margin-bottom: 14px; }
+  .pauta-hero .h-block { flex: 1; min-width: 0; }
+  .pauta-hero .h-k { font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-faint); }
+  .pauta-hero .h-v { font-size: 23px; font-weight: 800; margin-top: 3px; }
+  .pauta-hero .h-v.accent { color: var(--accent); }
+  .pauta-meterrow { display: flex; flex-direction: column; gap: 9px; margin-bottom: 14px; }
+  .pauta-meter { display: grid; grid-template-columns: 92px 1fr 58px; gap: 10px; align-items: center; font-size: 11.5px; }
+  .pauta-meter .m-k { color: var(--ink-muted); font-weight: 700; }
+  .pauta-meter .m-v { text-align: right; font-weight: 700; color: var(--ink); }
+  .pauta-meter-track { height: 8px; border-radius: 5px; background: var(--surface); overflow: hidden; border: 1px solid var(--border); }
+  .pauta-meter-fill { display: block; height: 100%; border-radius: 5px; }
+  .pauta-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pauta-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 10.5px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .03em; }
+  .pauta-chip b { display: block; font-size: 13px; margin-top: 2px; color: var(--ink); text-transform: none; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+
+  .pauta-twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  @media (max-width: 700px) { .pauta-twocol { grid-template-columns: 1fr; } }
+  .pauta-donut-wrap { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .pauta-donut-wrap svg { display: block; flex: 0 0 auto; }
+  .pauta-leg-list { display: flex; flex-direction: column; gap: 6px; font-size: 12px; min-width: 0; }
+  .pauta-leg { color: var(--ink-muted); }
+  .pauta-leg-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+  .pauta-leg b { color: var(--ink); }
+
+  .pauta-table-ctr { display: inline-block; width: 46px; height: 6px; border-radius: 4px; background: var(--surface-2); overflow: hidden; vertical-align: middle; margin-right: 7px; }
+  .pauta-table-ctr i { display: block; height: 100%; background: var(--accent); }
+
   /* Constancia */
   .constancia-check-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; cursor: pointer; }
   .constancia-check-row:last-child { border-bottom: none; }
@@ -1463,15 +1503,19 @@
       ctrLink: findH('ctr (porcentaje de clics en el enlace', 'ctr (link click-through rate'),
       igVisits: findH('visitas al perfil de instagram', 'instagram profile visits'),
       igFollows: findH('seguimientos de instagram', 'instagram follows'),
-      interactions: findH('interacciones', 'post engagements')
+      interactions: findH('interacciones', 'post engagements'),
+      repStart: findH('inicio del informe', 'reporting starts'),
+      repEnd: findH('fin del informe', 'reporting ends')
     };
     if (C.name < 0) return { error: 'no-name' };
+    var period = null;
     var rows = [];
     for (var r = 1; r < lines.length; r++) {
       var cells = splitLine(lines[r]);
       var get = function (i) { return i >= 0 && i < cells.length ? String(cells[i]).trim() : ''; };
       var name = get(C.name);
       if (!name) continue;
+      if (!period && (get(C.repStart) || get(C.repEnd))) period = { start: get(C.repStart), end: get(C.repEnd) };
       rows.push({
         name: name,
         brand: pautaBrand(name),
@@ -1496,46 +1540,103 @@
         interactions: pautaNum(get(C.interactions))
       });
     }
-    return { rows: rows, cols: C };
+    return { rows: rows, cols: C, period: period };
   }
 
-  function pautaSupportStats(p) {
+  var PAUTA_OBJ_COLOR = {
+    'Conversaciones de WhatsApp': '#29abc7',
+    'Clics en el enlace': '#9bc93c',
+    'Visitas al perfil de IG': '#1f7fc4',
+    'Interacción con publicación': '#f8be22',
+    'Visitas a la página': '#f1812c',
+    'Alcance': '#aedeea',
+    '—': '#757575'
+  };
+  function pautaObjColor(label) { return PAUTA_OBJ_COLOR[label] || '#29abc7'; }
+
+  // Medidor horizontal con color semántico (verde bien / ámbar ojo / rojo mal)
+  function pautaMeter(label, valueText, pct, color) {
+    pct = Math.max(2, Math.min(100, pct));
+    return '<div class="pauta-meter"><span class="m-k">' + label + '</span>' +
+      '<span class="pauta-meter-track"><span class="pauta-meter-fill" style="width:' + pct.toFixed(1) + '%;background:' + color + '"></span></span>' +
+      '<span class="m-v">' + valueText + '</span></div>';
+  }
+  function pautaCtrColor(ctr) { return ctr >= 3 ? 'var(--good)' : (ctr >= 1.5 ? 'var(--accent)' : 'var(--warn)'); }
+  function pautaFreqColor(f) { return f > 2.8 ? 'var(--crit)' : (f > 2.3 ? 'var(--warn)' : 'var(--good)'); }
+
+  // Dona SVG compacta
+  function pautaDonut(segs, center) {
+    var size = 118, th = 20, r = (size - th) / 2, cx = size / 2, cy = size / 2, circ = 2 * Math.PI * r;
+    var total = segs.reduce(function (s, x) { return s + x.value; }, 0) || 1, off = 0;
+    var arcs = segs.filter(function (s) { return s.value > 0; }).map(function (s) {
+      var dash = s.value / total * circ;
+      var c = '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + s.color + '" stroke-width="' + th + '" stroke-dasharray="' + dash.toFixed(2) + ' ' + (circ - dash).toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '" transform="rotate(-90 ' + cx + ' ' + cy + ')"></circle>';
+      off += dash; return c;
+    }).join('');
+    var svg = '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">' + arcs +
+      (center ? '<text x="' + cx + '" y="' + (cy + 5) + '" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">' + center + '</text>' : '') + '</svg>';
+    var legend = segs.map(function (s) {
+      return '<div class="pauta-leg"><span class="pauta-leg-dot" style="background:' + s.color + '"></span>' + s.label + ' <b>' + s.sub + '</b></div>';
+    }).join('');
+    return '<div class="pauta-donut-wrap"><div>' + svg + '</div><div class="pauta-leg-list">' + legend + '</div></div>';
+  }
+
+  // Sparkline de área (evolución de un costo en el tiempo)
+  function pautaSpark(points) {
+    var w = 480, h = 132, pad = 30;
+    var vals = points.map(function (p) { return p.v; });
+    var mx = Math.max.apply(null, vals), mn = Math.min.apply(null, vals.concat([mx]));
+    var lo = Math.min(mn, mx * 0.8);
+    var sx = points.length > 1 ? (w - pad * 2) / (points.length - 1) : 0;
+    var sy = function (v) { return h - pad - ((v - lo) / ((mx - lo) || 1)) * (h - pad * 2); };
+    var pts = points.map(function (p, i) { return [pad + i * sx, sy(p.v)]; });
+    var d = pts.map(function (c, i) { return (i ? 'L' : 'M') + c[0].toFixed(1) + ',' + c[1].toFixed(1); }).join(' ');
+    var area = d + ' L' + pts[pts.length - 1][0].toFixed(1) + ',' + (h - pad) + ' L' + pts[0][0].toFixed(1) + ',' + (h - pad) + ' Z';
+    var avg = vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
+    var ay = sy(avg).toFixed(1);
+    var dots = pts.map(function (c, i) {
+      var last = i === pts.length - 1;
+      return '<circle cx="' + c[0].toFixed(1) + '" cy="' + c[1].toFixed(1) + '" r="' + (last ? 4.5 : 3) + '" fill="' + (last ? 'var(--accent-strong)' : 'var(--accent)') + '"></circle>' +
+        '<text x="' + c[0].toFixed(1) + '" y="' + (c[1] - 9).toFixed(1) + '" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--ink)">' + points[i].t + '</text>' +
+        '<text x="' + c[0].toFixed(1) + '" y="' + (h - 9) + '" text-anchor="middle" font-size="9" fill="var(--ink-faint)">' + points[i].label + '</text>';
+    }).join('');
+    return '<div class="chart-line-wrap"><svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="xMidYMid meet">' +
+      '<path d="' + area + '" fill="var(--accent-soft)"></path>' +
+      '<line x1="' + pad + '" x2="' + (w - pad) + '" y1="' + ay + '" y2="' + ay + '" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="3 3"></line>' +
+      '<text x="' + (w - pad) + '" y="' + (ay - 4) + '" text-anchor="end" font-size="9" fill="var(--ink-faint)">prom. ' + fmtCOP(avg) + '</text>' +
+      '<path d="' + d + '" fill="none" stroke="var(--accent)" stroke-width="2.5"></path>' + dots + '</svg></div>';
+  }
+
+  function renderPautaBigCard(p) {
     var isConv = (p.resInd || '').indexOf('messaging') > -1;
     var convRate = (isConv && p.linkClicks) ? (p.results / p.linkClicks) * 100 : null;
-    return '<div class="campaign-stats">' +
-      '<div><div class="k">CTR (enlace)</div><div class="v">' + fmtPct2(p.ctrLink) + '</div></div>' +
-      '<div><div class="k">CPC (enlace)</div><div class="v">' + fmtCOP(p.cpcLink) + '</div></div>' +
-      '<div><div class="k">CPM</div><div class="v">' + fmtCOP(p.cpm) + '</div></div>' +
-      '<div><div class="k">Frecuencia</div><div class="v"' + (p.freq > 2.5 ? ' style="color:var(--warn-ink)"' : '') + '>' + fmtFreq(p.freq) + '</div></div>' +
-      '<div><div class="k">Alcance</div><div class="v">' + fmtNumCO(p.reach) + '</div></div>' +
-      (isConv ? '<div><div class="k">Conv. ÷ clics</div><div class="v">' + (convRate == null ? '—' : fmtPct2(convRate)) + '</div></div>' : '') +
-      '</div>';
-  }
-
-  function renderPautaCard(p) {
-    var pctBudget = (p.budget && p.spend) ? Math.min(100, Math.round((p.spend / p.budget) * 100)) : null;
-    var budgetLine = p.budget
-      ? '<div class="progress-track"><div class="progress-fill' + (pctBudget >= 90 ? ' warn' : '') + '" style="width:' + (pctBudget || 0) + '%"></div></div>' +
-        '<div class="progress-caption">Presupuesto ' + (p.budgetType ? p.budgetType.toLowerCase() + ' ' : '') + fmtCOP(p.budget) + ' · gastado ' + fmtCOP(p.spend) + (pctBudget != null ? ' (' + pctBudget + '%)' : '') + '</div>'
-      : '<div class="progress-caption">Gastado ' + fmtCOP(p.spend) + (p.budget ? '' : ' · sin presupuesto en el informe') + '</div>';
-    return '<div class="campaign-card">' +
-      '<div class="campaign-top"><div class="campaign-name">' + p.name + '</div>' +
-      '<span class="status-pill ' + p.status.cls + '">' + p.status.label + '</span></div>' +
-      '<div class="vc-note" style="margin:-4px 0 10px">' + p.brand + (p.start ? ' · ' + p.start + (p.end ? ' → ' + p.end : '') : '') + '</div>' +
-      '<div class="campaign-stats">' +
-      '<div><div class="k">' + pautaResLabel(p.resInd) + '</div><div class="v">' + fmtNumCO(p.results) + '</div></div>' +
-      '<div><div class="k">Costo por resultado</div><div class="v">' + fmtCOP(p.cpr) + '</div></div>' +
-      '<div><div class="k">Gasto</div><div class="v">' + fmtCOP(p.spend) + '</div></div>' +
+    var pctBudget = (p.budget && p.spend) ? Math.min(100, (p.spend / p.budget) * 100) : null;
+    var meters = pautaMeter('CTR enlace', fmtPct2(p.ctrLink), (p.ctrLink / 6) * 100, pautaCtrColor(p.ctrLink)) +
+      pautaMeter('Frecuencia', fmtFreq(p.freq), (p.freq / 3.5) * 100, pautaFreqColor(p.freq)) +
+      (pctBudget != null ? pautaMeter('Presupuesto', Math.round(pctBudget) + '%', pctBudget, pctBudget >= 90 ? 'var(--warn)' : 'var(--accent)') : '');
+    var chips = '<div class="pauta-chip">CPC enlace<b>' + fmtCOP(p.cpcLink) + '</b></div>' +
+      '<div class="pauta-chip">CPM<b>' + fmtCOP(p.cpm) + '</b></div>' +
+      '<div class="pauta-chip">Alcance<b>' + fmtNumCO(p.reach) + '</b></div>' +
+      '<div class="pauta-chip">Gasto<b>' + fmtCOP(p.spend) + '</b></div>' +
+      (convRate != null ? '<div class="pauta-chip">Conv. ÷ clics<b>' + fmtPct2(convRate) + '</b></div>' : '');
+    return '<div class="pauta-bigcard">' +
+      '<div class="p-brand">' + (p.brand === '—' ? 'Sin marca' : p.brand) + ' <span class="status-pill ' + p.status.cls + '" style="margin-left:4px">' + p.status.label + '</span></div>' +
+      '<div class="p-name">' + p.name + '</div>' +
+      '<div class="p-dates">' + (p.start ? p.start + (p.end ? ' → ' + p.end : '') : 'sin fechas') + '</div>' +
+      '<div class="pauta-hero">' +
+      '<div class="h-block"><div class="h-k">' + pautaResLabel(p.resInd) + '</div><div class="h-v">' + fmtNumCO(p.results) + '</div></div>' +
+      '<div class="h-block"><div class="h-k">Costo por resultado</div><div class="h-v accent">' + fmtCOP(p.cpr) + '</div></div>' +
       '</div>' +
-      pautaSupportStats(p) +
-      budgetLine + '</div>';
+      '<div class="pauta-meterrow">' + meters + '</div>' +
+      '<div class="pauta-chips">' + chips + '</div>' +
+      '</div>';
   }
 
   function renderPautas(parsed) {
     var out = el('pautas-output');
     if (!out) return;
     if (!parsed || parsed.error === 'no-name' || !parsed.rows || !parsed.rows.length) {
-      out.innerHTML = '<div class="card"><div class="leads-empty-state">No pude leer el informe. Asegúrate de pegar la <b>fila de encabezados</b> de Meta (que incluya "Nombre de la campaña") y al menos una campaña.</div></div>';
+      out.innerHTML = '<div class="card"><div class="leads-empty-state">No pude leer el informe. Asegúrate de que el archivo tenga la <b>fila de encabezados</b> de Meta (con "Nombre de la campaña") y al menos una campaña.</div></div>';
       return;
     }
     var rows = parsed.rows;
@@ -1544,63 +1645,110 @@
     rows.forEach(function (p) {
       totalSpend += p.spend;
       if (p.status.k === 'active') activeCount++;
-      var b = byBrand[p.brand] = byBrand[p.brand] || { spend: 0, active: 0, byInd: {} };
-      b.spend += p.spend;
+      var b = byBrand[p.brand] = byBrand[p.brand] || { spend: 0, active: 0, n: 0, byInd: {} };
+      b.spend += p.spend; b.n++;
       if (p.status.k === 'active') b.active++;
-      var key = p.resInd || '(sin resultado)';
+      var key = pautaResLabel(p.resInd);
       var bi = b.byInd[key] = b.byInd[key] || { results: 0, spend: 0, n: 0 };
       bi.results += p.results; bi.spend += p.spend; bi.n++;
     });
+    var brandOrder = Object.keys(byBrand).sort(function (a, b) { return byBrand[b].spend - byBrand[a].spend; });
+    var realBrands = brandOrder.filter(function (b) { return b !== '—'; });
+    var periodTxt = parsed.period && (parsed.period.start || parsed.period.end)
+      ? (parsed.period.start || '') + (parsed.period.end ? ' – ' + parsed.period.end : '') : '';
 
     var html = '';
-    html += '<div class="kpi-row">' +
-      '<div class="kpi-tile"><div class="kpi-label">Pautas en el informe</div><div class="kpi-value">' + rows.length + '</div></div>' +
-      '<div class="kpi-tile"><div class="kpi-label">Activas ahora</div><div class="kpi-value" style="color:var(--good-ink)">' + activeCount + '</div></div>' +
-      '<div class="kpi-tile"><div class="kpi-label">Inversión total del informe</div><div class="kpi-value" style="font-size:17px">' + fmtCOP(totalSpend) + '</div></div>' +
-      '<div class="kpi-tile"><div class="kpi-label">Marcas</div><div class="kpi-value" style="font-size:16px">' + Object.keys(byBrand).filter(function (b) { return b !== '—'; }).length + '</div></div>' +
+
+    // ---- Resumen ----
+    html += '<div class="card">' +
+      (periodTxt ? '<p class="vc-note" style="margin-top:-2px">Informe de Meta · ' + periodTxt + '</p>' : '') +
+      '<div class="kpi-row" style="margin-bottom:10px">' +
+      '<div class="kpi-tile"><div class="kpi-label">Inversión total</div><div class="kpi-value" style="font-size:19px">' + fmtCOP(totalSpend) + '</div></div>' +
+      '<div class="kpi-tile"><div class="kpi-label">Pautas activas</div><div class="kpi-value" style="color:var(--good-ink)">' + activeCount + '<span style="font-size:13px;color:var(--ink-faint);font-weight:600"> / ' + rows.length + '</span></div></div>' +
+      realBrands.map(function (b) {
+        var bd = byBrand[b];
+        return '<div class="kpi-tile"><div class="kpi-label">' + b + '</div><div class="kpi-value" style="font-size:16px">' + fmtCOP(bd.spend) + '</div><div class="kpi-sub">' + Math.round(bd.spend / (totalSpend || 1) * 100) + '% · ' + bd.active + ' activa(s)</div></div>';
+      }).join('') +
       '</div>';
-
-    // Por marca
-    html += '<div class="card"><h2>🏷️ Por marca</h2>';
-    Object.keys(byBrand).sort().forEach(function (b) {
-      var bd = byBrand[b];
-      var indLines = Object.keys(bd.byInd).map(function (k) {
-        var x = bd.byInd[k];
-        var cpr = x.results ? x.spend / x.results : null;
-        return '<div class="sede-row"><div class="sede-name" style="width:220px;flex-basis:220px">' + pautaResLabel(k) + '</div>' +
-          '<div class="sede-counts" style="width:auto;flex:1;text-align:left">' + fmtNumCO(x.results) + ' · ' + (cpr == null ? '—' : fmtCOP(cpr) + ' c/u') + ' · ' + x.n + ' pauta(s)</div></div>';
-      }).join('');
-      html += '<div style="margin-bottom:12px"><div class="type-heading" style="margin:6px 0 6px"><span class="type-dot tactica"></span>' + b + ' — ' + fmtCOP(bd.spend) + ' · ' + bd.active + ' activa(s)</div>' + indLines + '</div>';
-    });
+    // barra apilada de inversión por marca
+    if (realBrands.length) {
+      var palette = ['#29abc7', '#1f7fc4', '#9bc93c', '#f8be22'];
+      html += '<div class="pauta-split">' + realBrands.map(function (b, i) {
+        var w = byBrand[b].spend / (totalSpend || 1) * 100;
+        return '<div class="pauta-split-seg" style="width:' + w.toFixed(2) + '%;background:' + palette[i % palette.length] + '">' + (w > 12 ? Math.round(w) + '%' : '') + '</div>';
+      }).join('') + '</div>' +
+      '<div class="pauta-splitleg">' + realBrands.map(function (b, i) {
+        return '<span><span class="pauta-dot" style="background:' + palette[i % palette.length] + '"></span>' + b + ' · ' + fmtCOP(byBrand[b].spend) + '</span>';
+      }).join('') + '</div>';
+    }
     html += '</div>';
 
-    // Activas
-    var actives = rows.filter(function (p) { return p.status.k === 'active'; });
+    // ---- Pautas activas ahora ----
+    var actives = rows.filter(function (p) { return p.status.k === 'active'; })
+      .sort(function (a, b) { return b.spend - a.spend; });
     html += '<div class="card"><h2>🟢 Pautas activas ahora</h2>';
-    html += actives.length ? actives.map(renderPautaCard).join('') : '<div class="leads-empty-state">Ninguna pauta con entrega activa en este informe.</div>';
+    if (actives.length) {
+      html += '<div class="pauta-active-grid">' + actives.map(renderPautaBigCard).join('') + '</div>';
+      if (actives.length >= 2) {
+        html += '<p class="vc-note" style="margin-top:12px">Cada marca se mide con su propio resultado (' +
+          actives.map(function (p) { return '<b>' + (p.brand === '—' ? p.name : p.brand.split(' ')[0]) + '</b>: ' + pautaResLabel(p.resInd).toLowerCase(); }).join(' · ') +
+          '), así que los "costo por resultado" no son comparables entre sí.</p>';
+      }
+    } else {
+      html += '<div class="leads-empty-state">Ninguna pauta con entrega activa en este informe.</div>';
+    }
     html += '</div>';
 
-    // Tabla completa
+    // ---- En qué se fue la inversión ----
+    html += '<div class="card"><h2>🧭 En qué se fue la inversión</h2><div class="pauta-twocol">' +
+      realBrands.map(function (b) {
+        var bd = byBrand[b];
+        var segs = Object.keys(bd.byInd).map(function (k) {
+          var x = bd.byInd[k];
+          return { label: k, value: x.spend, color: pautaObjColor(k), sub: fmtCOP(x.spend) + (x.results ? ' · ' + fmtCOP(x.spend / x.results) + ' c/u' : '') };
+        }).filter(function (s) { return s.value > 0; }).sort(function (a, b2) { return b2.value - a.value; });
+        return '<div><div class="type-heading" style="margin:0 0 10px"><span class="type-dot tactica"></span>' + b + ' · ' + fmtCOP(bd.spend) + '</div>' +
+          pautaDonut(segs, '') + '</div>';
+      }).join('') +
+      '</div><p class="vc-note" style="margin-top:10px">Reparto del gasto por objetivo de campaña, dentro de cada marca.</p></div>';
+
+    // ---- Evolución del costo por conversación (si hay historia) ----
+    var convHist = rows.filter(function (p) { return (p.resInd || '').indexOf('messaging') > -1 && p.results > 0 && p.start; })
+      .sort(function (a, b) { return (a.start || '').localeCompare(b.start || ''); });
+    if (convHist.length >= 2) {
+      var pts = convHist.map(function (p) {
+        var mm = (p.start || '').slice(5, 7);
+        var months = { '01': 'ene', '02': 'feb', '03': 'mar', '04': 'abr', '05': 'may', '06': 'jun', '07': 'jul', '08': 'ago', '09': 'sep', '10': 'oct', '11': 'nov', '12': 'dic' };
+        return { v: p.cpr, label: months[mm] || (p.start || '').slice(5, 10), t: fmtCOP(p.cpr).replace('$', '') };
+      });
+      html += '<div class="card"><h2>📈 Costo por conversación de WhatsApp en el tiempo</h2>' +
+        pautaSpark(pts) +
+        '<p class="vc-note" style="margin-top:6px">Cada punto es una campaña de conversaciones, ordenadas por fecha de inicio. La línea punteada es el promedio del período.</p></div>';
+    }
+
+    // ---- Tabla completa ----
     var order = { active: 0, nodeliv: 1, paused: 2, done: 3, archived: 4, other: 5 };
     var sorted = rows.slice().sort(function (a, b) {
       return (order[a.status.k] - order[b.status.k]) || (b.spend - a.spend);
     });
+    var maxCtr = Math.max.apply(null, rows.map(function (p) { return p.ctrLink; }).concat([1]));
     html += '<div class="card"><h2>📄 Todas las pautas</h2><div class="simple-table-wrap"><table class="simple-table">' +
       '<thead><tr><th>Marca</th><th>Campaña</th><th>Estado</th><th>Objetivo</th><th>Resultado</th><th>Costo/result.</th><th>Gasto</th><th>CTR</th><th>Frec.</th></tr></thead><tbody>' +
       sorted.map(function (p) {
+        var objLabel = pautaResLabel(p.resInd);
         return '<tr>' +
           '<td>' + (p.brand === '—' ? '—' : p.brand.split(' ')[0]) + '</td>' +
           '<td>' + p.name + '</td>' +
           '<td><span class="status-pill ' + p.status.cls + '">' + p.status.label + '</span></td>' +
-          '<td>' + pautaResLabel(p.resInd) + '</td>' +
+          '<td><span class="pauta-dot" style="background:' + pautaObjColor(objLabel) + ';margin-right:6px"></span>' + objLabel + '</td>' +
           '<td>' + fmtNumCO(p.results) + '</td>' +
           '<td>' + fmtCOP(p.cpr) + '</td>' +
           '<td>' + fmtCOP(p.spend) + '</td>' +
-          '<td>' + fmtPct2(p.ctrLink) + '</td>' +
-          '<td' + (p.freq > 2.5 ? ' style="color:var(--warn-ink)"' : '') + '>' + fmtFreq(p.freq) + '</td>' +
+          '<td><span class="pauta-table-ctr"><i style="width:' + Math.round(p.ctrLink / maxCtr * 100) + '%"></i></span>' + fmtPct2(p.ctrLink) + '</td>' +
+          '<td style="color:' + pautaFreqColor(p.freq) + ';font-weight:700">' + fmtFreq(p.freq) + '</td>' +
           '</tr>';
       }).join('') + '</tbody></table></div>' +
-      '<p class="vc-note" style="margin-top:8px">El "Resultado" y su costo se muestran según el objetivo de cada campaña (conversaciones, clics, visitas al perfil…), no se suman entre objetivos distintos. Frecuencia en <span style="color:var(--warn-ink)">ámbar</span> = por encima de 2,5 (posible saturación).</p>' +
+      '<p class="vc-note" style="margin-top:8px">El resultado y su costo se muestran según el objetivo de cada campaña; no se suman entre objetivos distintos. Frecuencia coloreada: <span style="color:var(--good)">≤2,3</span> · <span style="color:var(--warn)">2,3–2,8</span> · <span style="color:var(--crit)">&gt;2,8</span> (saturación).</p>' +
       '</div>';
 
     out.innerHTML = html;

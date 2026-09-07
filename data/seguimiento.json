@@ -1,0 +1,246 @@
+{
+  "updatedAt": "2026-09-07T22:16:31.999Z",
+  "source": "Excel · ProviserXNass.xlsx",
+  "rows": [
+    {
+      "fecha": "2026-09-07",
+      "mes": "2026-09",
+      "semana": "Semana del 7 al 11 de septiembre",
+      "actividad": "¿Lo viste?",
+      "objetivo": "Venta",
+      "empresa": "Proviser",
+      "formato": "Reel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-07",
+      "mes": "2026-09",
+      "semana": "Semana del 7 al 11 de septiembre",
+      "actividad": "Encuentra el punto vulnerable",
+      "objetivo": "Awareness",
+      "empresa": "Nass",
+      "formato": "Carrusel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-09",
+      "mes": "2026-09",
+      "semana": "Semana del 7 al 11 de septiembre",
+      "actividad": "¿Tienes seguridad o solo elementos de seguridad?",
+      "objetivo": "Awareness",
+      "empresa": "Proviser",
+      "formato": "Carrusel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-09",
+      "mes": "2026-09",
+      "semana": "Semana del 7 al 11 de septiembre",
+      "actividad": "Humano vs. Tecnología",
+      "objetivo": "Awareness",
+      "empresa": "Nass",
+      "formato": "Reel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-11",
+      "mes": "2026-09",
+      "semana": "Semana del 7 al 11 de septiembre",
+      "actividad": "15 segundos que nadie nota",
+      "objetivo": "Humano",
+      "empresa": "Proviser",
+      "formato": "Carrusel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-11",
+      "mes": "2026-09",
+      "semana": "Semana del 7 al 11 de septiembre",
+      "actividad": "Encuentra el punto vulnerable",
+      "objetivo": "Awareness",
+      "empresa": "Nass",
+      "formato": "Carrusel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-14",
+      "mes": "2026-09",
+      "semana": "Semana del 14 al 18 de agosto",
+      "actividad": "Una cámara no toma decisiones",
+      "objetivo": "Awareness",
+      "empresa": "Proviser",
+      "formato": "Post estático",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-14",
+      "mes": "2026-09",
+      "semana": "Semana del 14 al 18 de agosto",
+      "actividad": "Tu casa tiene tecnología. ¿Pero piensa en seguridad?",
+      "objetivo": "Venta",
+      "empresa": "Nass",
+      "formato": "Post estático",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-16",
+      "mes": "2026-09",
+      "semana": "Semana del 14 al 18 de agosto",
+      "actividad": "Lo que hay detrás de quien te protege",
+      "objetivo": "Venta",
+      "empresa": "Proviser",
+      "formato": "Reel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-16",
+      "mes": "2026-09",
+      "semana": "Semana del 14 al 18 de agosto",
+      "actividad": "La prueba de los 10 segundos",
+      "objetivo": "Awareness",
+      "empresa": "Nass",
+      "formato": "Reel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-19",
+      "mes": "2026-09",
+      "semana": "Semana del 14 al 18 de agosto",
+      "actividad": "Cuidar empieza por conocer",
+      "objetivo": "Humano",
+      "empresa": "Proviser",
+      "formato": "Reel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-19",
+      "mes": "2026-09",
+      "semana": "Semana del 14 al 18 de agosto",
+      "actividad": "Amor y Amistad: cuidar también es dar tranquilidad",
+      "objetivo": "Humano",
+      "empresa": "Nass",
+      "formato": "Carrusel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-21",
+      "mes": "2026-09",
+      "semana": "Semana del 21 al 25 de septiembre",
+      "actividad": "Tu planta no tiene un solo punto de riesgo",
+      "objetivo": "Venta",
+      "empresa": "Proviser",
+      "formato": "Carrusel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-21",
+      "mes": "2026-09",
+      "semana": "Semana del 21 al 25 de septiembre",
+      "actividad": "La tranquilidad también se diseña",
+      "objetivo": "Awareness",
+      "empresa": "Nass",
+      "formato": "Carrusel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-23",
+      "mes": "2026-09",
+      "semana": "Semana del 21 al 25 de septiembre",
+      "actividad": "Cuando todos se van",
+      "objetivo": "Venta",
+      "empresa": "Proviser",
+      "formato": "Reel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-23",
+      "mes": "2026-09",
+      "semana": "Semana del 21 al 25 de septiembre",
+      "actividad": "Una instalación, cuatro capas",
+      "objetivo": "Venta",
+      "empresa": "Nass",
+      "formato": "Reel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-25",
+      "mes": "2026-09",
+      "semana": "Semana del 21 al 25 de septiembre",
+      "actividad": "Cuando cambia el turno",
+      "objetivo": "Venta",
+      "empresa": "Proviser",
+      "formato": "Reel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-25",
+      "mes": "2026-09",
+      "semana": "Semana del 21 al 25 de septiembre",
+      "actividad": "Tu cámara está grabando. Haz esta prueba",
+      "objetivo": "Venta",
+      "empresa": "Nass",
+      "formato": "Carrusel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-28",
+      "mes": "2026-09",
+      "semana": "Semana del 28 de septiembre al 2 de octubre",
+      "actividad": "No todo riesgo hace ruido",
+      "objetivo": "Venta",
+      "empresa": "Proviser",
+      "formato": "Post estático",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-28",
+      "mes": "2026-09",
+      "semana": "Semana del 28 de septiembre al 2 de octubre",
+      "actividad": "No vendemos la misma seguridad para todos",
+      "objetivo": "Humano",
+      "empresa": "Nass",
+      "formato": "Carrusel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-30",
+      "mes": "2026-09",
+      "semana": "Semana del 28 de septiembre al 2 de octubre",
+      "actividad": "Decisiones que probablemente nunca vas a ver",
+      "objetivo": "Venta",
+      "empresa": "Proviser",
+      "formato": "Carrusel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-09-30",
+      "mes": "2026-09",
+      "semana": "Semana del 28 de septiembre al 2 de octubre",
+      "actividad": "Lo que tú ves / lo que el sistema entiende",
+      "objetivo": "Venta",
+      "empresa": "Nass",
+      "formato": "Reel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-10-02",
+      "mes": "2026-10",
+      "semana": "Semana del 28 de septiembre al 2 de octubre",
+      "actividad": "La seguridad que funciona no siempre se nota",
+      "objetivo": "Venta",
+      "empresa": "Proviser",
+      "formato": "Carrusel",
+      "hoja": "Septiembre 2026"
+    },
+    {
+      "fecha": "2026-10-02",
+      "mes": "2026-10",
+      "semana": "Semana del 28 de septiembre al 2 de octubre",
+      "actividad": "¿Comprarías seguridad por número de cámaras?",
+      "objetivo": "Venta",
+      "empresa": "Nass",
+      "formato": "Post estático",
+      "hoja": "Septiembre 2026"
+    }
+  ]
+}

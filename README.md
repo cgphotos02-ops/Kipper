@@ -18,6 +18,7 @@ Estas herramientas funcionan sin conexión de datos (todo se procesa en el naveg
 
 - **Campañas → Planear campaña nueva** — genera una estructura de campaña a partir de un brief.
 - **Campañas → Seguimiento de leads** — pegas el Excel semanal y clasifica los leads on/off target.
+- **Posts → Seguimiento de contenidos** — lista las piezas de la parrilla del mes; marcas Grabado / Elaborado / Programado / Publicado en cada una y el avance se guarda en el navegador (`localStorage`, clave `kipper_seguimiento`). Debajo, un donut con el % del plan ejecutado y el reparto por etapa.
 
 ## Archivos
 
@@ -27,6 +28,8 @@ Estas herramientas funcionan sin conexión de datos (todo se procesa en el naveg
 | `data/pautas.json` | Estado de las pautas de Meta que muestra la pestaña **Pautas**. Se genera desde el informe de Meta y se versiona en el repo (persiste entre visitas). |
 | `scripts/gen-pautas.js` | Convierte un informe de campañas de Meta (`.xlsx` o `.csv`) en `data/pautas.json`. |
 | `data/social.json` | Datos de Instagram + Facebook (Metricool) que alimentan **Inicio, Posts, Mi audiencia, Competencia**. Transcrito de los informes PDF de Metricool. |
+| `data/seguimiento.json` | Lista de piezas de la parrilla (una fila por contenido, con mes/semana/marca/formato). La usa **Posts → Seguimiento de contenidos**. Los checks de avance NO están aquí: viven en el navegador. |
+| `scripts/gen-seguimiento.js` | Convierte `ProviserXNass.xlsx` (todas las hojas visibles, una por mes) en `data/seguimiento.json`. Uso: `node scripts/gen-seguimiento.js "ruta/ProviserXNass.xlsx"`. |
 | `data/live-metrics.json` | Datos de Meta Ads por marca. Vacío hasta conectar. Lo reescribe el flujo de Actions. |
 | `scripts/refresh-meta-data.js` | Jala datos de la Graph API de Meta. Falta completar `AD_ACCOUNT_ID` y los IDs de campaña/conjunto de cada marca. |
 | `.github/workflows/refresh-meta-data.yml` | Ejecuta el script anterior. Programación en pausa; se dispara a mano (`workflow_dispatch`). |

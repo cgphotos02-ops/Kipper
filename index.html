@@ -788,7 +788,21 @@
   <!-- POSTS -->
   <section class="view" id="view-posts">
     <h1 class="greeting">Mis posts</h1>
-    <div class="date-sub">Análisis de todo tu contenido publicado</div>
+    <div class="date-sub">Seguimiento de tu parrilla y análisis de lo publicado</div>
+
+    <div class="card">
+      <h2>📋 Seguimiento de contenidos</h2>
+      <p class="vc-note" style="margin-top:-4px">Cada pieza de tu parrilla del mes. Marca el avance a medida que lo haces — se guarda en este navegador.</p>
+      <div id="posts-seguimiento"><div class="leads-empty-state">Cargando contenidos…</div></div>
+    </div>
+
+    <div class="card">
+      <h2>🎯 Cómo voy con la parrilla</h2>
+      <p class="vc-note" style="margin-top:-4px">Avance del mes según lo que has marcado arriba.</p>
+      <div id="posts-seg-donut"><div class="leads-empty-state">Se calcula cuando haya contenidos del mes.</div></div>
+    </div>
+
+    <h2 class="section-h" style="margin:26px 0 4px;font-size:14px;color:var(--ink-muted)">📈 Análisis de lo publicado</h2>
 
     <div class="filter-row" id="posts-fmt-tabs">
       <div class="tab active" data-fmt="todos">Todos</div>
@@ -1115,35 +1129,48 @@
   var mesSel = el('global-mes');
   function currentAccount() { return cuentaSel ? cuentaSel.value : 'proviser'; }
 
-  if (mesSel) {
-    var _now = new Date();
-    var _maxY = _now.getFullYear(), _maxM = _now.getMonth() + 1;
-    var _opts = [];
-    for (var _y = 2026; _y <= _maxY; _y++) {
-      for (var _m = 1; _m <= 12; _m++) {
-        if (_y === _maxY && _m > _maxM) break;
-        var _k = _y + '-' + (_m < 10 ? '0' : '') + _m;
-        _opts.push('<option value="' + _k + '"' + (_k === selectedMonth ? ' selected' : '') + '>' +
-          monthLabel(_k) + (_k === DATA_MONTH ? '' : ' · sin datos') + '</option>');
+  // ¿qué meses tienen algo cargado? (métricas de social.json o contenidos de seguimiento.json)
+  function monthsWithData() {
+    var set = {};
+    set[DATA_MONTH] = true;
+    if (typeof SEG !== 'undefined' && SEG && SEG.rows) SEG.rows.forEach(function (r) { if (r.mes) set[r.mes] = true; });
+    return set;
+  }
+  function hasSocialData(k) { return k === DATA_MONTH; }
+
+  function buildMonthOptions() {
+    if (!mesSel) return;
+    var withData = monthsWithData();
+    var now = new Date(), maxY = now.getFullYear(), maxM = now.getMonth() + 1;
+    var opts = [];
+    for (var y = 2026; y <= maxY; y++) {
+      for (var m = 1; m <= 12; m++) {
+        if (y === maxY && m > maxM) break;
+        var k = y + '-' + (m < 10 ? '0' : '') + m;
+        opts.push('<option value="' + k + '"' + (k === selectedMonth ? ' selected' : '') + '>' +
+          monthLabel(k) + (withData[k] ? '' : ' · sin datos') + '</option>');
       }
     }
-    mesSel.innerHTML = _opts.reverse().join('');
+    mesSel.innerHTML = opts.reverse().join('');
     if (![].some.call(mesSel.options, function (o) { return o.value === selectedMonth; })) {
-      selectedMonth = DATA_MONTH; mesSel.value = DATA_MONTH;
+      selectedMonth = DATA_MONTH;
     }
-    mesSel.addEventListener('change', function () {
-      selectedMonth = mesSel.value;
-      try { localStorage.setItem('kipper_mes', selectedMonth); } catch (e) {}
-      refreshAccount();
-    });
+    mesSel.value = selectedMonth;
   }
+  buildMonthOptions();
+  if (mesSel) mesSel.addEventListener('change', function () {
+    selectedMonth = mesSel.value;
+    try { localStorage.setItem('kipper_mes', selectedMonth); } catch (e) {}
+    refreshAccount();
+  });
 
   function refreshAccount() {
     setText('home-greeting', 'Buenos días 👋 — ' + accountLabels[currentAccount()]);
     setText('today-date', '📅 Estás viendo: ' + monthLabel(selectedMonth) +
-      (selectedMonth === DATA_MONTH ? '' : ' — sin datos (lo cargado es de ' + monthLabel(DATA_MONTH) + ')'));
-    setText('profile-updated', 'Datos: ' + monthLabel(DATA_MONTH));
+      (hasSocialData(selectedMonth) ? '' : ' — sin métricas de este mes (las cargadas son de ' + monthLabel(DATA_MONTH) + ')'));
+    setText('profile-updated', 'Métricas: ' + monthLabel(DATA_MONTH));
     renderSocial(currentAccount());
+    renderSeguimiento(currentAccount());
   }
   if (cuentaSel) cuentaSel.addEventListener('change', refreshAccount);
 
@@ -1607,6 +1634,7 @@
 
   // ---------- Social: datos de Metricool (data/social.json, generado desde los informes exportados) ----------
   var SOCIAL = null;
+  var SEG = null; // seguimiento de contenidos (data/seguimiento.json, generado del Excel)
 
   function socEmpty(id, msg) { var e = el(id); if (e) e.innerHTML = '<div class="leads-empty-state">' + (msg || 'Aún no hay datos cargados.') + '</div>'; }
   function socBars(rows, unit) {
@@ -1842,6 +1870,177 @@
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (data) { if (data && data.accounts) { SOCIAL = data; renderSocial(currentAccount()); } })
     .catch(function () { /* sin archivo: se quedan los estados vacíos */ });
+
+  // ---------- Seguimiento de contenidos (data/seguimiento.json, generado del Excel) ----------
+  var SEG_STEPS = [
+    { k: 'grabado', label: 'Grabado' },
+    { k: 'elaborado', label: 'Elaborado' },
+    { k: 'programado', label: 'Programado' },
+    { k: 'publicado', label: 'Publicado' }
+  ];
+  var SEG_BUCKETS = [
+    { k: 'sin', label: 'Sin empezar', color: '#9aa0a6' },
+    { k: 'grabado', label: 'Grabado', color: '#f1812c' },
+    { k: 'elaborado', label: 'Elaborado', color: '#f8be22' },
+    { k: 'programado', label: 'Programado', color: '#5fa8dc' },
+    { k: 'publicado', label: 'Publicado', color: '#9bc93c' }
+  ];
+  function segAll() { try { return JSON.parse(localStorage.getItem('kipper_seguimiento') || '{}'); } catch (e) { return {}; } }
+  function segGet(id) { return segAll()[id] || {}; }
+  function segSet(id, k, v) {
+    var all = segAll(); all[id] = all[id] || {}; all[id][k] = v;
+    try { localStorage.setItem('kipper_seguimiento', JSON.stringify(all)); } catch (e) {}
+  }
+  function segId(r) { return (r.fecha || '?') + '|' + (r.empresa || '?') + '|' + String(r.actividad || '').slice(0, 60); }
+  function segBrandKey(e) { var n = (e || '').toLowerCase(); return n.indexOf('nass') > -1 ? 'nass' : (n.indexOf('proviser') > -1 ? 'proviser' : ''); }
+  function segFmtIcon(f) {
+    var k = (f || '').toLowerCase();
+    if (k.indexOf('reel') > -1 || k.indexOf('video') > -1) return '🎬';
+    if (k.indexOf('carrus') > -1) return '🖼️';
+    if (k.indexOf('histor') > -1 || k.indexOf('stor') > -1) return '⭕';
+    if (k.indexOf('post') > -1 || k.indexOf('imag') > -1 || k.indexOf('estát') > -1 || k.indexOf('foto') > -1) return '📷';
+    return '📌';
+  }
+  function segFecha(iso) {
+    if (!iso) return 'Sin fecha';
+    var d = new Date(iso + 'T00:00:00');
+    if (isNaN(d)) return iso;
+    var s = d.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'short' });
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+  function segFurthest(st) {
+    var f = 'sin';
+    for (var i = 0; i < SEG_STEPS.length; i++) if (st[SEG_STEPS[i].k]) f = SEG_STEPS[i].k;
+    return f;
+  }
+
+  function renderSeguimiento(key) {
+    var out = el('posts-seguimiento'), donut = el('posts-seg-donut');
+    if (!out) return;
+    var mesTxt = monthLabel(selectedMonth);
+    if (!SEG || !SEG.rows) {
+      out.innerHTML = '<div class="leads-empty-state">Aún no has cargado tu parrilla de Excel.</div>';
+      if (donut) donut.innerHTML = '<div class="leads-empty-state">Se calcula cuando haya contenidos del mes.</div>';
+      return;
+    }
+    var brand = segBrandKey(accountLabels[key] || key);
+    var rows = SEG.rows.filter(function (r) { return segBrandKey(r.empresa) === brand && r.mes === selectedMonth; });
+    rows.sort(function (a, b) { return (a.fecha || '').localeCompare(b.fecha || ''); });
+
+    if (!rows.length) {
+      out.innerHTML = '<div class="leads-empty-state">No hay contenidos de <b>' + mesTxt + '</b> para ' + (accountLabels[key] || key) + ' en tu Excel.' +
+        (SEG.rows.some(function (r) { return segBrandKey(r.empresa) === brand; }) ? ' Cambia de mes arriba para ver otros.' : '') + '</div>';
+      if (donut) donut.innerHTML = '<div class="leads-empty-state">Se calcula cuando haya contenidos del mes.</div>';
+      return;
+    }
+
+    // agrupar por semana
+    var weeks = {}, order = [];
+    rows.forEach(function (r) {
+      var w = (r.semana && String(r.semana).trim()) || 'Sin semana';
+      if (!weeks[w]) { weeks[w] = []; order.push(w); }
+      weeks[w].push(r);
+    });
+
+    var totalSteps = rows.length * SEG_STEPS.length;
+    var doneSteps = 0, publicadas = 0;
+    rows.forEach(function (r) {
+      var st = segGet(segId(r));
+      SEG_STEPS.forEach(function (s) { if (st[s.k]) doneSteps++; });
+      if (st.publicado) publicadas++;
+    });
+    var pct = totalSteps ? Math.round((doneSteps / totalSteps) * 100) : 0;
+
+    var head = '<div class="par-topbar"><span class="vc-note" style="margin:0" id="seg-head-txt">' +
+      '<b>' + rows.length + '</b> piezas · <b>' + publicadas + '</b> publicada' + (publicadas === 1 ? '' : 's') +
+      ' · <b>' + pct + '%</b> del plan ejecutado</span></div>';
+
+    var body = order.map(function (w) {
+      var wr = weeks[w];
+      var wpub = wr.filter(function (r) { return segGet(segId(r)).publicado; }).length;
+      var sum = '<span class="par-week-sum"><b>' + wr.length + '</b> pieza' + (wr.length === 1 ? '' : 's') +
+        (wpub ? ' · <b>' + wpub + '</b> publicada' + (wpub === 1 ? '' : 's') : '') + '</span>';
+      var cards = wr.map(function (r) {
+        var id = segId(r), st = segGet(id);
+        var allDone = SEG_STEPS.every(function (s) { return st[s.k]; });
+        var chips = '<span class="par-chip date">📅 ' + segFecha(r.fecha) + '</span>' +
+          '<span class="par-chip b-' + (segBrandKey(r.empresa) || 'proviser') + '">' + (segBrandKey(r.empresa) === 'nass' ? 'Nass' : 'Proviser') + '</span>' +
+          (r.formato ? '<span class="par-chip">' + r.formato + '</span>' : '') +
+          (r.objetivo ? '<span class="par-chip">' + r.objetivo + '</span>' : '');
+        var checks = '<div class="par-check" data-id="' + encodeURIComponent(id) + '">' + SEG_STEPS.map(function (s) {
+          return '<label class="' + (st[s.k] ? 'on' : '') + '"><input type="checkbox" data-k="' + s.k + '"' + (st[s.k] ? ' checked' : '') + '> ' + s.label + '</label>';
+        }).join('') + '</div>';
+        return '<div class="par-card' + (allDone ? ' done' : '') + '">' +
+          '<div class="par-card-top"><div class="par-fmt-badge" style="background:var(--surface)">' + segFmtIcon(r.formato) + '</div>' +
+          '<div class="par-card-main"><div class="par-card-title">' + (r.actividad || '(sin título)') + '</div>' +
+          '<div class="par-chips">' + chips + '</div></div></div>' + checks + '</div>';
+      }).join('');
+      return '<div class="par-week"><div class="par-week-head"><h3>' + w + '</h3>' + sum + '</div><div class="par-grid">' + cards + '</div></div>';
+    }).join('');
+
+    out.innerHTML = head + body;
+    out.querySelectorAll('.par-check input[type=checkbox]').forEach(function (cb) {
+      cb.addEventListener('change', function () {
+        var id = decodeURIComponent(cb.closest('.par-check').getAttribute('data-id'));
+        segSet(id, cb.dataset.k, cb.checked);
+        cb.parentNode.classList.toggle('on', cb.checked);
+        var row = cb.closest('.par-check');
+        var done = Array.prototype.every.call(row.querySelectorAll('input'), function (x) { return x.checked; });
+        cb.closest('.par-card').classList.toggle('done', done);
+        // actualiza solo resumen + donut, sin re-pintar las tarjetas
+        var ds = 0, pubs = 0;
+        rows.forEach(function (rr) {
+          var s2 = segGet(segId(rr));
+          SEG_STEPS.forEach(function (s) { if (s2[s.k]) ds++; });
+          if (s2.publicado) pubs++;
+        });
+        var p2 = rows.length ? Math.round((ds / (rows.length * SEG_STEPS.length)) * 100) : 0;
+        var htxt = el('seg-head-txt');
+        if (htxt) htxt.innerHTML = '<b>' + rows.length + '</b> piezas · <b>' + pubs + '</b> publicada' + (pubs === 1 ? '' : 's') + ' · <b>' + p2 + '%</b> del plan ejecutado';
+        renderSegDonut(rows);
+      });
+    });
+
+    renderSegDonut(rows);
+  }
+
+  function renderSegDonut(rows) {
+    var donut = el('posts-seg-donut');
+    if (!donut) return;
+    var n = rows.length;
+    var bucketCount = {}, stepCount = {};
+    SEG_BUCKETS.forEach(function (b) { bucketCount[b.k] = 0; });
+    SEG_STEPS.forEach(function (s) { stepCount[s.k] = 0; });
+    var doneSteps = 0;
+    rows.forEach(function (r) {
+      var st = segGet(segId(r));
+      SEG_STEPS.forEach(function (s) { if (st[s.k]) { stepCount[s.k]++; doneSteps++; } });
+      bucketCount[segFurthest(st)]++;
+    });
+    var pct = n ? Math.round((doneSteps / (n * SEG_STEPS.length)) * 100) : 0;
+
+    var segs = SEG_BUCKETS.filter(function (b) { return bucketCount[b.k] > 0; }).map(function (b) {
+      return { label: b.label, value: bucketCount[b.k], color: b.color,
+        sub: bucketCount[b.k] + ' · ' + Math.round((bucketCount[b.k] / n) * 100) + '%' };
+    });
+
+    var bars = SEG_STEPS.map(function (s, i) {
+      var c = stepCount[s.k], p = n ? Math.round((c / n) * 100) : 0;
+      return '<div class="sede-row"><div class="sede-name" style="width:110px;flex-basis:110px">' + s.label + '</div>' +
+        '<div class="sede-bar-track"><div class="sede-bar-fill" style="width:' + p + '%;background:' + SEG_BUCKETS[i + 1].color + '"></div></div>' +
+        '<div class="sede-counts">' + c + '/' + n + ' · ' + p + '%</div></div>';
+    }).join('');
+
+    donut.innerHTML =
+      pautaDonut(segs, pct + '%', 'del plan') +
+      '<p class="vc-note" style="margin:10px 0 6px">Cada pieza cuenta en su etapa más avanzada. Las barras muestran cuántas piezas han pasado por cada paso.</p>' +
+      bars;
+  }
+
+  fetch('data/seguimiento.json', { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) { if (data && data.rows) { SEG = data; buildMonthOptions(); renderSeguimiento(currentAccount()); } })
+    .catch(function () { /* sin archivo: estado vacío */ });
 
   // ---------- Pautas: carga los datos guardados en data/pautas.json ----------
   fetch('data/pautas.json', { cache: 'no-store' })

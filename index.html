@@ -775,27 +775,27 @@
     </div>
 
     <div class="card">
-      <h2>🎬 Mezcla de parrilla</h2>
+      <h2>🎬 Mezcla de contenido</h2>
       <div class="leads-empty-state" id="posts-parrilla-donut">Aún no conectado. La distribución de piezas por formato aparece aquí cuando haya publicaciones cargadas.</div>
     </div>
 
     <div class="card">
-      <h2>🏷️ Hashtags que más engagement te traen</h2>
+      <h2>🏷️ Hashtags usados</h2>
       <div class="leads-empty-state" id="posts-hashtags">Aún no conectado.</div>
     </div>
 
     <div class="card">
-      <h2>📺 Series detectadas</h2>
+      <h2>📊 Resumen por formato</h2>
       <div class="leads-empty-state" id="posts-series">Aún no conectado.</div>
     </div>
 
     <div class="card">
-      <h2>🎬 Patrón de tus Reels/Carruseles</h2>
+      <h2>🎯 Patrón de tu contenido</h2>
       <div class="leads-empty-state" id="posts-pattern">Aún no conectado.</div>
     </div>
 
     <div class="card">
-      <h2>💡 Ideas de contenido orgánico</h2>
+      <h2>💡 Tus posts con más alcance</h2>
       <div class="leads-empty-state" id="posts-organic-ideas">Aún no conectado. Las propuestas de contenido aparecen aquí cuando haya datos de la cuenta.</div>
     </div>
   </section>
@@ -1754,20 +1754,24 @@
 
     // ---- POSTS ----
     var c = ig.content || {};
+    var fmt = (typeof postsFmt !== 'undefined') ? postsFmt : 'todos';
+    var fmtBadge = fmt === 'todos' ? '' : '<p class="vc-note" style="margin:-2px 0 10px"><b style="color:var(--accent-soft-ink)">Filtro: ' + fmt + '</b> — <a href="#" id="posts-fmt-clear" style="color:var(--accent)">ver todos</a></p>';
     var fmtSegs = [
       { label: 'Reels', value: (c.reels || {}).count || 0, color: '#29abc7' },
       { label: 'Imágenes', value: (c.posts || {}).count || 0, color: '#1f7fc4' },
       { label: 'Historias', value: (c.stories || {}).count || 0, color: '#9bc93c' }
-    ].filter(function (s) { return s.value > 0; }).map(function (s) { return { label: s.label, value: s.value, color: s.color, sub: s.value + '' }; });
+    ].map(function (s) { return { label: s.label, value: s.value, color: (fmt === 'todos' || fmt === s.label) ? s.color : '#3a3a3a', sub: s.value + '' + ((fmt !== 'todos' && fmt === s.label) ? ' ◄' : '') }; })
+      .filter(function (s) { return s.value > 0; });
     if (el('posts-parrilla-donut')) el('posts-parrilla-donut').innerHTML = fmtSegs.length
-      ? pautaDonut(fmtSegs, String(fmtSegs.reduce(function (t, s) { return t + s.value; }, 0)), 'piezas')
+      ? fmtBadge + pautaDonut(fmtSegs, String(fmtSegs.reduce(function (t, s) { return t + s.value; }, 0)), 'piezas')
       : '<div class="leads-empty-state">Sin publicaciones en el período.</div>';
+    var pfc = el('posts-fmt-clear');
+    if (pfc) pfc.addEventListener('click', function (e) { e.preventDefault(); var t = document.querySelector('#posts-fmt-tabs .tab[data-fmt="todos"]'); if (t) t.click(); });
 
     if (el('posts-hashtags')) el('posts-hashtags').innerHTML = (ig.hashtags && ig.hashtags.length)
       ? socBars(ig.hashtags, ' pub.')
       : '<div class="leads-empty-state">Sin hashtags detectados en el período.</div>';
 
-    var fmt = (typeof postsFmt !== 'undefined') ? postsFmt : 'todos';
     if (el('posts-series')) {
       var blocks = [];
       var engTxt = function (n) { return n ? String(Math.round(n * 100) / 100).replace('.', ',') : '—'; };

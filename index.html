@@ -767,11 +767,11 @@
     <h1 class="greeting">Mis posts</h1>
     <div class="date-sub">Análisis de todo tu contenido publicado</div>
 
-    <div class="filter-row">
-      <div class="tab active">Todos los tipos</div>
-      <div class="tab">Reels</div>
-      <div class="tab">Carruseles</div>
-      <div class="tab">Fotos</div>
+    <div class="filter-row" id="posts-fmt-tabs">
+      <div class="tab active" data-fmt="todos">Todos</div>
+      <div class="tab" data-fmt="Reels">Reels</div>
+      <div class="tab" data-fmt="Imágenes">Imágenes</div>
+      <div class="tab" data-fmt="Historias">Historias</div>
     </div>
 
     <div class="card">
@@ -1115,6 +1115,17 @@
         igCard.style.gridColumn = (socialNet === 'ig') ? '1 / -1' : '';
         fbCard.style.gridColumn = (socialNet === 'fb') ? '1 / -1' : '';
       }
+      renderSocial(currentAccount());
+    });
+  });
+
+  // ---------- Posts: filtro por formato ----------
+  var postsFmt = 'todos';
+  document.querySelectorAll('#posts-fmt-tabs .tab').forEach(function (tabEl) {
+    tabEl.addEventListener('click', function () {
+      document.querySelectorAll('#posts-fmt-tabs .tab').forEach(function (t) { t.classList.remove('active'); });
+      tabEl.classList.add('active');
+      postsFmt = tabEl.getAttribute('data-fmt');
       renderSocial(currentAccount());
     });
   });
@@ -1756,15 +1767,16 @@
       ? socBars(ig.hashtags, ' pub.')
       : '<div class="leads-empty-state">Sin hashtags detectados en el período.</div>';
 
+    var fmt = (typeof postsFmt !== 'undefined') ? postsFmt : 'todos';
     if (el('posts-series')) {
       var blocks = [];
       var engTxt = function (n) { return n ? String(Math.round(n * 100) / 100).replace('.', ',') : '—'; };
-      if ((c.reels || {}).count) blocks.push(['📹 Reels', c.reels.count + ' · índice eng. ' + engTxt(c.reels.engagement) + ' · alcance medio ' + fmtNumCO(c.reels.avgReach || 0) + ' · ' + fmtNumCO(c.reels.views || 0) + ' vis.']);
-      if ((c.posts || {}).count) blocks.push(['🖼️ Imágenes', c.posts.count + ' · índice eng. ' + engTxt(c.posts.engagement) + ' · alcance medio ' + fmtNumCO(c.posts.avgReach || 0)]);
-      if ((c.stories || {}).count) blocks.push(['🗂️ Historias', c.stories.count + ' · ' + fmtNumCO(c.stories.impressions || 0) + ' impresiones · alcance medio ' + fmtNumCO(c.stories.avgReach || 0)]);
+      if ((c.reels || {}).count && (fmt === 'todos' || fmt === 'Reels')) blocks.push(['📹 Reels', c.reels.count + ' · índice eng. ' + engTxt(c.reels.engagement) + ' · alcance medio ' + fmtNumCO(c.reels.avgReach || 0) + ' · ' + fmtNumCO(c.reels.views || 0) + ' vis.']);
+      if ((c.posts || {}).count && (fmt === 'todos' || fmt === 'Imágenes')) blocks.push(['🖼️ Imágenes', c.posts.count + ' · índice eng. ' + engTxt(c.posts.engagement) + ' · alcance medio ' + fmtNumCO(c.posts.avgReach || 0)]);
+      if ((c.stories || {}).count && (fmt === 'todos' || fmt === 'Historias')) blocks.push(['🗂️ Historias', c.stories.count + ' · ' + fmtNumCO(c.stories.impressions || 0) + ' impresiones · alcance medio ' + fmtNumCO(c.stories.avgReach || 0)]);
       el('posts-series').innerHTML = blocks.length
         ? '<div class="series-grid">' + blocks.map(function (b) { return '<div class="series-card"><div class="series-tag">' + b[0] + '</div><div class="series-meta">' + b[1] + '</div></div>'; }).join('') + '</div>'
-        : '<div class="leads-empty-state">Sin contenido en el período.</div>';
+        : '<div class="leads-empty-state">Sin ' + (fmt === 'todos' ? 'contenido' : fmt.toLowerCase()) + ' en el período.</div>';
     }
 
     if (el('posts-pattern')) {
@@ -1776,9 +1788,17 @@
         '</div>';
     }
 
-    if (el('posts-organic-ideas')) el('posts-organic-ideas').innerHTML = (ig.topPosts && ig.topPosts.length)
-      ? socBars(ig.topPosts.map(function (p) { return [p.kind + ' · ' + p.date + ' — ' + (p.caption || '').slice(0, 48), p.reach]; }))
-      : '<div class="leads-empty-state">Sin publicaciones en el período.</div>';
+    if (el('posts-organic-ideas')) {
+      if (fmt === 'Historias') {
+        el('posts-organic-ideas').innerHTML = '<div class="leads-empty-state">El informe de Metricool no trae la lista de historias post a post (solo el total: ' + (((c.stories || {}).count) || 0) + ').</div>';
+      } else {
+        var kindOf = { 'Reels': 'Reel', 'Imágenes': 'Imagen' };
+        var list = (ig.topPosts || []).filter(function (p) { return fmt === 'todos' || p.kind === kindOf[fmt]; });
+        el('posts-organic-ideas').innerHTML = list.length
+          ? socBars(list.map(function (p) { return [p.kind + ' · ' + p.date + ' — ' + (p.caption || '').slice(0, 48), p.reach]; }))
+          : '<div class="leads-empty-state">Sin ' + (fmt === 'todos' ? 'publicaciones' : fmt.toLowerCase()) + ' en el período.</div>';
+      }
+    }
 
     // ---- MI AUDIENCIA ----
     setText('audiencia-period', 'Metricool · ' + (SOCIAL.period || '') + ' · IG @' + (ig.username || ''));

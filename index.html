@@ -572,21 +572,36 @@
   .pauta-table-ctr { display: inline-block; width: 46px; height: 6px; border-radius: 4px; background: var(--surface-2); overflow: hidden; vertical-align: middle; margin-right: 7px; }
   .pauta-table-ctr i { display: block; height: 100%; background: var(--accent); }
 
-  /* Parrilla de contenidos */
-  .par-week { margin-bottom: 16px; }
-  .par-week > h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--accent-soft-ink); margin: 0 0 8px; font-weight: 800; }
-  .par-item { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; background: var(--surface-2); overflow: hidden; }
-  .par-item > summary { list-style: none; cursor: pointer; padding: 11px 14px; display: grid; grid-template-columns: 76px 1fr 84px 96px auto; gap: 12px; align-items: center; font-size: 12.5px; }
-  .par-item > summary::-webkit-details-marker { display: none; }
-  .par-item > summary:hover { background: var(--surface); }
-  .par-item .par-date { color: var(--ink-faint); font-variant-numeric: tabular-nums; }
-  .par-item .par-act { font-weight: 700; }
-  .par-item .par-fmt { color: var(--ink-muted); }
-  .par-item .par-obj { color: var(--ink-muted); }
-  .par-body { padding: 4px 14px 14px; border-top: 1px dashed var(--border); font-size: 12.5px; line-height: 1.55; }
-  .par-body .par-k { font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); font-weight: 800; margin: 10px 0 3px; }
-  .par-body .par-k:first-child { margin-top: 6px; }
-  @media (max-width: 720px) { .par-item > summary { grid-template-columns: 1fr auto; grid-auto-rows: min-content; } .par-item .par-date, .par-item .par-fmt, .par-item .par-obj { grid-column: 1 / -1; } }
+  /* Parrilla de contenidos — tablero semanal */
+  .par-topbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .par-topbar .par-toggle { font-size: 12px; color: var(--accent); cursor: pointer; font-weight: 700; }
+  .par-week { margin-bottom: 24px; }
+  .par-week:last-child { margin-bottom: 0; }
+  .par-week-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+  .par-week-head h3 { font-size: 15.5px; font-weight: 800; color: var(--accent-strong); margin: 0; }
+  .par-week-sum { font-size: 11.5px; color: var(--ink-muted); }
+  .par-week-sum b { color: var(--ink); }
+  .par-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 780px) { .par-grid { grid-template-columns: 1fr; } }
+  .par-card { border: 1px solid var(--border); border-radius: 13px; background: var(--surface-2); overflow: hidden; box-shadow: var(--shadow); }
+  .par-card-top { display: flex; gap: 11px; padding: 13px 14px 11px; align-items: flex-start; }
+  .par-fmt-badge { flex: 0 0 40px; width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 19px; }
+  .par-card-main { flex: 1; min-width: 0; }
+  .par-card-title { font-weight: 700; font-size: 13.5px; line-height: 1.3; }
+  .par-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 7px; align-items: center; }
+  .par-chip { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--ink-muted); text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; }
+  .par-chip.b-proviser { color: var(--accent-soft-ink); border-color: transparent; background: var(--accent-soft); }
+  .par-chip.b-nass { color: var(--vc-proyeccion-ink); border-color: transparent; background: var(--vc-proyeccion-soft); }
+  .par-chip.date { color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .par-card-status { flex: 0 0 auto; }
+  .par-brief { border-top: 1px dashed var(--border); }
+  .par-brief > summary { list-style: none; cursor: pointer; padding: 9px 14px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); }
+  .par-brief > summary::-webkit-details-marker { display: none; }
+  .par-brief > summary:hover { color: var(--ink); }
+  .par-brief[open] > summary { color: var(--accent-soft-ink); }
+  .par-brief-body { padding: 2px 14px 14px; font-size: 12.5px; line-height: 1.55; color: var(--ink); }
+  .par-brief-body .par-k { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); font-weight: 800; margin: 11px 0 3px; }
+  .par-brief-body .par-k:first-child { margin-top: 4px; }
 
   /* Pautas: estilo "reporte" — títulos centrados, tarjetas suaves, píldoras */
   .pauta-softcard { background: var(--surface-2); border: 1px solid var(--border); border-radius: 18px; padding: 22px 24px; margin-bottom: 16px; box-shadow: var(--shadow); }
@@ -1899,47 +1914,100 @@
   }
   function esc(x) { return String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
+  var PAR_FMT = {
+    reel:     { icon: '🎬', bg: 'rgba(41,171,199,0.18)' },
+    carrusel: { icon: '🖼️', bg: 'rgba(31,127,196,0.18)' },
+    historia: { icon: '⭕', bg: 'rgba(155,201,60,0.18)' },
+    story:    { icon: '⭕', bg: 'rgba(155,201,60,0.18)' },
+    imagen:   { icon: '📷', bg: 'rgba(241,129,44,0.18)' },
+    foto:     { icon: '📷', bg: 'rgba(241,129,44,0.18)' },
+    post:     { icon: '📷', bg: 'rgba(241,129,44,0.18)' },
+    video:    { icon: '📹', bg: 'rgba(31,127,196,0.18)' }
+  };
+  function parFmtBadge(f) {
+    var k = (f || '').toLowerCase().trim();
+    var m = PAR_FMT[k] || Object.keys(PAR_FMT).map(function (x) { return k.indexOf(x) > -1 ? PAR_FMT[x] : null; }).filter(Boolean)[0] || { icon: '📌', bg: 'var(--surface)' };
+    return '<div class="par-fmt-badge" style="background:' + m.bg + '">' + m.icon + '</div>';
+  }
+  function parBrandKey(e) {
+    var n = (e || '').toLowerCase();
+    if (n.indexOf('proviser') > -1) return 'proviser';
+    if (n.indexOf('nass') > -1) return 'nass';
+    return '';
+  }
+  var parAllBrands = false;
+
   function renderParrilla(key) {
     var out = el('parrilla-tabla');
     if (!out) return;
     if (!PARRILLA || !PARRILLA.rows) { out.innerHTML = '<div class="leads-empty-state">Aún no hay parrilla cargada.</div>'; return; }
-    var brand = (accountLabels[key] || key).split(' ')[0].toLowerCase();  // "proviser" / "nass"
-    // forward-fill de fecha (viene combinada en el Excel)
+    var brand = parBrandKey(accountLabels[key] || key);
+
     var lastFecha = null;
-    var rows = PARRILLA.rows.map(function (r) {
+    var all = PARRILLA.rows.map(function (r) {
       var rr = Object.assign({}, r);
       if (rr.fecha) lastFecha = rr.fecha; else rr.fecha = lastFecha;
+      rr._b = parBrandKey(rr.empresa);
       return rr;
-    }).filter(function (r) { return (r.empresa || '').toLowerCase().indexOf(brand) > -1; });
-    if (PARRILLA.updatedAt) setText('parrilla-sub', 'Cronograma de ' + (accountLabels[key] || key) + ' · sincronizado ' + new Date(PARRILLA.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long' }));
-    if (!rows.length) { out.innerHTML = '<div class="leads-empty-state">Sin contenidos de ' + (accountLabels[key] || key) + ' en la parrilla.</div>'; return; }
-    rows.sort(function (a, b) { return (a.fecha || '').localeCompare(b.fecha || ''); });
+    });
+    var rows = parAllBrands ? all.slice() : all.filter(function (r) { return r._b === brand; });
+
+    if (PARRILLA.updatedAt) setText('parrilla-sub',
+      (parAllBrands ? 'Cronograma de ambas marcas' : 'Cronograma de ' + (accountLabels[key] || key)) +
+      ' · sincronizado ' + new Date(PARRILLA.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long' }));
+
+    var toggle = '<div class="par-topbar"><span class="vc-note" style="margin:0">' +
+      (parAllBrands ? all.length + ' piezas · ' + all.filter(function (r) { return r._b === 'proviser'; }).length + ' Proviser · ' + all.filter(function (r) { return r._b === 'nass'; }).length + ' Nass'
+                    : rows.length + (rows.length === 1 ? ' pieza de ' : ' piezas de ') + (accountLabels[key] || key)) +
+      '</span><span class="par-toggle" id="par-toggle-brands">' + (parAllBrands ? '◄ solo ' + (accountLabels[key] || key).split(' ')[0] : 'ver ambas marcas ►') + '</span></div>';
+
+    if (!rows.length) { out.innerHTML = toggle + '<div class="leads-empty-state">Sin contenidos en la parrilla.</div>'; wireParToggle(key); return; }
+    rows.sort(function (a, b) { return (a.fecha || '').localeCompare(b.fecha || '') || (a._b || '').localeCompare(b._b || ''); });
+
     var weeks = {}, order = [];
     rows.forEach(function (r) {
       var w = (r.semana && String(r.semana).trim()) || parWeekKey(r.fecha) || 'sin-fecha';
       if (!weeks[w]) { weeks[w] = []; order.push(w); }
       weeks[w].push(r);
     });
-    var html = order.map(function (w) {
-      var items = weeks[w].map(function (r) {
+
+    var html = toggle + order.map(function (w) {
+      var wr = weeks[w];
+      var pend = wr.filter(function (r) { return /sin empezar|pendiente|por hacer/i.test(r.estadoDiseno || ''); }).length;
+      var done = wr.filter(function (r) { return /listo|aprobad|publicad|hecho/i.test(r.estadoDiseno || ''); }).length;
+      var sum = '<span class="par-week-sum"><b>' + wr.length + '</b> pieza' + (wr.length === 1 ? '' : 's') +
+        (parAllBrands ? '' : '') +
+        (pend ? ' · <b>' + pend + '</b> sin empezar' : '') + (done ? ' · <b>' + done + '</b> listas' : '') + '</span>';
+      var wl = w === 'sin-fecha' ? 'Sin fecha' : (/^\d{4}-\d{2}-\d{2}$/.test(w) ? parWeekLabel(w) : w);
+
+      var cards = wr.map(function (r) {
         var body = '';
         if (r.escenario) body += '<div class="par-k">Escenario</div>' + esc(r.escenario);
         if (r.copyIn) body += '<div class="par-k">Copy in</div>' + esc(r.copyIn);
         if (r.copyOut) body += '<div class="par-k">Copy out</div>' + esc(r.copyOut);
         if (r.correcciones) body += '<div class="par-k">Correcciones</div>' + esc(r.correcciones);
-        var fechaTxt = r.fecha ? new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit' }) : '—';
-        return '<details class="par-item"><summary>' +
-          '<span class="par-date">' + fechaTxt + '</span>' +
-          '<span class="par-act">' + esc(r.actividad || '(sin título)') + '</span>' +
-          '<span class="par-fmt">' + esc(r.formato || '') + '</span>' +
-          '<span class="par-obj">' + esc(r.objetivo || '') + '</span>' +
-          parStatusPill(r.estadoDiseno) +
-          '</summary>' + (body ? '<div class="par-body">' + body + '</div>' : '') + '</details>';
+        var fechaTxt = r.fecha ? new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-CO', { day: '2-digit', month: 'short' }) : '—';
+        var chips = '<span class="par-chip date">📅 ' + fechaTxt + '</span>';
+        if (r._b) chips += '<span class="par-chip b-' + r._b + '">' + (r._b === 'proviser' ? 'Proviser' : 'Nass') + '</span>';
+        if (r.objetivo) chips += '<span class="par-chip">' + esc(r.objetivo) + '</span>';
+        return '<div class="par-card">' +
+          '<div class="par-card-top">' + parFmtBadge(r.formato) +
+          '<div class="par-card-main"><div class="par-card-title">' + esc(r.actividad || '(sin título)') + '</div>' +
+          '<div class="par-chips">' + chips + '</div></div>' +
+          '<div class="par-card-status">' + parStatusPill(r.estadoDiseno) + '</div></div>' +
+          (body ? '<details class="par-brief"><summary>Ver brief y copy</summary><div class="par-brief-body">' + body + '</div></details>' : '') +
+          '</div>';
       }).join('');
-      var wl = w === 'sin-fecha' ? 'Sin fecha' : (/^\d{4}-\d{2}-\d{2}$/.test(w) ? parWeekLabel(w) : w);
-      return '<div class="par-week"><h3>' + esc(wl) + '</h3>' + items + '</div>';
+
+      return '<div class="par-week"><div class="par-week-head"><h3>' + esc(wl) + '</h3>' + sum + '</div><div class="par-grid">' + cards + '</div></div>';
     }).join('');
+
     out.innerHTML = html;
+    wireParToggle(key);
+  }
+  function wireParToggle(key) {
+    var t = el('par-toggle-brands');
+    if (t) t.addEventListener('click', function () { parAllBrands = !parAllBrands; renderParrilla(key); });
   }
 
   fetch('data/parrilla.json', { cache: 'no-store' })

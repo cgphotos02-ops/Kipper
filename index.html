@@ -880,16 +880,16 @@
   <!-- COMPETENCIA -->
   <section class="view" id="view-competencia">
     <h1 class="greeting">Competencia</h1>
-    <div class="date-sub">Tu competencia directa en Cali — seguidores, engagement y share of voice</div>
+    <div class="date-sub">Dónde está la marca frente a la competencia de seguridad en Cali — resumen para dirección</div>
 
     <div class="card">
-      <h2 id="referentes-competencia-title">🏢 Tu competencia directa en Cali</h2>
-      <div class="leads-empty-state" id="referentes-competencia">Aún no has cargado competidores. Cuando agregues cuentas de empresas de seguridad privada y seguridad electrónica de Cali, aparecen aquí con sus seguidores y engagement.</div>
+      <h2 id="referentes-competencia-title">📊 Posición frente a la competencia</h2>
+      <div class="leads-empty-state" id="referentes-competencia">Aún no has cargado competidores. Cuando agregues cuentas de empresas de seguridad privada y seguridad electrónica de Cali, aparecen aquí ordenadas por tamaño de comunidad, con tu marca resaltada.</div>
     </div>
 
     <div class="card">
-      <h2>🥇 Share of voice en Cali</h2>
-      <p class="vc-note" style="margin-top:-4px">Tus marcas frente a cada competidor — % del total de seguidores entre las cuentas comparadas.</p>
+      <h2>🎯 Lectura para dirección</h2>
+      <p class="vc-note" style="margin-top:-4px">El % del donut es tu share of voice: qué parte de la comunidad total (tu marca + competidores comparados) te corresponde. Debajo, fortaleza, brecha y foco.</p>
       <div class="leads-empty-state" id="referentes-share">Aún no conectado. Se calcula al cargar los competidores.</div>
     </div>
   </section>
@@ -1758,28 +1758,77 @@
       ? '<div class="hero-stat"><div class="hero-number">' + ig.bestTime + '</div><div class="hero-sub">Instagram · Metricool</div></div>'
       : '<div class="leads-empty-state">Sin dato.</div>';
 
-    // ---- COMPETENCIA ----
+    // ---- COMPETENCIA (vista para dirección) ----
     var comps = (ig.competitors || []).filter(function (x) { return x.followers != null; });
-    if (el('referentes-competencia-title')) setText('referentes-competencia-title', '🏢 Competencia de ' + a.label + ' en Cali');
-    if (el('referentes-competencia')) el('referentes-competencia').innerHTML = comps.length
-      ? socBars(comps.map(function (x) { return [x.name + (x.engagement != null ? ' · eng. ' + fmtPct2(x.engagement) : ''), x.followers]; }))
-      : '<div class="leads-empty-state">Aún sin métricas de competidores' + ((ig.competitors || []).length ? ' (' + ig.competitors.map(function (x) { return x.name; }).join(', ') + ' agregados en Metricool, sin datos todavía)' : '') + '.</div>';
+    if (el('referentes-competencia-title')) setText('referentes-competencia-title', '📊 ' + a.label + ' vs. su competencia en Cali');
+
+    if (!comps.length || ig.followers == null) {
+      if (el('referentes-competencia')) el('referentes-competencia').innerHTML =
+        '<div class="leads-empty-state">Aún no hay comparativa de competencia para ' + a.label + '.' +
+        ((ig.competitors || []).length ? ' Están agregados <b>' + ig.competitors.map(function (x) { return x.name; }).join(', ') + '</b> en Metricool, pero sin métricas todavía — actívales el seguimiento.' : '') + '</div>';
+      if (el('referentes-share')) el('referentes-share').innerHTML = '<div class="leads-empty-state">Se calcula cuando haya competidores con datos.</div>';
+      return;
+    }
+
+    var board = comps.map(function (x) { return { name: x.name, followers: x.followers, engagement: x.engagement, me: false }; });
+    board.push({ name: a.label, followers: ig.followers, engagement: ig.engagement != null ? ig.engagement : null, me: true });
+    board.sort(function (x, y) { return y.followers - x.followers; });
+    var meRank = board.findIndex(function (x) { return x.me; }) + 1;
+    var N = board.length;
+    var totalF = board.reduce(function (t, x) { return t + x.followers; }, 0) || 1;
+    var mySoV = Math.round((ig.followers / totalF) * 1000) / 10;
+    var leader = board[0];
+    var nextUp = meRank > 1 ? board[meRank - 2] : null;
+    var gapNext = nextUp ? nextUp.followers - ig.followers : 0;
+    var gapLeader = leader.me ? 0 : leader.followers - ig.followers;
+    var engs = board.filter(function (x) { return !x.me && x.engagement != null; }).map(function (x) { return x.engagement; }).sort(function (p, q) { return p - q; });
+    var catMedEng = engs.length ? Math.round(engs[Math.floor((engs.length - 1) / 2)] * 100) / 100 : null;
+
+    var verdict = '<b>' + a.label + ' va #' + meRank + ' de ' + N + '</b> por tamaño de comunidad en Instagram entre las cuentas de seguridad de Cali comparadas, con <b>' + fmtPct2(mySoV) + '</b> del share of voice del grupo. ' +
+      (nextUp ? 'Le faltan <b>' + fmtNumCO(gapNext) + '</b> seguidores para alcanzar el #' + (meRank - 1) + ' (' + nextUp.name + '). ' : '¡Es la cuenta más grande del grupo! ') +
+      (leader.me ? '' : 'El líder, ' + leader.name + ', le lleva <b>' + fmtNumCO(gapLeader) + '</b>.');
+
+    if (el('referentes-competencia')) el('referentes-competencia').innerHTML =
+      '<div class="disclaimer-note" style="align-items:flex-start;line-height:1.55">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg>' +
+      '<div style="flex:1">' + verdict + '</div></div>' +
+      '<div class="share-table-wrap"><table class="share-table">' +
+      '<thead><tr><th>#</th><th>Cuenta</th><th style="text-align:right">Seguidores</th><th style="text-align:right">Eng. x seguidor</th><th>Comunidad (% del grupo)</th></tr></thead><tbody>' +
+      board.map(function (x, i) {
+        var barPct = Math.round((x.followers / leader.followers) * 100);
+        return '<tr' + (x.me ? ' class="highlight-row"' : '') + '>' +
+          '<td style="font-weight:800">' + (i + 1) + '</td>' +
+          '<td>' + x.name + (x.me ? ' <span class="par-chip b-proviser" style="padding:1px 7px">TÚ</span>' : '') + '</td>' +
+          '<td style="text-align:right;font-weight:700">' + fmtNumCO(x.followers) + '</td>' +
+          '<td style="text-align:right">' + (x.engagement != null ? fmtPct2(x.engagement) : '—') + '</td>' +
+          '<td class="share-bar-cell"><div class="share-bar-track"><div class="share-bar-fill" style="width:' + barPct + '%;' + (x.me ? 'background:var(--good-soft)' : '') + '"></div><div class="share-bar-value">' + Math.round((x.followers / totalF) * 100) + '%</div></div></td>' +
+          '</tr>';
+      }).join('') + '</tbody></table></div>' +
+      '<p class="vc-note" style="margin-top:8px">"Eng. x seguidor" = interacciones medias por publicación ÷ seguidores. El engagement de ' + a.label + ' es una estimación con los posts del período.</p>';
+
     if (el('referentes-share')) {
-      var all = comps.concat(ig.followers != null ? [{ name: a.label + ' (tú)', followers: ig.followers, me: true }] : []);
-      if (all.length >= 2) {
-        var totalF = all.reduce(function (t, x) { return t + x.followers; }, 0) || 1;
-        el('referentes-share').innerHTML = '<p class="vc-note" style="margin-top:-4px">Share of voice por seguidores en Instagram (tú + competidores cargados):</p>' +
-          all.slice().sort(function (x, y) { return y.followers - x.followers; }).map(function (x) {
-            var pct = Math.round((x.followers / totalF) * 100);
-            return '<div class="sede-row"><div class="sede-name" style="width:220px;flex-basis:220px' + (x.me ? ';color:var(--accent-soft-ink);font-weight:800' : '') + '">' + x.name + '</div>' +
-              '<div class="sede-bar-track"><div class="sede-bar-fill ' + (x.me ? 'bar-fill-good' : 'bar-fill-accent') + '" style="width:' + Math.round((x.followers / Math.max.apply(null, all.map(function (z) { return z.followers; }))) * 100) + '%"></div></div>' +
-              '<div class="sede-counts">' + fmtNumCO(x.followers) + ' · ' + pct + '%</div></div>';
-          }).join('');
-      } else {
-        el('referentes-share').innerHTML = '<div class="leads-empty-state">Se calcula cuando haya competidores con datos.</div>';
-      }
+      var pal = ['#1f7fc4', '#5fa8dc', '#aedeea', '#f8be22', '#f1812c', '#757575'];
+      var pi = 0;
+      var segs = board.map(function (x) {
+        return { label: x.name.length > 24 ? x.name.slice(0, 22) + '…' : x.name, value: x.followers, color: x.me ? '#9bc93c' : pal[pi++ % pal.length], sub: fmtNumCO(x.followers) + ' · ' + Math.round((x.followers / totalF) * 100) + '%' };
+      });
+      var strong = ig.reelEngagement ? 'Tus <b>reels</b> enganchan bien (engagement medio ' + fmtEsp(ig.reelEngagement) + ' en Metricool, retención ~45%).' : 'Publicas con constancia.';
+      var engVs = (ig.engagement != null && catMedEng != null)
+        ? (ig.engagement >= catMedEng * 0.9 ? 'está en línea con lo típico del sector (mediana ' + fmtPct2(catMedEng) + ')' : 'está por debajo de lo típico del sector (mediana ' + fmtPct2(catMedEng) + ')')
+        : 'aún no se puede comparar';
+      el('referentes-share').innerHTML =
+        pautaDonut(segs, fmtPct2(mySoV), 'tu SoV') +
+        '<div class="par-brief-body" style="padding:14px 0 0;text-align:left">' +
+        '<div class="par-k">✅ Fortaleza</div>' + strong +
+        '<div class="par-k">⚠️ Brecha</div>Comunidad pequeña: <b>#' + meRank + ' de ' + N + '</b>. Tu interacción por seguidor (~' + fmtPct2(ig.engagement != null ? ig.engagement : 0) + ') ' + engVs + '. ' + (function () {
+          var out = board.find(function (z) { return z.engagement != null && z.engagement > (catMedEng || 0) * 5; });
+          return out && !out.me ? out.name + ' es la excepción del sector (' + fmtPct2(out.engagement) + '), impulsada por reels.' : '';
+        })() +
+        '<div class="par-k">🎯 Foco para dirección</div>Crecer comunidad — meta corta: <b>+' + fmtNumCO(gapNext) + ' seguidores</b> para subir al #' + Math.max(1, meRank - 1) + ' — sosteniendo la cadencia y el rendimiento de los reels.' +
+        '</div>';
     }
   }
+  function fmtEsp(n) { return (n == null || !isFinite(n)) ? '—' : String(Math.round(n * 100) / 100).replace('.', ','); }
 
   fetch('data/social.json', { cache: 'no-store' })
     .then(function (r) { return r.ok ? r.json() : null; })

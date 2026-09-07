@@ -1121,6 +1121,7 @@
   function currentAccount() { return cuentaSel ? cuentaSel.value : 'proviser'; }
   function refreshAccount() {
     setText('home-greeting', 'Buenos días 👋 — ' + accountLabels[currentAccount()]);
+    renderSocial(currentAccount());
   }
   if (cuentaSel) cuentaSel.addEventListener('change', refreshAccount);
 
@@ -1648,6 +1649,145 @@
 
     out.innerHTML = html;
   }
+
+  // ---------- Social: datos de Metricool (data/social.json, generado desde los informes exportados) ----------
+  var SOCIAL = null;
+
+  function socEmpty(id, msg) { var e = el(id); if (e) e.innerHTML = '<div class="leads-empty-state">' + (msg || 'Aún no hay datos cargados.') + '</div>'; }
+  function socBars(rows, unit) {
+    var max = Math.max.apply(null, rows.map(function (r) { return r[1] || 0; }).concat([1]));
+    return rows.map(function (r) {
+      var pct = Math.round(((r[1] || 0) / max) * 100);
+      return '<div class="sede-row"><div class="sede-name" style="width:180px;flex-basis:180px">' + r[0] + '</div>' +
+        '<div class="sede-bar-track"><div class="sede-bar-fill bar-fill-accent" style="width:' + pct + '%"></div></div>' +
+        '<div class="sede-counts">' + (r[1] != null ? fmtNumCO(r[1]) + (unit || '') : '—') + '</div></div>';
+    }).join('');
+  }
+
+  function renderSocial(key) {
+    if (!SOCIAL || !SOCIAL.accounts || !SOCIAL.accounts[key]) return;
+    var a = SOCIAL.accounts[key], ig = a.instagram || {}, fb = a.facebook || {};
+    var upd = SOCIAL.updatedAt ? new Date(SOCIAL.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+    var periodo = (SOCIAL.period || '') + (upd ? ' · actualizado ' + upd : '');
+
+    // ---- INICIO ----
+    var tp = (ig.topPosts || [])[0];
+    if (el('home-lastpost')) el('home-lastpost').innerHTML = tp
+      ? '<div style="text-align:left"><b>' + tp.kind + '</b> · ' + tp.date + ' · <b>' + fmtNumCO(tp.reach) + '</b> de alcance<br><span style="color:var(--ink-muted)">«' + tp.caption + '»</span></div>'
+      : '<div class="leads-empty-state">Sin publicaciones en el período.</div>';
+
+    if (el('home-metas-pills')) el('home-metas-pills').innerHTML =
+      '<div class="pauta-pillrow" style="justify-content:flex-start">' +
+      pautaStatPill('Seguidores IG', ig.followers != null ? fmtNumCO(ig.followers) : '—', 'accent') +
+      pautaStatPill('Crecimiento', ig.followersDelta != null ? (ig.followersDelta >= 0 ? '+' : '') + fmtNumCO(ig.followersDelta) : '—', ig.followersDelta >= 0 ? 'good' : 'crit') +
+      pautaStatPill('Visualizaciones', ig.views != null ? fmtNumCO(ig.views) : '—', 'blue') +
+      pautaStatPill('Alcance medio/día', ig.avgDailyReach != null ? fmtNumCO(ig.avgDailyReach) : '—', 'blue') +
+      pautaStatPill('Cuentas con interacción', ig.engagedAccounts != null ? fmtNumCO(ig.engagedAccounts) : '—', 'accent') +
+      '</div>';
+
+    if (el('home-idea')) el('home-idea').innerHTML = '<div class="leads-empty-state" style="padding:14px 10px">📊 Datos de Metricool · ' + periodo + '</div>';
+    if (el('home-agenda')) el('home-agenda').innerHTML = '<div class="leads-empty-state" style="padding:14px 10px">Sin agenda conectada — usa la Parrilla para planear.</div>';
+
+    if (el('home-ig-stats')) el('home-ig-stats').innerHTML =
+      '<div class="net-followers">' + (ig.followers != null ? fmtNumCO(ig.followers) : '—') + '</div>' +
+      '<div class="net-label">Seguidores · @' + (ig.username || '') + '</div>' +
+      (ig.followersDelta != null ? '<span class="net-delta">' + (ig.followersDelta >= 0 ? '+' : '') + ig.followersDelta + ' en el período</span>' : '') +
+      '<div class="net-er">' + (ig.postsInPeriod != null ? ig.postsInPeriod + ' posts · ' : '') + (ig.avgDailyReach != null ? fmtNumCO(ig.avgDailyReach) + ' alcance/día' : '') + '</div>';
+    if (el('home-fb-stats')) el('home-fb-stats').innerHTML =
+      '<div class="net-followers">' + (fb.followers != null ? fmtNumCO(fb.followers) : '—') + '</div>' +
+      '<div class="net-label">Seguidores · Facebook</div>' +
+      (fb.followersDelta != null ? '<span class="net-delta">' + (fb.followersDelta >= 0 ? '+' : '') + fb.followersDelta + ' en el período</span>' : '') +
+      '<div class="net-er">' + (fb.views != null ? fmtNumCO(fb.views) + ' visualizaciones · ' : '') + (fb.pageVisits != null ? fmtNumCO(fb.pageVisits) + ' visitas' : '') + '</div>';
+
+    if (el('home-besttime')) el('home-besttime').innerHTML = ig.bestTime
+      ? '<div class="hero-stat"><div class="hero-number">' + ig.bestTime + '</div><div class="hero-sub">Franja de más actividad de tus seguidores en Instagram (Metricool)</div></div>'
+      : '<div class="leads-empty-state">Sin dato de mejor hora.</div>';
+
+    // ---- POSTS ----
+    var c = ig.content || {};
+    var fmtSegs = [
+      { label: 'Reels', value: (c.reels || {}).count || 0, color: '#29abc7' },
+      { label: 'Imágenes', value: (c.posts || {}).count || 0, color: '#1f7fc4' },
+      { label: 'Historias', value: (c.stories || {}).count || 0, color: '#9bc93c' }
+    ].filter(function (s) { return s.value > 0; }).map(function (s) { return { label: s.label, value: s.value, color: s.color, sub: s.value + '' }; });
+    if (el('posts-parrilla-donut')) el('posts-parrilla-donut').innerHTML = fmtSegs.length
+      ? pautaDonut(fmtSegs, String(fmtSegs.reduce(function (t, s) { return t + s.value; }, 0)), 'piezas')
+      : '<div class="leads-empty-state">Sin publicaciones en el período.</div>';
+
+    if (el('posts-hashtags')) el('posts-hashtags').innerHTML = (ig.hashtags && ig.hashtags.length)
+      ? socBars(ig.hashtags, ' pub.')
+      : '<div class="leads-empty-state">Sin hashtags detectados en el período.</div>';
+
+    if (el('posts-series')) {
+      var blocks = [];
+      var engTxt = function (n) { return n ? String(Math.round(n * 100) / 100).replace('.', ',') : '—'; };
+      if ((c.reels || {}).count) blocks.push(['📹 Reels', c.reels.count + ' · índice eng. ' + engTxt(c.reels.engagement) + ' · alcance medio ' + fmtNumCO(c.reels.avgReach || 0) + ' · ' + fmtNumCO(c.reels.views || 0) + ' vis.']);
+      if ((c.posts || {}).count) blocks.push(['🖼️ Imágenes', c.posts.count + ' · índice eng. ' + engTxt(c.posts.engagement) + ' · alcance medio ' + fmtNumCO(c.posts.avgReach || 0)]);
+      if ((c.stories || {}).count) blocks.push(['🗂️ Historias', c.stories.count + ' · ' + fmtNumCO(c.stories.impressions || 0) + ' impresiones · alcance medio ' + fmtNumCO(c.stories.avgReach || 0)]);
+      el('posts-series').innerHTML = blocks.length
+        ? '<div class="series-grid">' + blocks.map(function (b) { return '<div class="series-card"><div class="series-tag">' + b[0] + '</div><div class="series-meta">' + b[1] + '</div></div>'; }).join('') + '</div>'
+        : '<div class="leads-empty-state">Sin contenido en el período.</div>';
+    }
+
+    if (el('posts-pattern')) {
+      var bestFmt = fmtSegs.slice().sort(function (x, y) { return y.value - x.value; })[0];
+      el('posts-pattern').innerHTML = '<div class="pattern-row">' +
+        '<div class="pattern-item"><div class="k">Formato más usado</div><div class="v">' + (bestFmt ? bestFmt.label : '—') + '</div></div>' +
+        '<div class="pattern-item"><div class="k">Mejor hora</div><div class="v">' + (ig.bestTime || '—') + '</div></div>' +
+        '<div class="pattern-item"><div class="k">Alcance medio/día</div><div class="v">' + fmtNumCO(ig.avgDailyReach || 0) + '</div></div>' +
+        '</div>';
+    }
+
+    if (el('posts-organic-ideas')) el('posts-organic-ideas').innerHTML = (ig.topPosts && ig.topPosts.length)
+      ? socBars(ig.topPosts.map(function (p) { return [p.kind + ' · ' + p.date + ' — ' + (p.caption || '').slice(0, 48), p.reach]; }))
+      : '<div class="leads-empty-state">Sin publicaciones en el período.</div>';
+
+    // ---- MI AUDIENCIA ----
+    setText('audiencia-period', 'Metricool · ' + (SOCIAL.period || '') + ' · IG @' + (ig.username || ''));
+    if (el('audiencia-marzo-kpis')) el('audiencia-marzo-kpis').innerHTML =
+      '<div class="pauta-pillrow" style="justify-content:flex-start">' +
+      pautaStatPill('Seguidores', ig.followers != null ? fmtNumCO(ig.followers) : '—', 'accent') +
+      pautaStatPill('Adquiridos', ig.acquired != null ? fmtNumCO(ig.acquired) : '—', 'good') +
+      pautaStatPill('Perdidos', ig.lost != null ? fmtNumCO(ig.lost) : '—', 'crit') +
+      pautaStatPill('Alcance medio/día', ig.avgDailyReach != null ? fmtNumCO(ig.avgDailyReach) : '—', 'blue') +
+      '</div>' + (ig.followersNote ? '<p class="vc-note" style="margin-top:8px">' + ig.followersNote + '</p>' : '');
+    socEmpty('audiencia-gender', 'El desglose por sexo no viene en el informe PDF de Metricool — está solo en el CSV. Se puede añadir cuando lo exportes en ese formato.');
+    socEmpty('audiencia-age', 'El desglose por edad tampoco viene en el PDF (solo en el CSV de Metricool).');
+    if (el('audiencia-places')) el('audiencia-places').innerHTML = (ig.cities && ig.cities.length)
+      ? '<p class="vc-note" style="margin-top:-4px">Principales ciudades (Instagram):</p>' + socBars(ig.cities.map(function (r) { return [r[0], r[1]]; }), '%') +
+        (ig.countries && ig.countries.length ? '<p class="vc-note" style="margin-top:10px">Países: ' + ig.countries.join(' · ') + '</p>' : '')
+      : '<div class="leads-empty-state">Sin desglose geográfico.</div>';
+    if (el('audiencia-besttime')) el('audiencia-besttime').innerHTML = ig.bestTime
+      ? '<div class="hero-stat"><div class="hero-number">' + ig.bestTime + '</div><div class="hero-sub">Instagram · Metricool</div></div>'
+      : '<div class="leads-empty-state">Sin dato.</div>';
+
+    // ---- COMPETENCIA ----
+    var comps = (ig.competitors || []).filter(function (x) { return x.followers != null; });
+    if (el('referentes-competencia-title')) setText('referentes-competencia-title', '🏢 Competencia de ' + a.label + ' en Cali');
+    if (el('referentes-competencia')) el('referentes-competencia').innerHTML = comps.length
+      ? socBars(comps.map(function (x) { return [x.name + (x.engagement != null ? ' · eng. ' + fmtPct2(x.engagement) : ''), x.followers]; }))
+      : '<div class="leads-empty-state">Aún sin métricas de competidores' + ((ig.competitors || []).length ? ' (' + ig.competitors.map(function (x) { return x.name; }).join(', ') + ' agregados en Metricool, sin datos todavía)' : '') + '.</div>';
+    if (el('referentes-share')) {
+      var all = comps.concat(ig.followers != null ? [{ name: a.label + ' (tú)', followers: ig.followers, me: true }] : []);
+      if (all.length >= 2) {
+        var totalF = all.reduce(function (t, x) { return t + x.followers; }, 0) || 1;
+        el('referentes-share').innerHTML = '<p class="vc-note" style="margin-top:-4px">Share of voice por seguidores en Instagram (tú + competidores cargados):</p>' +
+          all.slice().sort(function (x, y) { return y.followers - x.followers; }).map(function (x) {
+            var pct = Math.round((x.followers / totalF) * 100);
+            return '<div class="sede-row"><div class="sede-name" style="width:220px;flex-basis:220px' + (x.me ? ';color:var(--accent-soft-ink);font-weight:800' : '') + '">' + x.name + '</div>' +
+              '<div class="sede-bar-track"><div class="sede-bar-fill ' + (x.me ? 'bar-fill-good' : 'bar-fill-accent') + '" style="width:' + Math.round((x.followers / Math.max.apply(null, all.map(function (z) { return z.followers; }))) * 100) + '%"></div></div>' +
+              '<div class="sede-counts">' + fmtNumCO(x.followers) + ' · ' + pct + '%</div></div>';
+          }).join('');
+      } else {
+        el('referentes-share').innerHTML = '<div class="leads-empty-state">Se calcula cuando haya competidores con datos.</div>';
+      }
+    }
+  }
+
+  fetch('data/social.json', { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) { if (data && data.accounts) { SOCIAL = data; renderSocial(currentAccount()); } })
+    .catch(function () { /* sin archivo: se quedan los estados vacíos */ });
 
   // ---------- Pautas: carga los datos guardados en data/pautas.json ----------
   fetch('data/pautas.json', { cache: 'no-store' })

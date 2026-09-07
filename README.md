@@ -24,6 +24,7 @@ Estas herramientas ya funcionan sin conexión de datos (todo se procesa en el na
 | `index.html` | El panel completo (HTML + CSS + JS en un solo archivo). |
 | `data/pautas.json` | Estado de las pautas de Meta que muestra la pestaña **Pautas**. Se genera desde el informe de Meta y se versiona en el repo (persiste entre visitas). |
 | `scripts/gen-pautas.js` | Convierte un informe de campañas de Meta (`.xlsx` o `.csv`) en `data/pautas.json`. |
+| `data/social.json` | Datos de Instagram + Facebook (Metricool) que alimentan **Inicio, Posts, Mi audiencia, Competencia**. Transcrito de los informes PDF de Metricool. |
 | `data/live-metrics.json` | Datos de Meta Ads por marca. Vacío hasta conectar. Lo reescribe el flujo de Actions. |
 | `scripts/refresh-meta-data.js` | Jala datos de la Graph API de Meta. Falta completar `AD_ACCOUNT_ID` y los IDs de campaña/conjunto de cada marca. |
 | `.github/workflows/refresh-meta-data.yml` | Ejecuta el script anterior. Programación en pausa; se dispara a mano (`workflow_dispatch`). |
@@ -34,6 +35,16 @@ Estas herramientas ya funcionan sin conexión de datos (todo se procesa en el na
 Publicado con **GitHub Pages** usando **GitHub Actions** como origen
 (`.github/workflows/deploy-pages.yml`). Cada push a `main` empaqueta la raíz del
 repo y la despliega. El propio workflow activa Pages la primera vez (`enablement: true`).
+
+## Actualizar Inicio / Posts / Mi audiencia / Competencia (Metricool)
+
+El plan de Metricool (Starter) no tiene API, así que estos datos se cargan a mano:
+
+1. En Metricool → **Analítica**, exporta el informe **PDF** de cada cuenta: Instagram Proviser, Instagram Nass, Facebook Proviser, Facebook Nass (rango de fechas del mes).
+2. Pásalos y se transcriben a `data/social.json` (estructura por marca → `instagram` / `facebook`: seguidores, crecimiento, alcance, mejor hora, ciudades, contenido, top posts, competidores).
+3. `git add data/social.json && git commit && git push` → el panel se actualiza.
+
+El desglose de audiencia por **edad y sexo** no viene en el PDF de Metricool (solo en el CSV); esas dos tarjetas quedan pendientes hasta exportar en ese formato.
 
 ## Actualizar la pestaña Pautas
 

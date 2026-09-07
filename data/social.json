@@ -1,0 +1,112 @@
+{
+  "updatedAt": "2026-09-07T20:30:00-05:00",
+  "source": "Metricool — informes exportados (Analítica, PDF)",
+  "period": "1–31 ago 2026",
+  "note": "Datos transcritos de los informes PDF de Metricool. El desglose de audiencia por edad y sexo no viene en el PDF (solo en el CSV); por eso esas tarjetas quedan pendientes. Para actualizar: re-exportar los 4 informes y volver a generar este archivo.",
+  "accounts": {
+    "proviser": {
+      "label": "Proviser Seguridad",
+      "instagram": {
+        "username": "proviserseguridad",
+        "followers": 4312,
+        "following": 628,
+        "followersDelta": 11,
+        "acquired": 39,
+        "lost": 26,
+        "views": 9930,
+        "avgDailyReach": 128,
+        "engagedAccounts": 228,
+        "postsInPeriod": 8,
+        "bestTime": "18:00–21:00",
+        "cities": [["Santiago de Cali", 28.17], ["Bogotá", 15.85], ["Medellín", 4.36], ["Palmira", 2.83], ["Jamundí", 2.76]],
+        "countries": ["Colombia", "España", "Venezuela", "Estados Unidos", "Argentina", "México", "Chile"],
+        "content": {
+          "posts":   { "count": 1, "engagement": 35.35, "interactions": 14, "avgReach": 396, "views": 804, "likes": 13, "comments": 0, "saves": 1 },
+          "reels":   { "count": 4, "engagement": 86.96, "interactions": 192, "avgReach": 552, "views": 3745, "likes": 181, "comments": 5, "saves": 1, "shares": 5 },
+          "stories": { "count": 3, "impressions": 588, "avgReach": 193 }
+        },
+        "topPosts": [
+          { "date": "2026-08-29", "kind": "Reel", "reach": 707, "caption": "¿La seguridad de tu empresa proyecta el prestigio de tu marca?" },
+          { "date": "2026-08-13", "kind": "Reel", "reach": 568, "caption": "Los momentos de prueba nos recuerdan de qué estamos hechos" },
+          { "date": "2026-08-08", "kind": "Reel", "reach": 511, "caption": "En los momentos difíciles es cuando demostramos de qué estamos hechos" },
+          { "date": "2026-08-20", "kind": "Reel", "reach": 422, "caption": "La seguridad de tu compañía exige estrategias sólidas y reacción inmediata" },
+          { "date": "2026-08-11", "kind": "Imagen", "reach": 396, "caption": "El sismo del pasado lunes 10 de agosto nos recordó que… ESTAMOS CONTIGO" }
+        ],
+        "hashtags": [],
+        "competitors": [
+          { "name": "Grupo Atlas Seguridad", "followers": 10370, "engagement": 3.3 },
+          { "name": "Alarmas Telesentinel", "followers": 9940, "engagement": 0.4 },
+          { "name": "Oszford Seguridad Privada Cali", "followers": 4970, "engagement": 7.1 },
+          { "name": "Seguridad Omega", "followers": 2840, "engagement": 0.8 },
+          { "name": "Sotech Seguridad y Tecnología", "followers": 347, "engagement": null }
+        ]
+      },
+      "facebook": {
+        "followers": 15510,
+        "followersDelta": 25,
+        "acquired": 55,
+        "lost": 30,
+        "views": 67700,
+        "pageVisits": 1295,
+        "postsInPeriod": 5,
+        "cities": [["Cali", 33.06], ["Bogotá", 11.04], ["Medellín", 2.11], ["Jamundí", 1.94], ["Cartagena", 1.86]],
+        "content": {
+          "posts":   { "count": 1, "engagement": 56.52, "interactions": 39, "avgReach": 690, "views": 1125, "reactions": 16, "shares": 1, "clicks": 22 },
+          "reels":   { "count": 3, "interactions": 205, "videoViews": 5571, "likes": 176, "actions": 29 },
+          "stories": { "count": 1 }
+        }
+      }
+    },
+    "nass": {
+      "label": "Nass Tecnología",
+      "instagram": {
+        "username": "nasstecnologia",
+        "followers": null,
+        "following": null,
+        "followersDelta": null,
+        "acquired": 23,
+        "lost": 13,
+        "views": 9838,
+        "avgDailyReach": 470,
+        "engagedAccounts": 5,
+        "postsInPeriod": 6,
+        "bestTime": "18:00–20:00",
+        "followersNote": "El conteo de seguidores solo existe desde la conexión de la cuenta (3 sep 2026). El informe de agosto no lo trae.",
+        "cities": [["Santiago de Cali", 33.12], ["Bogotá", 8.77], ["Medellín", 3.55], ["Jamundí", 2.96], ["Palmira", 2.13]],
+        "countries": ["Colombia", "Argentina", "Brasil", "Venezuela", "España", "Estados Unidos", "México"],
+        "content": {
+          "posts":   { "count": 4, "engagement": 121.02, "interactions": 38, "avgReach": 79, "views": 623, "likes": 37, "comments": 1 },
+          "reels":   { "count": 2, "engagement": 61.98, "interactions": 30, "avgReach": 242, "views": 681, "likes": 25, "saves": 3, "shares": 2 },
+          "stories": { "count": 0 }
+        },
+        "topPosts": [
+          { "date": "2026-08-08", "kind": "Reel", "reach": 275, "caption": "No dejes tu seguridad al azar. Tener cámaras no basta si no tienen un buen respaldo" },
+          { "date": "2026-08-20", "kind": "Reel", "reach": 209, "caption": "¿Sabías que un sistema de seguridad híbrido es tu mejor aliado financiero y operativo?" },
+          { "date": "2026-08-03", "kind": "Imagen", "reach": 107, "caption": "Publicación del 3 de agosto" },
+          { "date": "2026-08-13", "kind": "Imagen", "reach": 79, "caption": "¡Hoy celebramos 16 años de innovación, confianza y crecimiento!" },
+          { "date": "2026-08-04", "kind": "Imagen", "reach": 60, "caption": "Este mes celebramos 16 años protegiendo lo que más importa" }
+        ],
+        "hashtags": [["#confianza", 1], ["#juntoscrecemos", 1], ["#innovación", 1], ["#tecnología", 1], ["#aniversario", 1]],
+        "competitors": [
+          { "name": "TANGO Colombia", "followers": null, "engagement": null },
+          { "name": "SYTEC", "followers": null, "engagement": null }
+        ]
+      },
+      "facebook": {
+        "followers": 3599,
+        "followersDelta": 2,
+        "acquired": 5,
+        "lost": 3,
+        "views": 42780,
+        "pageVisits": 140,
+        "postsInPeriod": 2,
+        "cities": [["Cali", 58.57], ["Bogotá", 3.11], ["Jamundí", 2.05], ["Yumbo", 1.19], ["Candelaria", 1.19]],
+        "content": {
+          "posts":   { "count": 1, "engagement": 111.11, "interactions": 2, "avgReach": 18, "views": 25 },
+          "reels":   { "count": 1, "interactions": 3, "videoViews": 298, "likes": 2, "actions": 1 },
+          "stories": { "count": 0 }
+        }
+      }
+    }
+  }
+}

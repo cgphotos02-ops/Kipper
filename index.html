@@ -757,24 +757,9 @@
       <div class="tab" data-network="fb">Facebook</div>
     </div>
 
-    <div class="card highlight-card">
-      <div class="label">🔥 Tu último post</div>
-      <div class="leads-empty-state" id="home-lastpost">Aún no conectado. Cuando conectes la cuenta de esta marca, aquí aparece tu post más reciente y su rendimiento.</div>
-    </div>
-
     <div class="card">
       <h2>📊 Cumplimiento de metas</h2>
       <div class="leads-empty-state" id="home-metas-pills">Aún no hay metas definidas ni datos conectados para esta marca.</div>
-    </div>
-
-    <div class="card idea-card">
-      <h2>⚡ Esto te toca hoy</h2>
-      <div class="leads-empty-state" id="home-idea">Aún no conectado. Las ideas del día aparecen aquí cuando haya datos de la cuenta.</div>
-    </div>
-
-    <div class="card">
-      <h2>📅 En tu agenda</h2>
-      <div class="leads-empty-state" id="home-agenda">Aún no conectado. Tu contenido agendado aparece aquí.</div>
     </div>
 
     <div class="grid-2" id="home-networks-grid">
@@ -1634,7 +1619,7 @@
     }).join('');
   }
 
-  var SOCIAL_VIEW_IDS = ['home-lastpost', 'home-metas-pills', 'home-idea', 'home-agenda', 'home-ig-stats', 'home-fb-stats', 'home-besttime',
+  var SOCIAL_VIEW_IDS = ['home-metas-pills', 'home-ig-stats', 'home-fb-stats', 'home-besttime',
     'posts-parrilla-donut', 'posts-hashtags', 'posts-series', 'posts-pattern', 'posts-organic-ideas',
     'audiencia-marzo-kpis', 'audiencia-gender', 'audiencia-age', 'audiencia-places', 'audiencia-besttime',
     'referentes-competencia', 'referentes-share'];
@@ -1642,8 +1627,6 @@
   function renderSocial(key) {
     if (!SOCIAL || !SOCIAL.accounts || !SOCIAL.accounts[key]) return;
     var a = SOCIAL.accounts[key], ig = a.instagram || {}, fb = a.facebook || {};
-    var upd = SOCIAL.updatedAt ? new Date(SOCIAL.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-    var periodo = (SOCIAL.period || '') + (upd ? ' · actualizado ' + upd : '');
 
     // ---- Filtro por mes ----
     var dataMonth = SOCIAL.month || (typeof DATA_MONTH !== 'undefined' ? DATA_MONTH : null);
@@ -1661,19 +1644,6 @@
     var sumN = function () { var vs = [].slice.call(arguments).filter(function (v) { return v != null; }); return vs.length ? vs.reduce(function (s, v) { return s + v; }, 0) : null; };
     var pill = function (k, v, cls) { return pautaStatPill(k, v != null ? (typeof v === 'number' ? fmtNumCO(v) : v) : '—', cls); };
     var delta = function (d) { return d == null ? '—' : (d >= 0 ? '+' : '') + fmtNumCO(d); };
-
-    var tp = (ig.topPosts || [])[0];
-    if (el('home-lastpost')) {
-      if (net === 'fb') {
-        el('home-lastpost').innerHTML = '<div style="text-align:left">' +
-          '<b>' + (fb.postsInPeriod != null ? fb.postsInPeriod : '—') + '</b> publicaciones en Facebook en el período · alcance medio <b>' + fmtNumCO((fb.content && fb.content.posts && fb.content.posts.avgReach) || 0) + '</b>' +
-          '<br><span style="color:var(--ink-faint)">Metricool no da el detalle post a post de Facebook en el informe.</span></div>';
-      } else {
-        el('home-lastpost').innerHTML = tp
-          ? '<div style="text-align:left"><b>' + tp.kind + '</b> · ' + tp.date + ' · <b>' + fmtNumCO(tp.reach) + '</b> de alcance<br><span style="color:var(--ink-muted)">«' + tp.caption + '»</span></div>'
-          : '<div class="leads-empty-state">Sin publicaciones en el período.</div>';
-      }
-    }
 
     if (el('home-metas-pills')) {
       var pills;
@@ -1698,9 +1668,6 @@
       }
       el('home-metas-pills').innerHTML = '<div class="pauta-pillrow" style="justify-content:flex-start">' + pills + '</div>';
     }
-
-    if (el('home-idea')) el('home-idea').innerHTML = '<div class="leads-empty-state" style="padding:14px 10px">📊 Datos de Metricool · ' + periodo + ' · vista: ' + (net === 'ig' ? 'Instagram' : (net === 'fb' ? 'Facebook' : 'Todo')) + '</div>';
-    if (el('home-agenda')) el('home-agenda').innerHTML = '<div class="leads-empty-state" style="padding:14px 10px">El cronograma de contenidos se lleva en el Excel. Este panel es solo para datos y reportes.</div>';
 
     if (el('home-ig-stats')) el('home-ig-stats').innerHTML =
       '<div class="net-followers">' + (ig.followers != null ? fmtNumCO(ig.followers) : '—') + '</div>' +

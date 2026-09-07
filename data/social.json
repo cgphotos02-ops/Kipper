@@ -2,6 +2,7 @@
   "updatedAt": "2026-09-07T20:30:00-05:00",
   "source": "Metricool — informes exportados (Analítica, PDF)",
   "period": "1–31 ago 2026",
+  "month": "2026-08",
   "note": "Datos de Metricool. Proviser Instagram tiene detalle de CSV (reels, competidores exactos, sexo exacto, edad aprox. del gráfico). El resto viene del PDF. Para actualizar: re-exportar los informes (mejor CSV) y volver a generar este archivo.",
   "accounts": {
     "proviser": {

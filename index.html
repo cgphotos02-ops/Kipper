@@ -432,15 +432,16 @@
 
   /* Global account bar */
   .account-bar {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 22px;
+    display: flex; align-items: center; gap: 10px; margin-bottom: 22px; flex-wrap: wrap;
     background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
     padding: 10px 14px; box-shadow: var(--shadow);
   }
   .account-bar label { font-size: 12px; font-weight: 700; color: var(--ink-muted); white-space: nowrap; }
   .account-bar select {
-    flex: 1; max-width: 320px; font: inherit; font-size: 13.5px; padding: 7px 10px; border-radius: 8px;
+    flex: 1; min-width: 160px; max-width: 280px; font: inherit; font-size: 13.5px; padding: 7px 10px; border-radius: 8px;
     border: 1px solid var(--border); background: var(--surface-2); color: var(--ink); font-weight: 700;
   }
+  .account-bar select#global-mes { flex: 0 1 190px; }
 
   /* Variable Crítica chip */
   .vc-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-right: 6px; }
@@ -690,13 +691,13 @@
 </style>
 </head>
 <body>
-<div class="banner">📡 Panel de Kipper · aún no hay datos conectados — cada sección queda lista para cargar datos reales de Proviser Seguridad y Nass Tecnología.</div>
+<div class="banner">📡 Panel de datos de Kipper — Proviser Seguridad y Nass Tecnología. Elige la marca y el mes arriba; los datos vienen de Metricool.</div>
 
 <aside class="sidebar" style="margin-top:28px;">
   <div class="profile">
     <div class="avatar">K</div>
     <div class="profile-name">Kipper</div>
-    <div class="profile-updated">Sin datos conectados</div>
+    <div class="profile-updated" id="profile-updated">Metricool</div>
   </div>
 
   <nav id="nav">
@@ -711,10 +712,6 @@
     <button class="nav-item" data-view="audiencia">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       Mi audiencia
-    </button>
-    <button class="nav-item" data-view="parrilla">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
-      Parrilla
     </button>
     <button class="nav-item" data-view="competencia">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20c0-3 2.5-5 6-5s6 2 6 5M14 20c0-2 1.8-3.5 4.5-3.5S23 18 23 20"/></svg>
@@ -734,7 +731,7 @@
     </button>
   </nav>
 
-  <div class="sidebar-footer"><span class="dot"></span> Sin conexión de datos</div>
+  <div class="sidebar-footer" id="sidebar-footer"><span class="dot"></span> Datos de Metricool</div>
 </aside>
 
 <main>
@@ -745,6 +742,8 @@
       <option value="proviser">Proviser Seguridad</option>
       <option value="nass">Nass Tecnología</option>
     </select>
+    <label for="global-mes">📅 Mes</label>
+    <select id="global-mes"></select>
   </div>
 
   <!-- INICIO -->
@@ -864,16 +863,6 @@
     <div class="card">
       <h2>⏰ Cuándo está más activa tu audiencia</h2>
       <div class="leads-empty-state" id="audiencia-besttime">Aún no conectado. Se calcula con la actividad de tus seguidores en Instagram.</div>
-    </div>
-  </section>
-
-  <!-- PARRILLA -->
-  <section class="view" id="view-parrilla">
-    <h1 class="greeting">Parrilla</h1>
-    <div class="date-sub" id="parrilla-sub">Tu cronograma de contenidos por semana</div>
-
-    <div class="card">
-      <div id="parrilla-tabla"><div class="leads-empty-state">Cargando parrilla…</div></div>
     </div>
   </section>
 
@@ -1067,8 +1056,6 @@
   function setText(id, t) { var e = el(id); if (e) e.textContent = t; }
   function fmtMoney(n) { return '$' + Number(n).toLocaleString('es-CO', { maximumFractionDigits: 0 }); }
 
-  var td = el('today-date');
-  if (td) td.textContent = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
 
   // ---------- Navegación entre vistas ----------
   document.querySelectorAll('.nav-item').forEach(function (btn) {
@@ -1126,13 +1113,52 @@
     });
   });
 
-  // ---------- Selector de marca ----------
+  // ---------- Selector de marca y de mes ----------
+  var MESES_ES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+  function monthLabel(k) {
+    var p = String(k || '').split('-');
+    if (p.length < 2) return k || '';
+    var s = (MESES_ES[+p[1] - 1] || '') + ' ' + p[0];
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+  // Mes al que corresponde TODO lo que hay cargado hoy en data/social.json.
+  var DATA_MONTH = '2026-08';
+  var selectedMonth = DATA_MONTH;
+  try { var _sm = localStorage.getItem('kipper_mes'); if (_sm) selectedMonth = _sm; } catch (e) {}
+
   var cuentaSel = el('global-cuenta');
+  var mesSel = el('global-mes');
   function currentAccount() { return cuentaSel ? cuentaSel.value : 'proviser'; }
+
+  if (mesSel) {
+    var _now = new Date();
+    var _maxY = _now.getFullYear(), _maxM = _now.getMonth() + 1;
+    var _opts = [];
+    for (var _y = 2026; _y <= _maxY; _y++) {
+      for (var _m = 1; _m <= 12; _m++) {
+        if (_y === _maxY && _m > _maxM) break;
+        var _k = _y + '-' + (_m < 10 ? '0' : '') + _m;
+        _opts.push('<option value="' + _k + '"' + (_k === selectedMonth ? ' selected' : '') + '>' +
+          monthLabel(_k) + (_k === DATA_MONTH ? '' : ' · sin datos') + '</option>');
+      }
+    }
+    mesSel.innerHTML = _opts.reverse().join('');
+    if (![].some.call(mesSel.options, function (o) { return o.value === selectedMonth; })) {
+      selectedMonth = DATA_MONTH; mesSel.value = DATA_MONTH;
+    }
+    mesSel.addEventListener('change', function () {
+      selectedMonth = mesSel.value;
+      try { localStorage.setItem('kipper_mes', selectedMonth); } catch (e) {}
+      refreshAccount();
+    });
+  }
+
   function refreshAccount() {
     setText('home-greeting', 'Buenos días 👋 — ' + accountLabels[currentAccount()]);
+    setText('today-date', '📅 Estás viendo: ' + monthLabel(selectedMonth) +
+      (selectedMonth === DATA_MONTH ? '' : ' — sin datos (lo cargado es de ' + monthLabel(DATA_MONTH) + ')'));
+    setText('profile-updated', 'Datos: ' + monthLabel(DATA_MONTH));
     renderSocial(currentAccount());
-    renderParrilla(currentAccount());
   }
   if (cuentaSel) cuentaSel.addEventListener('change', refreshAccount);
 
@@ -1608,11 +1634,26 @@
     }).join('');
   }
 
+  var SOCIAL_VIEW_IDS = ['home-lastpost', 'home-metas-pills', 'home-idea', 'home-agenda', 'home-ig-stats', 'home-fb-stats', 'home-besttime',
+    'posts-parrilla-donut', 'posts-hashtags', 'posts-series', 'posts-pattern', 'posts-organic-ideas',
+    'audiencia-marzo-kpis', 'audiencia-gender', 'audiencia-age', 'audiencia-places', 'audiencia-besttime',
+    'referentes-competencia', 'referentes-share'];
+
   function renderSocial(key) {
     if (!SOCIAL || !SOCIAL.accounts || !SOCIAL.accounts[key]) return;
     var a = SOCIAL.accounts[key], ig = a.instagram || {}, fb = a.facebook || {};
     var upd = SOCIAL.updatedAt ? new Date(SOCIAL.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
     var periodo = (SOCIAL.period || '') + (upd ? ' · actualizado ' + upd : '');
+
+    // ---- Filtro por mes ----
+    var dataMonth = SOCIAL.month || (typeof DATA_MONTH !== 'undefined' ? DATA_MONTH : null);
+    if (typeof selectedMonth !== 'undefined' && dataMonth && selectedMonth !== dataMonth) {
+      var msg = 'Sin datos de ' + monthLabel(selectedMonth) + '. Lo que has cargado corresponde a ' + monthLabel(dataMonth) + '.';
+      SOCIAL_VIEW_IDS.forEach(function (id) { socEmpty(id, msg); });
+      setText('audiencia-period', monthLabel(selectedMonth) + ' · sin datos');
+      if (el('referentes-competencia-title')) setText('referentes-competencia-title', 'Competencia · ' + monthLabel(selectedMonth));
+      return;
+    }
 
     // ---- INICIO (según la pestaña Todo / Instagram / Facebook) ----
     var net = (typeof socialNet !== 'undefined') ? socialNet : 'todo';
@@ -1659,7 +1700,7 @@
     }
 
     if (el('home-idea')) el('home-idea').innerHTML = '<div class="leads-empty-state" style="padding:14px 10px">📊 Datos de Metricool · ' + periodo + ' · vista: ' + (net === 'ig' ? 'Instagram' : (net === 'fb' ? 'Facebook' : 'Todo')) + '</div>';
-    if (el('home-agenda')) el('home-agenda').innerHTML = '<div class="leads-empty-state" style="padding:14px 10px">Sin agenda conectada — usa la Parrilla para planear.</div>';
+    if (el('home-agenda')) el('home-agenda').innerHTML = '<div class="leads-empty-state" style="padding:14px 10px">El cronograma de contenidos se lleva en el Excel. Este panel es solo para datos y reportes.</div>';
 
     if (el('home-ig-stats')) el('home-ig-stats').innerHTML =
       '<div class="net-followers">' + (ig.followers != null ? fmtNumCO(ig.followers) : '—') + '</div>' +
@@ -1834,170 +1875,6 @@
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (data) { if (data && data.accounts) { SOCIAL = data; renderSocial(currentAccount()); } })
     .catch(function () { /* sin archivo: se quedan los estados vacíos */ });
-
-  // ---------- Parrilla: contenidos desde data/parrilla.json (sincronizado del Excel en línea) ----------
-  var PARRILLA = null;
-  var PAR_STEPS = [
-    { k: 'grabado', label: 'Grabado' },
-    { k: 'elaborado', label: 'Elaborado' },
-    { k: 'programado', label: 'Programado' },
-    { k: 'publicado', label: 'Publicado' }
-  ];
-  function parCheckAll() { try { return JSON.parse(localStorage.getItem('kipper_parrilla') || '{}'); } catch (e) { return {}; } }
-  function parCheckGet(pid) { return parCheckAll()[pid] || {}; }
-  function parCheckSet(pid, k, v) {
-    var all = parCheckAll();
-    all[pid] = all[pid] || {};
-    all[pid][k] = v;
-    try { localStorage.setItem('kipper_parrilla', JSON.stringify(all)); } catch (e) {}
-  }
-  function parCheckId(r) {
-    return (r.fecha || '?') + '|' + (r.empresa || '?') + '|' + String(r.actividad || '').slice(0, 60);
-  }
-  function parWeekKey(iso) {
-    var d = new Date(iso + 'T00:00:00'); if (isNaN(d)) return null;
-    var day = d.getDay(), diff = (day === 0 ? -6 : 1 - day);
-    d.setDate(d.getDate() + diff);
-    var m = d.getMonth() + 1, dd = d.getDate();
-    return d.getFullYear() + '-' + (m < 10 ? '0' + m : m) + '-' + (dd < 10 ? '0' + dd : dd);
-  }
-  function parWeekLabel(mondayIso) {
-    var mon = new Date(mondayIso + 'T00:00:00'), fri = new Date(mon); fri.setDate(fri.getDate() + 4);
-    var f = function (x) { return x.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' }); };
-    return 'Semana del ' + f(mon) + ' al ' + f(fri);
-  }
-  function parStatusPill(s) {
-    var t = (s || '').toLowerCase();
-    if (/listo|aprobad|publicad|hecho|ok/.test(t)) return '<span class="status-pill good">' + s + '</span>';
-    if (/dise|proceso|edici|revis/.test(t)) return '<span class="status-pill warn">' + s + '</span>';
-    if (/sin empezar|pendiente|por hacer/.test(t)) return '<span class="status-pill off">' + s + '</span>';
-    return s ? '<span class="status-pill off">' + s + '</span>' : '<span class="status-pill off">—</span>';
-  }
-  function esc(x) { return String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-
-  var PAR_FMT = {
-    reel:     { icon: '🎬', bg: 'rgba(41,171,199,0.18)' },
-    carrusel: { icon: '🖼️', bg: 'rgba(31,127,196,0.18)' },
-    historia: { icon: '⭕', bg: 'rgba(155,201,60,0.18)' },
-    story:    { icon: '⭕', bg: 'rgba(155,201,60,0.18)' },
-    imagen:   { icon: '📷', bg: 'rgba(241,129,44,0.18)' },
-    foto:     { icon: '📷', bg: 'rgba(241,129,44,0.18)' },
-    post:     { icon: '📷', bg: 'rgba(241,129,44,0.18)' },
-    video:    { icon: '📹', bg: 'rgba(31,127,196,0.18)' }
-  };
-  function parFmtBadge(f) {
-    var k = (f || '').toLowerCase().trim();
-    var m = PAR_FMT[k] || Object.keys(PAR_FMT).map(function (x) { return k.indexOf(x) > -1 ? PAR_FMT[x] : null; }).filter(Boolean)[0] || { icon: '📌', bg: 'var(--surface)' };
-    return '<div class="par-fmt-badge" style="background:' + m.bg + '">' + m.icon + '</div>';
-  }
-  function parBrandKey(e) {
-    var n = (e || '').toLowerCase();
-    if (n.indexOf('proviser') > -1) return 'proviser';
-    if (n.indexOf('nass') > -1) return 'nass';
-    return '';
-  }
-  var parAllBrands = false;
-
-  function renderParrilla(key) {
-    var out = el('parrilla-tabla');
-    if (!out) return;
-    if (!PARRILLA || !PARRILLA.rows) { out.innerHTML = '<div class="leads-empty-state">Aún no hay parrilla cargada.</div>'; return; }
-    var brand = parBrandKey(accountLabels[key] || key);
-
-    var lastFecha = null;
-    var all = PARRILLA.rows.map(function (r) {
-      var rr = Object.assign({}, r);
-      if (rr.fecha) lastFecha = rr.fecha; else rr.fecha = lastFecha;
-      rr._b = parBrandKey(rr.empresa);
-      return rr;
-    });
-    var rows = parAllBrands ? all.slice() : all.filter(function (r) { return r._b === brand; });
-
-    if (PARRILLA.updatedAt) setText('parrilla-sub',
-      (parAllBrands ? 'Cronograma de ambas marcas' : 'Cronograma de ' + (accountLabels[key] || key)) +
-      ' · sincronizado ' + new Date(PARRILLA.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long' }));
-
-    var toggle = '<div class="par-topbar"><span class="vc-note" style="margin:0">' +
-      (parAllBrands ? all.length + ' piezas · ' + all.filter(function (r) { return r._b === 'proviser'; }).length + ' Proviser · ' + all.filter(function (r) { return r._b === 'nass'; }).length + ' Nass'
-                    : rows.length + (rows.length === 1 ? ' pieza de ' : ' piezas de ') + (accountLabels[key] || key)) +
-      '</span><span class="par-toggle" id="par-toggle-brands">' + (parAllBrands ? '◄ solo ' + (accountLabels[key] || key).split(' ')[0] : 'ver ambas marcas ►') + '</span></div>';
-
-    if (!rows.length) { out.innerHTML = toggle + '<div class="leads-empty-state">Sin contenidos en la parrilla.</div>'; wireParToggle(key); return; }
-    rows.sort(function (a, b) { return (a.fecha || '').localeCompare(b.fecha || '') || (a._b || '').localeCompare(b._b || ''); });
-
-    var weeks = {}, order = [];
-    rows.forEach(function (r) {
-      var w = (r.semana && String(r.semana).trim()) || parWeekKey(r.fecha) || 'sin-fecha';
-      if (!weeks[w]) { weeks[w] = []; order.push(w); }
-      weeks[w].push(r);
-    });
-
-    var html = toggle + order.map(function (w) {
-      var wr = weeks[w];
-      var pend = wr.filter(function (r) { return /sin empezar|pendiente|por hacer/i.test(r.estadoDiseno || ''); }).length;
-      var done = wr.filter(function (r) { return /listo|aprobad|publicad|hecho/i.test(r.estadoDiseno || ''); }).length;
-      var sum = '<span class="par-week-sum"><b>' + wr.length + '</b> pieza' + (wr.length === 1 ? '' : 's') +
-        (parAllBrands ? '' : '') +
-        (pend ? ' · <b>' + pend + '</b> sin empezar' : '') + (done ? ' · <b>' + done + '</b> listas' : '') + '</span>';
-      var wl = w === 'sin-fecha' ? 'Sin fecha' : (/^\d{4}-\d{2}-\d{2}$/.test(w) ? parWeekLabel(w) : w);
-
-      var cards = wr.map(function (r) {
-        var body = '';
-        if (r.escenario) body += '<div class="par-k">Escenario</div>' + esc(r.escenario).replace(/\n/g, '<br>');
-        if (r.copyIn) body += '<div class="par-k">Copy in</div>' + esc(r.copyIn).replace(/\n/g, '<br>');
-        if (r.copyOut) body += '<div class="par-k">Copy out</div>' + esc(r.copyOut).replace(/\n/g, '<br>');
-        if (r.correcciones) body += '<div class="par-k">Correcciones</div>' + esc(r.correcciones).replace(/\n/g, '<br>');
-        if (r.link) body += '<div class="par-k">Link</div><a href="' + esc(r.link) + '" target="_blank" rel="noopener">' + esc(r.link) + '</a>';
-        var fechaTxt = '—';
-        if (r.fecha) {
-          var dt = new Date(r.fecha + 'T00:00:00');
-          fechaTxt = dt.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'short' });
-          fechaTxt = fechaTxt.charAt(0).toUpperCase() + fechaTxt.slice(1);
-        }
-        var chips = '<span class="par-chip date">📅 ' + fechaTxt + '</span>';
-        if (r._b) chips += '<span class="par-chip b-' + r._b + '">' + (r._b === 'proviser' ? 'Proviser' : 'Nass') + '</span>';
-        if (r.formato) chips += '<span class="par-chip">' + esc(r.formato) + '</span>';
-        if (r.objetivo) chips += '<span class="par-chip">' + esc(r.objetivo) + '</span>';
-        if (r.estadoDiseno) chips += '<span class="par-chip" title="Estado en el Excel">diseño: ' + esc(r.estadoDiseno) + '</span>';
-
-        var pid = parCheckId(r);
-        var st = parCheckGet(pid);
-        var allDone = PAR_STEPS.every(function (s) { return st[s.k]; });
-        var checkRow = '<div class="par-check" data-pid="' + esc(pid) + '">' + PAR_STEPS.map(function (s) {
-          return '<label class="' + (st[s.k] ? 'on' : '') + '"><input type="checkbox" data-k="' + s.k + '"' + (st[s.k] ? ' checked' : '') + '> ' + s.label + '</label>';
-        }).join('') + '</div>';
-
-        return '<div class="par-card' + (allDone ? ' done' : '') + '">' +
-          '<div class="par-card-top">' + parFmtBadge(r.formato) +
-          '<div class="par-card-main"><div class="par-card-title">' + esc(r.actividad || '(sin título)') + '</div>' +
-          '<div class="par-chips">' + chips + '</div></div></div>' +
-          checkRow +
-          (body ? '<details class="par-brief" open><summary>Brief y copy</summary><div class="par-brief-body">' + body + '</div></details>' : '') +
-          '</div>';
-      }).join('');
-
-      return '<div class="par-week"><div class="par-week-head"><h3>' + esc(wl) + '</h3>' + sum + '</div><div class="par-grid">' + cards + '</div></div>';
-    }).join('');
-
-    out.innerHTML = html;
-    var t = el('par-toggle-brands');
-    if (t) t.addEventListener('click', function () { parAllBrands = !parAllBrands; renderParrilla(key); });
-    out.querySelectorAll('.par-check input[type=checkbox]').forEach(function (cb) {
-      cb.addEventListener('change', function () {
-        var pid = cb.closest('.par-check').getAttribute('data-pid');
-        parCheckSet(pid, cb.dataset.k, cb.checked);
-        cb.parentNode.classList.toggle('on', cb.checked);
-        var row = cb.closest('.par-check');
-        var done = Array.prototype.every.call(row.querySelectorAll('input'), function (x) { return x.checked; });
-        cb.closest('.par-card').classList.toggle('done', done);
-      });
-    });
-  }
-
-  fetch('data/parrilla.json', { cache: 'no-store' })
-    .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (data) { if (data && data.rows) { PARRILLA = data; renderParrilla(currentAccount()); } })
-    .catch(function () {});
 
   // ---------- Pautas: carga los datos guardados en data/pautas.json ----------
   fetch('data/pautas.json', { cache: 'no-store' })

@@ -7,13 +7,15 @@ Panel interno para dos marcas independientes:
 
 ## Estado actual
 
-Todas las secciones están **en blanco / "aún no conectado"**. La estructura queda lista para cargar
-datos reales: Inicio, Posts, Mi audiencia, Constancia, Parrilla, Tendencias, Competencia, Leads y Campañas.
+Panel **solo de datos y reportes**. Secciones: Inicio, Posts, Mi audiencia, Competencia, Leads, Campañas y Pautas.
+El cronograma de contenidos (parrilla) se lleva aparte, en Excel.
 
-Estas herramientas ya funcionan sin conexión de datos (todo se procesa en el navegador):
+En la barra superior se elige la **marca** y el **mes**. Hoy los datos cargados corresponden a **agosto 2026**
+(`data/social.json` → campo `month`). Los meses sin datos aparecen en el selector marcados como "sin datos"
+y las tarjetas muestran un aviso.
 
-- **Constancia** — marcas tus 3 posts semanales; la racha se guarda en `localStorage`.
-- **Parrilla** — pegas tu cronograma de Excel y lo muestra; genera parrilla de historias a partir de eventos.
+Estas herramientas funcionan sin conexión de datos (todo se procesa en el navegador):
+
 - **Campañas → Planear campaña nueva** — genera una estructura de campaña a partir de un brief.
 - **Campañas → Seguimiento de leads** — pegas el Excel semanal y clasifica los leads on/off target.
 
@@ -21,7 +23,7 @@ Estas herramientas ya funcionan sin conexión de datos (todo se procesa en el na
 
 | Archivo | Qué es |
 | --- | --- |
-| `index.html` | El panel completo (HTML + CSS + JS en un solo archivo). |
+| `index.html` | El panel completo (HTML + CSS + JS en un solo archivo). Selector de marca y de mes en la barra superior. |
 | `data/pautas.json` | Estado de las pautas de Meta que muestra la pestaña **Pautas**. Se genera desde el informe de Meta y se versiona en el repo (persiste entre visitas). |
 | `scripts/gen-pautas.js` | Convierte un informe de campañas de Meta (`.xlsx` o `.csv`) en `data/pautas.json`. |
 | `data/social.json` | Datos de Instagram + Facebook (Metricool) que alimentan **Inicio, Posts, Mi audiencia, Competencia**. Transcrito de los informes PDF de Metricool. |
@@ -45,6 +47,11 @@ El plan de Metricool (Starter) no tiene API, así que estos datos se cargan a ma
 3. `git add data/social.json && git commit && git push` → el panel se actualiza.
 
 El desglose de audiencia por **edad y sexo** no viene en el PDF de Metricool (solo en el CSV); esas dos tarjetas quedan pendientes hasta exportar en ese formato.
+
+**Cambiar de mes:** hoy `data/social.json` es de un solo mes (`"month": "2026-08"`). Para pasar a otro mes,
+re-exporta los informes de ese mes y reescribe `data/social.json` con el nuevo `month` y los nuevos datos;
+además actualiza `DATA_MONTH` en `index.html`. (Para conservar el histórico habría que pasar `social.json`
+a una estructura por mes; hoy guarda solo el último cargado.)
 
 ## Actualizar la pestaña Pautas
 

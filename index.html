@@ -581,9 +581,9 @@
   .par-week-head h3 { font-size: 15.5px; font-weight: 800; color: var(--accent-strong); margin: 0; }
   .par-week-sum { font-size: 11.5px; color: var(--ink-muted); }
   .par-week-sum b { color: var(--ink); }
-  .par-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  @media (max-width: 780px) { .par-grid { grid-template-columns: 1fr; } }
+  .par-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
   .par-card { border: 1px solid var(--border); border-radius: 13px; background: var(--surface-2); overflow: hidden; box-shadow: var(--shadow); }
+  .par-card.done { border-color: var(--good-soft); background: linear-gradient(180deg, var(--good-soft), var(--surface-2) 60px); }
   .par-card-top { display: flex; gap: 11px; padding: 13px 14px 11px; align-items: flex-start; }
   .par-fmt-badge { flex: 0 0 40px; width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 19px; }
   .par-card-main { flex: 1; min-width: 0; }
@@ -594,14 +594,22 @@
   .par-chip.b-nass { color: var(--vc-proyeccion-ink); border-color: transparent; background: var(--vc-proyeccion-soft); }
   .par-chip.date { color: var(--ink-faint); font-variant-numeric: tabular-nums; }
   .par-card-status { flex: 0 0 auto; }
+  /* checklist horizontal por pieza */
+  .par-check { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 14px 12px; border-top: 1px dashed var(--border); }
+  .par-check label { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: var(--ink-muted); border: 1px solid var(--border); border-radius: 999px; padding: 5px 11px 5px 8px; cursor: pointer; user-select: none; transition: background .12s, color .12s, border-color .12s; }
+  .par-check label:hover { border-color: var(--accent); }
+  .par-check input { width: 15px; height: 15px; accent-color: var(--good); flex: 0 0 15px; margin: 0; cursor: pointer; }
+  .par-check label.on { background: var(--good-soft); color: var(--good-ink); border-color: transparent; }
+
   .par-brief { border-top: 1px dashed var(--border); }
   .par-brief > summary { list-style: none; cursor: pointer; padding: 9px 14px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); }
   .par-brief > summary::-webkit-details-marker { display: none; }
   .par-brief > summary:hover { color: var(--ink); }
   .par-brief[open] > summary { color: var(--accent-soft-ink); }
-  .par-brief-body { padding: 2px 14px 14px; font-size: 12.5px; line-height: 1.55; color: var(--ink); }
-  .par-brief-body .par-k { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); font-weight: 800; margin: 11px 0 3px; }
+  .par-brief-body { padding: 2px 14px 14px; font-size: 12.5px; line-height: 1.6; color: var(--ink); }
+  .par-brief-body .par-k { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); font-weight: 800; margin: 12px 0 3px; }
   .par-brief-body .par-k:first-child { margin-top: 4px; }
+  .par-brief-body a { color: var(--accent); word-break: break-all; }
 
   /* Pautas: estilo "reporte" — títulos centrados, tarjetas suaves, píldoras */
   .pauta-softcard { background: var(--surface-2); border: 1px solid var(--border); border-radius: 18px; padding: 22px 24px; margin-bottom: 16px; box-shadow: var(--shadow); }
@@ -865,53 +873,7 @@
     <div class="date-sub" id="parrilla-sub">Tu cronograma de contenidos por semana</div>
 
     <div class="card">
-      <h2>📅 Parrilla de contenidos</h2>
       <div id="parrilla-tabla"><div class="leads-empty-state">Cargando parrilla…</div></div>
-    </div>
-
-    <details class="card" style="padding:14px 20px">
-      <summary style="cursor:pointer;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);font-weight:700">📋 Pegar cronograma a mano (alternativa)</summary>
-      <p class="vc-note" style="margin-top:10px">Si aún no está conectado el Excel en línea, copia las filas de tu Excel (con encabezado) y pégalas aquí.</p>
-      <textarea class="leads-textarea" id="proximos-input" placeholder="Pega aquí las filas copiadas de tu Excel de cronograma…"></textarea>
-      <div class="action-row" style="margin-top:10px">
-        <button class="btn primary" id="show-proximos-btn">📆 Mostrar cronograma</button>
-      </div>
-    </details>
-
-    <div id="proximos-output"></div>
-
-    <div class="card">
-      <h2>📋 Posts de esta semana — listos para programar</h2>
-      <div class="leads-empty-state" id="calendario-posts">Aún no conectado. Cuando cargues tu parrilla, los posts de la semana aparecen aquí.</div>
-    </div>
-
-    <div class="card">
-      <h2>🗂️ Parrilla de historias <span style="text-transform:none;font-weight:400;color:var(--ink-faint)">— 3 días por semana, entregada con 3 semanas de anticipación</span></h2>
-      <p class="vc-note" style="margin-top:-4px">La parrilla planea el <b>tema y el día</b>, no siempre la pieza final — muchas historias se graban el día del evento.</p>
-
-      <div class="events-form">
-        <label class="brief-label" style="margin:0">Eventos del mes (uno por línea — dime qué viene y yo organizo el plan)</label>
-        <textarea id="events-input" placeholder="Feria de seguridad&#10;Capacitación a clientes&#10;Lanzamiento de servicio&#10;Visita a instalación"></textarea>
-        <div>
-          <button class="btn primary" id="generate-stories-btn">🗓️ Generar parrilla con estos eventos</button>
-          <span class="events-overflow-note" id="events-overflow-note"></span>
-        </div>
-      </div>
-
-      <div id="calendario-stories"></div>
-    </div>
-
-    <div class="card">
-      <h2>🎨 Reparto de contenidos con tu equipo de diseño</h2>
-      <p class="vc-note" style="margin-top:-4px">El reparto respeta un tope semanal — lo que no cabe, lo produces tú directo.</p>
-      <div class="form-grid" style="margin-bottom:10px">
-        <div class="form-group">
-          <label for="intern-cap">Máximo de piezas para diseño esta semana</label>
-          <input type="number" id="intern-cap" min="0" max="10" value="2" />
-        </div>
-      </div>
-      <button class="btn primary" id="split-intern-btn">⚖️ Repartir esta semana</button>
-      <div class="split-grid" id="split-output" style="margin-top:14px"></div>
     </div>
   </section>
 
@@ -1173,73 +1135,6 @@
     renderParrilla(currentAccount());
   }
   if (cuentaSel) cuentaSel.addEventListener('change', refreshAccount);
-
-  // ---------- Parrilla: pega tu cronograma de Excel ----------
-  function parseGenericTable(text) {
-    var lines = text.split(/\r?\n/).filter(function (l) { return l.trim() !== ''; });
-    if (lines.length < 2) return null;
-    var delim = lines[0].indexOf('\t') >= 0 ? '\t' : ',';
-    var headers = lines[0].split(delim).map(function (h) { return h.trim(); });
-    var rows = lines.slice(1).map(function (line) { return line.split(delim).map(function (c) { return c.trim(); }); });
-    return { headers: headers, rows: rows };
-  }
-  function renderProximos(parsed) {
-    var out = el('proximos-output');
-    if (!out) return;
-    if (!parsed) {
-      out.innerHTML = '<div class="card"><div class="leads-empty-state">No pude leer esas filas — asegúrate de incluir el encabezado y pegar directo desde Excel.</div></div>';
-      return;
-    }
-    var thead = '<tr>' + parsed.headers.map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr>';
-    var body = parsed.rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('');
-    out.innerHTML = '<div class="card"><div class="simple-table-wrap"><table class="simple-table"><thead>' + thead +
-      '</thead><tbody>' + body + '</tbody></table></div><p class="vc-note">' + parsed.rows.length + ' filas cargadas.</p></div>';
-  }
-  var proxBtn = el('show-proximos-btn');
-  if (proxBtn) proxBtn.addEventListener('click', function () { renderProximos(parseGenericTable(el('proximos-input').value)); });
-
-  // ---------- Parrilla de historias a partir de eventos ----------
-  var recurringStoryThemes = ['Bienvenida de la semana', 'Recordatorio institucional', 'Tip de seguridad para los clientes', 'Resumen de la semana', 'Detrás de cámaras del día a día', 'Pregunta a la comunidad'];
-  function buildStoriesPlanFromEvents(events) {
-    var days = ['Lunes', 'Miércoles', 'Viernes'], weeks = [[], [], []], queue = events.slice(), ri = 0;
-    for (var w = 0; w < 3; w++) {
-      for (var d = 0; d < 3; d++) {
-        if (queue.length) { weeks[w].push([days[d], queue.shift(), 'evento']); }
-        else { weeks[w].push([days[d], recurringStoryThemes[ri % recurringStoryThemes.length], 'lista']); ri++; }
-      }
-    }
-    return { weeks: weeks, leftover: queue.length };
-  }
-  function renderStories(weeks) {
-    var c = el('calendario-stories');
-    if (!c) return;
-    c.innerHTML = weeks.map(function (week, i) {
-      var rows = week.map(function (s) {
-        var label = s[2] === 'lista' ? '✅ Lista para programar' : '🎥 Se graba el día del evento';
-        return '<div class="story-row"><div class="story-day">' + s[0] + '</div><div class="story-tema">' + s[1] +
-          '</div><div class="story-status ' + s[2] + '">' + label + '</div></div>';
-      }).join('');
-      return '<div class="stories-week"><h3>Semana ' + (i + 1) + '</h3>' + rows + '</div>';
-    }).join('');
-  }
-  var genStoriesBtn = el('generate-stories-btn');
-  if (genStoriesBtn) genStoriesBtn.addEventListener('click', function () {
-    var note = el('events-overflow-note');
-    var events = el('events-input').value.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
-    if (!events.length) { if (note) note.textContent = 'Escribe al menos un evento para generar la parrilla.'; return; }
-    var built = buildStoriesPlanFromEvents(events);
-    renderStories(built.weeks);
-    if (note) note.textContent = built.leftover > 0
-      ? 'Tienes ' + built.leftover + ' evento(s) sin espacio en estas 3 semanas — pásalos a la siguiente tanda.'
-      : '';
-  });
-
-  // ---------- Reparto con diseño (se activa al cargar la parrilla) ----------
-  var splitBtn = el('split-intern-btn');
-  if (splitBtn) splitBtn.addEventListener('click', function () {
-    var out = el('split-output');
-    if (out) out.innerHTML = '<div class="leads-empty-state">Aún no hay parrilla de la semana cargada. Pega tu cronograma o genera la parrilla de historias arriba y el reparto aparece aquí.</div>';
-  });
 
   // ---------- Campañas: planear campaña nueva ----------
   function syncOtroTipoLabel() {
@@ -1893,6 +1788,23 @@
 
   // ---------- Parrilla: contenidos desde data/parrilla.json (sincronizado del Excel en línea) ----------
   var PARRILLA = null;
+  var PAR_STEPS = [
+    { k: 'grabado', label: 'Grabado' },
+    { k: 'elaborado', label: 'Elaborado' },
+    { k: 'programado', label: 'Programado' },
+    { k: 'publicado', label: 'Publicado' }
+  ];
+  function parCheckAll() { try { return JSON.parse(localStorage.getItem('kipper_parrilla') || '{}'); } catch (e) { return {}; } }
+  function parCheckGet(pid) { return parCheckAll()[pid] || {}; }
+  function parCheckSet(pid, k, v) {
+    var all = parCheckAll();
+    all[pid] = all[pid] || {};
+    all[pid][k] = v;
+    try { localStorage.setItem('kipper_parrilla', JSON.stringify(all)); } catch (e) {}
+  }
+  function parCheckId(r) {
+    return (r.fecha || '?') + '|' + (r.empresa || '?') + '|' + String(r.actividad || '').slice(0, 60);
+  }
   function parWeekKey(iso) {
     var d = new Date(iso + 'T00:00:00'); if (isNaN(d)) return null;
     var day = d.getDay(), diff = (day === 0 ? -6 : 1 - day);
@@ -1982,20 +1894,31 @@
 
       var cards = wr.map(function (r) {
         var body = '';
-        if (r.escenario) body += '<div class="par-k">Escenario</div>' + esc(r.escenario);
-        if (r.copyIn) body += '<div class="par-k">Copy in</div>' + esc(r.copyIn);
-        if (r.copyOut) body += '<div class="par-k">Copy out</div>' + esc(r.copyOut);
-        if (r.correcciones) body += '<div class="par-k">Correcciones</div>' + esc(r.correcciones);
+        if (r.escenario) body += '<div class="par-k">Escenario</div>' + esc(r.escenario).replace(/\n/g, '<br>');
+        if (r.copyIn) body += '<div class="par-k">Copy in</div>' + esc(r.copyIn).replace(/\n/g, '<br>');
+        if (r.copyOut) body += '<div class="par-k">Copy out</div>' + esc(r.copyOut).replace(/\n/g, '<br>');
+        if (r.correcciones) body += '<div class="par-k">Correcciones</div>' + esc(r.correcciones).replace(/\n/g, '<br>');
+        if (r.link) body += '<div class="par-k">Link</div><a href="' + esc(r.link) + '" target="_blank" rel="noopener">' + esc(r.link) + '</a>';
         var fechaTxt = r.fecha ? new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-CO', { day: '2-digit', month: 'short' }) : '—';
         var chips = '<span class="par-chip date">📅 ' + fechaTxt + '</span>';
         if (r._b) chips += '<span class="par-chip b-' + r._b + '">' + (r._b === 'proviser' ? 'Proviser' : 'Nass') + '</span>';
+        if (r.formato) chips += '<span class="par-chip">' + esc(r.formato) + '</span>';
         if (r.objetivo) chips += '<span class="par-chip">' + esc(r.objetivo) + '</span>';
-        return '<div class="par-card">' +
+        if (r.estadoDiseno) chips += '<span class="par-chip" title="Estado en el Excel">diseño: ' + esc(r.estadoDiseno) + '</span>';
+
+        var pid = parCheckId(r);
+        var st = parCheckGet(pid);
+        var allDone = PAR_STEPS.every(function (s) { return st[s.k]; });
+        var checkRow = '<div class="par-check" data-pid="' + esc(pid) + '">' + PAR_STEPS.map(function (s) {
+          return '<label class="' + (st[s.k] ? 'on' : '') + '"><input type="checkbox" data-k="' + s.k + '"' + (st[s.k] ? ' checked' : '') + '> ' + s.label + '</label>';
+        }).join('') + '</div>';
+
+        return '<div class="par-card' + (allDone ? ' done' : '') + '">' +
           '<div class="par-card-top">' + parFmtBadge(r.formato) +
           '<div class="par-card-main"><div class="par-card-title">' + esc(r.actividad || '(sin título)') + '</div>' +
-          '<div class="par-chips">' + chips + '</div></div>' +
-          '<div class="par-card-status">' + parStatusPill(r.estadoDiseno) + '</div></div>' +
-          (body ? '<details class="par-brief"><summary>Ver brief y copy</summary><div class="par-brief-body">' + body + '</div></details>' : '') +
+          '<div class="par-chips">' + chips + '</div></div></div>' +
+          checkRow +
+          (body ? '<details class="par-brief" open><summary>Brief y copy</summary><div class="par-brief-body">' + body + '</div></details>' : '') +
           '</div>';
       }).join('');
 
@@ -2003,11 +1926,18 @@
     }).join('');
 
     out.innerHTML = html;
-    wireParToggle(key);
-  }
-  function wireParToggle(key) {
     var t = el('par-toggle-brands');
     if (t) t.addEventListener('click', function () { parAllBrands = !parAllBrands; renderParrilla(key); });
+    out.querySelectorAll('.par-check input[type=checkbox]').forEach(function (cb) {
+      cb.addEventListener('change', function () {
+        var pid = cb.closest('.par-check').getAttribute('data-pid');
+        parCheckSet(pid, cb.dataset.k, cb.checked);
+        cb.parentNode.classList.toggle('on', cb.checked);
+        var row = cb.closest('.par-check');
+        var done = Array.prototype.every.call(row.querySelectorAll('input'), function (x) { return x.checked; });
+        cb.closest('.par-card').classList.toggle('done', done);
+      });
+    });
   }
 
   fetch('data/parrilla.json', { cache: 'no-store' })

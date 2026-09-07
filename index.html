@@ -572,6 +572,22 @@
   .pauta-table-ctr { display: inline-block; width: 46px; height: 6px; border-radius: 4px; background: var(--surface-2); overflow: hidden; vertical-align: middle; margin-right: 7px; }
   .pauta-table-ctr i { display: block; height: 100%; background: var(--accent); }
 
+  /* Parrilla de contenidos */
+  .par-week { margin-bottom: 16px; }
+  .par-week > h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--accent-soft-ink); margin: 0 0 8px; font-weight: 800; }
+  .par-item { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; background: var(--surface-2); overflow: hidden; }
+  .par-item > summary { list-style: none; cursor: pointer; padding: 11px 14px; display: grid; grid-template-columns: 76px 1fr 84px 96px auto; gap: 12px; align-items: center; font-size: 12.5px; }
+  .par-item > summary::-webkit-details-marker { display: none; }
+  .par-item > summary:hover { background: var(--surface); }
+  .par-item .par-date { color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .par-item .par-act { font-weight: 700; }
+  .par-item .par-fmt { color: var(--ink-muted); }
+  .par-item .par-obj { color: var(--ink-muted); }
+  .par-body { padding: 4px 14px 14px; border-top: 1px dashed var(--border); font-size: 12.5px; line-height: 1.55; }
+  .par-body .par-k { font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); font-weight: 800; margin: 10px 0 3px; }
+  .par-body .par-k:first-child { margin-top: 6px; }
+  @media (max-width: 720px) { .par-item > summary { grid-template-columns: 1fr auto; grid-auto-rows: min-content; } .par-item .par-date, .par-item .par-fmt, .par-item .par-obj { grid-column: 1 / -1; } }
+
   /* Pautas: estilo "reporte" — títulos centrados, tarjetas suaves, píldoras */
   .pauta-softcard { background: var(--surface-2); border: 1px solid var(--border); border-radius: 18px; padding: 22px 24px; margin-bottom: 16px; box-shadow: var(--shadow); }
   .pauta-section-title { text-align: center; font-size: 15px; font-weight: 800; color: var(--accent-strong); margin: 0 0 16px; letter-spacing: .01em; }
@@ -831,20 +847,23 @@
   <!-- PARRILLA -->
   <section class="view" id="view-parrilla">
     <h1 class="greeting">Parrilla</h1>
-    <div class="date-sub">Tu cronograma de posts y lo que entregas cada semana</div>
+    <div class="date-sub" id="parrilla-sub">Tu cronograma de contenidos por semana</div>
 
     <div class="card">
-      <h2>📋 Pega tu cronograma</h2>
-      <p class="vc-note" style="margin-top:-4px">Copia las filas de tu Excel de programación (con encabezado) y pégalas aquí. Se muestran tal cual, con las columnas que tú uses.</p>
+      <h2>📅 Parrilla de contenidos</h2>
+      <div id="parrilla-tabla"><div class="leads-empty-state">Cargando parrilla…</div></div>
+    </div>
+
+    <details class="card" style="padding:14px 20px">
+      <summary style="cursor:pointer;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);font-weight:700">📋 Pegar cronograma a mano (alternativa)</summary>
+      <p class="vc-note" style="margin-top:10px">Si aún no está conectado el Excel en línea, copia las filas de tu Excel (con encabezado) y pégalas aquí.</p>
       <textarea class="leads-textarea" id="proximos-input" placeholder="Pega aquí las filas copiadas de tu Excel de cronograma…"></textarea>
       <div class="action-row" style="margin-top:10px">
         <button class="btn primary" id="show-proximos-btn">📆 Mostrar cronograma</button>
       </div>
-    </div>
+    </details>
 
-    <div id="proximos-output">
-      <div class="card"><div class="leads-empty-state">Pega tu cronograma y dale a "Mostrar cronograma" para verlo aquí.</div></div>
-    </div>
+    <div id="proximos-output"></div>
 
     <div class="card">
       <h2>📋 Posts de esta semana — listos para programar</h2>
@@ -1136,6 +1155,7 @@
   function refreshAccount() {
     setText('home-greeting', 'Buenos días 👋 — ' + accountLabels[currentAccount()]);
     renderSocial(currentAccount());
+    renderParrilla(currentAccount());
   }
   if (cuentaSel) cuentaSel.addEventListener('change', refreshAccount);
 
@@ -1855,6 +1875,72 @@
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (data) { if (data && data.accounts) { SOCIAL = data; renderSocial(currentAccount()); } })
     .catch(function () { /* sin archivo: se quedan los estados vacíos */ });
+
+  // ---------- Parrilla: contenidos desde data/parrilla.json (sincronizado del Excel en línea) ----------
+  var PARRILLA = null;
+  function parWeekKey(iso) {
+    var d = new Date(iso + 'T00:00:00'); if (isNaN(d)) return null;
+    var day = d.getDay(), diff = (day === 0 ? -6 : 1 - day);
+    d.setDate(d.getDate() + diff);
+    var m = d.getMonth() + 1, dd = d.getDate();
+    return d.getFullYear() + '-' + (m < 10 ? '0' + m : m) + '-' + (dd < 10 ? '0' + dd : dd);
+  }
+  function parWeekLabel(mondayIso) {
+    var mon = new Date(mondayIso + 'T00:00:00'), fri = new Date(mon); fri.setDate(fri.getDate() + 4);
+    var f = function (x) { return x.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' }); };
+    return 'Semana del ' + f(mon) + ' al ' + f(fri);
+  }
+  function parStatusPill(s) {
+    var t = (s || '').toLowerCase();
+    if (/listo|aprobad|publicad|hecho|ok/.test(t)) return '<span class="status-pill good">' + s + '</span>';
+    if (/dise|proceso|edici|revis/.test(t)) return '<span class="status-pill warn">' + s + '</span>';
+    if (/sin empezar|pendiente|por hacer/.test(t)) return '<span class="status-pill off">' + s + '</span>';
+    return s ? '<span class="status-pill off">' + s + '</span>' : '<span class="status-pill off">—</span>';
+  }
+  function esc(x) { return String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  function renderParrilla(key) {
+    var out = el('parrilla-tabla');
+    if (!out) return;
+    if (!PARRILLA || !PARRILLA.rows) { out.innerHTML = '<div class="leads-empty-state">Aún no hay parrilla cargada.</div>'; return; }
+    var brand = (accountLabels[key] || key).split(' ')[0].toLowerCase();  // "proviser" / "nass"
+    // forward-fill de fecha (viene combinada en el Excel)
+    var lastFecha = null;
+    var rows = PARRILLA.rows.map(function (r) {
+      var rr = Object.assign({}, r);
+      if (rr.fecha) lastFecha = rr.fecha; else rr.fecha = lastFecha;
+      return rr;
+    }).filter(function (r) { return (r.empresa || '').toLowerCase().indexOf(brand) > -1; });
+    if (PARRILLA.updatedAt) setText('parrilla-sub', 'Cronograma de ' + (accountLabels[key] || key) + ' · sincronizado ' + new Date(PARRILLA.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long' }));
+    if (!rows.length) { out.innerHTML = '<div class="leads-empty-state">Sin contenidos de ' + (accountLabels[key] || key) + ' en la parrilla.</div>'; return; }
+    rows.sort(function (a, b) { return (a.fecha || '').localeCompare(b.fecha || ''); });
+    var weeks = {};
+    rows.forEach(function (r) { var w = parWeekKey(r.fecha) || 'sin-fecha'; (weeks[w] = weeks[w] || []).push(r); });
+    var html = Object.keys(weeks).sort().map(function (w) {
+      var items = weeks[w].map(function (r) {
+        var body = '';
+        if (r.escenario) body += '<div class="par-k">Escenario</div>' + esc(r.escenario);
+        if (r.copyIn) body += '<div class="par-k">Copy in</div>' + esc(r.copyIn);
+        if (r.copyOut) body += '<div class="par-k">Copy out</div>' + esc(r.copyOut);
+        if (r.correcciones) body += '<div class="par-k">Correcciones</div>' + esc(r.correcciones);
+        var fechaTxt = r.fecha ? new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit' }) : '—';
+        return '<details class="par-item"><summary>' +
+          '<span class="par-date">' + fechaTxt + '</span>' +
+          '<span class="par-act">' + esc(r.actividad || '(sin título)') + '</span>' +
+          '<span class="par-fmt">' + esc(r.formato || '') + '</span>' +
+          '<span class="par-obj">' + esc(r.objetivo || '') + '</span>' +
+          parStatusPill(r.estadoDiseno) +
+          '</summary>' + (body ? '<div class="par-body">' + body + '</div>' : '') + '</details>';
+      }).join('');
+      return '<div class="par-week"><h3>' + (w === 'sin-fecha' ? 'Sin fecha' : parWeekLabel(w)) + '</h3>' + items + '</div>';
+    }).join('');
+    out.innerHTML = html;
+  }
+
+  fetch('data/parrilla.json', { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) { if (data && data.rows) { PARRILLA = data; renderParrilla(currentAccount()); } })
+    .catch(function () {});
 
   // ---------- Pautas: carga los datos guardados en data/pautas.json ----------
   fetch('data/pautas.json', { cache: 'no-store' })

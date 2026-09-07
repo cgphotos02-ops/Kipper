@@ -1,0 +1,30 @@
+{
+  "updatedAt": "2026-09-07T21:00:00-05:00",
+  "source": "SharePoint · ProviserXNass.xlsx — pendiente de conectar con Power Automate",
+  "rows": [
+    {
+      "fecha": "2026-09-07",
+      "actividad": "¿Lo viste?",
+      "objetivo": "Venta",
+      "empresa": "Proviser",
+      "formato": "Reel",
+      "escenario": "Personas: 1 guarda + 1 visitante o empleado. Escenario: portería o acceso empresarial. Elementos: radio, sistema o registro de ingreso. Clave: una situación cotidiana que requiera validación, sin dramatizar delitos.",
+      "copyIn": "GUION: \"Hay algo en esta escena que requiere atención. ¿Lo viste?\" [Pausa visual] \"Para muchos, todo parece normal. Pero alguien entrenado no solo mira: observa, compara, verifica y decide.\" [Mostrar validación.] \"La diferencia no siempre está en reaccionar más rápido. A veces está en detectar antes.\" Call to Benefit: \"Detectar a tiempo te da más tiempo para tomar mejores decisiones.\"",
+      "copyOut": "",
+      "correcciones": "",
+      "estadoDiseno": "Sin empezar"
+    },
+    {
+      "fecha": "2026-09-07",
+      "actividad": "Encuentra el punto vulnerable",
+      "objetivo": "Awareness",
+      "empresa": "Nass",
+      "formato": "Carrusel",
+      "escenario": "Fotografía real de una casa, oficina, unidad o empresa. Diseño gráfico marcando zonas.",
+      "copyIn": "Slide 1: \"Hay un punto vulnerable en esta imagen. ¿Lo viste?\" Slide 2: misma foto, sin respuesta. \"Mira accesos, ángulos y zonas sin cobertura.\" Slide 3: revelación. Slide 4: \"Una cámara mal ubicada puede registrar mucho y proteger poco.\" Slide 5: \"El verdadero beneficio no está en tener más equipos. Está en tenerlos donde realmente los necesitas.\"",
+      "copyOut": "",
+      "correcciones": "",
+      "estadoDiseno": "Sin empezar"
+    }
+  ]
+}

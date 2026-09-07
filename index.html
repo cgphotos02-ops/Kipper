@@ -1102,17 +1102,20 @@
   });
 
   // ---------- Inicio: filtro Todo / Instagram / Facebook ----------
+  var socialNet = 'todo';
   document.querySelectorAll('#home-network-tabs .tab').forEach(function (tabEl) {
     tabEl.addEventListener('click', function () {
       document.querySelectorAll('#home-network-tabs .tab').forEach(function (t) { t.classList.remove('active'); });
       tabEl.classList.add('active');
-      var network = tabEl.getAttribute('data-network');
+      socialNet = tabEl.getAttribute('data-network');
       var igCard = el('home-ig-card'), fbCard = el('home-fb-card');
-      if (!igCard || !fbCard) return;
-      igCard.style.display = (network === 'fb') ? 'none' : '';
-      fbCard.style.display = (network === 'ig') ? 'none' : '';
-      igCard.style.gridColumn = (network === 'ig') ? '1 / -1' : '';
-      fbCard.style.gridColumn = (network === 'fb') ? '1 / -1' : '';
+      if (igCard && fbCard) {
+        igCard.style.display = (socialNet === 'fb') ? 'none' : '';
+        fbCard.style.display = (socialNet === 'ig') ? 'none' : '';
+        igCard.style.gridColumn = (socialNet === 'ig') ? '1 / -1' : '';
+        fbCard.style.gridColumn = (socialNet === 'fb') ? '1 / -1' : '';
+      }
+      renderSocial(currentAccount());
     });
   });
 
@@ -1670,22 +1673,51 @@
     var upd = SOCIAL.updatedAt ? new Date(SOCIAL.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
     var periodo = (SOCIAL.period || '') + (upd ? ' · actualizado ' + upd : '');
 
-    // ---- INICIO ----
+    // ---- INICIO (según la pestaña Todo / Instagram / Facebook) ----
+    var net = (typeof socialNet !== 'undefined') ? socialNet : 'todo';
+    var num = function (x) { return (x == null || isNaN(x)) ? null : x; };
+    var sumN = function () { var vs = [].slice.call(arguments).filter(function (v) { return v != null; }); return vs.length ? vs.reduce(function (s, v) { return s + v; }, 0) : null; };
+    var pill = function (k, v, cls) { return pautaStatPill(k, v != null ? (typeof v === 'number' ? fmtNumCO(v) : v) : '—', cls); };
+    var delta = function (d) { return d == null ? '—' : (d >= 0 ? '+' : '') + fmtNumCO(d); };
+
     var tp = (ig.topPosts || [])[0];
-    if (el('home-lastpost')) el('home-lastpost').innerHTML = tp
-      ? '<div style="text-align:left"><b>' + tp.kind + '</b> · ' + tp.date + ' · <b>' + fmtNumCO(tp.reach) + '</b> de alcance<br><span style="color:var(--ink-muted)">«' + tp.caption + '»</span></div>'
-      : '<div class="leads-empty-state">Sin publicaciones en el período.</div>';
+    if (el('home-lastpost')) {
+      if (net === 'fb') {
+        el('home-lastpost').innerHTML = '<div style="text-align:left">' +
+          '<b>' + (fb.postsInPeriod != null ? fb.postsInPeriod : '—') + '</b> publicaciones en Facebook en el período · alcance medio <b>' + fmtNumCO((fb.content && fb.content.posts && fb.content.posts.avgReach) || 0) + '</b>' +
+          '<br><span style="color:var(--ink-faint)">Metricool no da el detalle post a post de Facebook en el informe.</span></div>';
+      } else {
+        el('home-lastpost').innerHTML = tp
+          ? '<div style="text-align:left"><b>' + tp.kind + '</b> · ' + tp.date + ' · <b>' + fmtNumCO(tp.reach) + '</b> de alcance<br><span style="color:var(--ink-muted)">«' + tp.caption + '»</span></div>'
+          : '<div class="leads-empty-state">Sin publicaciones en el período.</div>';
+      }
+    }
 
-    if (el('home-metas-pills')) el('home-metas-pills').innerHTML =
-      '<div class="pauta-pillrow" style="justify-content:flex-start">' +
-      pautaStatPill('Seguidores IG', ig.followers != null ? fmtNumCO(ig.followers) : '—', 'accent') +
-      pautaStatPill('Crecimiento', ig.followersDelta != null ? (ig.followersDelta >= 0 ? '+' : '') + fmtNumCO(ig.followersDelta) : '—', ig.followersDelta >= 0 ? 'good' : 'crit') +
-      pautaStatPill('Visualizaciones', ig.views != null ? fmtNumCO(ig.views) : '—', 'blue') +
-      pautaStatPill('Alcance medio/día', ig.avgDailyReach != null ? fmtNumCO(ig.avgDailyReach) : '—', 'blue') +
-      pautaStatPill('Cuentas con interacción', ig.engagedAccounts != null ? fmtNumCO(ig.engagedAccounts) : '—', 'accent') +
-      '</div>';
+    if (el('home-metas-pills')) {
+      var pills;
+      if (net === 'ig') {
+        pills = pill('Seguidores IG', num(ig.followers), 'accent') +
+          pautaStatPill('Crecimiento', delta(ig.followersDelta), (ig.followersDelta || 0) >= 0 ? 'good' : 'crit') +
+          pill('Visualizaciones', num(ig.views), 'blue') +
+          pill('Alcance medio/día', num(ig.avgDailyReach), 'blue') +
+          pill('Cuentas con interacción', num(ig.engagedAccounts), 'accent');
+      } else if (net === 'fb') {
+        pills = pill('Seguidores FB', num(fb.followers), 'accent') +
+          pautaStatPill('Crecimiento', delta(fb.followersDelta), (fb.followersDelta || 0) >= 0 ? 'good' : 'crit') +
+          pill('Visualizaciones', num(fb.views), 'blue') +
+          pill('Visitas a página', num(fb.pageVisits), 'blue') +
+          pill('Publicaciones', num(fb.postsInPeriod), 'accent');
+      } else {
+        pills = pill('Seguidores (IG+FB)', sumN(num(ig.followers), num(fb.followers)), 'accent') +
+          pautaStatPill('Crecimiento', delta(sumN(num(ig.followersDelta), num(fb.followersDelta))), (sumN(num(ig.followersDelta), num(fb.followersDelta)) || 0) >= 0 ? 'good' : 'crit') +
+          pill('Visualizaciones', sumN(num(ig.views), num(fb.views)), 'blue') +
+          pill('Publicaciones', sumN(num(ig.postsInPeriod), num(fb.postsInPeriod)), 'blue') +
+          pill('Alcance IG/día', num(ig.avgDailyReach), 'accent');
+      }
+      el('home-metas-pills').innerHTML = '<div class="pauta-pillrow" style="justify-content:flex-start">' + pills + '</div>';
+    }
 
-    if (el('home-idea')) el('home-idea').innerHTML = '<div class="leads-empty-state" style="padding:14px 10px">📊 Datos de Metricool · ' + periodo + '</div>';
+    if (el('home-idea')) el('home-idea').innerHTML = '<div class="leads-empty-state" style="padding:14px 10px">📊 Datos de Metricool · ' + periodo + ' · vista: ' + (net === 'ig' ? 'Instagram' : (net === 'fb' ? 'Facebook' : 'Todo')) + '</div>';
     if (el('home-agenda')) el('home-agenda').innerHTML = '<div class="leads-empty-state" style="padding:14px 10px">Sin agenda conectada — usa la Parrilla para planear.</div>';
 
     if (el('home-ig-stats')) el('home-ig-stats').innerHTML =
@@ -1699,9 +1731,15 @@
       (fb.followersDelta != null ? '<span class="net-delta">' + (fb.followersDelta >= 0 ? '+' : '') + fb.followersDelta + ' en el período</span>' : '') +
       '<div class="net-er">' + (fb.views != null ? fmtNumCO(fb.views) + ' visualizaciones · ' : '') + (fb.pageVisits != null ? fmtNumCO(fb.pageVisits) + ' visitas' : '') + '</div>';
 
-    if (el('home-besttime')) el('home-besttime').innerHTML = ig.bestTime
-      ? '<div class="hero-stat"><div class="hero-number">' + ig.bestTime + '</div><div class="hero-sub">Franja de más actividad de tus seguidores en Instagram (Metricool)</div></div>'
-      : '<div class="leads-empty-state">Sin dato de mejor hora.</div>';
+    if (el('home-besttime')) {
+      if (net === 'fb') {
+        el('home-besttime').innerHTML = '<div class="leads-empty-state">Metricool no calcula "mejor hora" para Facebook. La de Instagram: <b>' + (ig.bestTime || '—') + '</b>.</div>';
+      } else {
+        el('home-besttime').innerHTML = ig.bestTime
+          ? '<div class="hero-stat"><div class="hero-number">' + ig.bestTime + '</div><div class="hero-sub">Franja de más actividad de tus seguidores en Instagram (Metricool)</div></div>'
+          : '<div class="leads-empty-state">Sin dato de mejor hora.</div>';
+      }
+    }
 
     // ---- POSTS ----
     var c = ig.content || {};

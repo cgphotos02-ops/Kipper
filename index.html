@@ -1899,7 +1899,12 @@
         if (r.copyOut) body += '<div class="par-k">Copy out</div>' + esc(r.copyOut).replace(/\n/g, '<br>');
         if (r.correcciones) body += '<div class="par-k">Correcciones</div>' + esc(r.correcciones).replace(/\n/g, '<br>');
         if (r.link) body += '<div class="par-k">Link</div><a href="' + esc(r.link) + '" target="_blank" rel="noopener">' + esc(r.link) + '</a>';
-        var fechaTxt = r.fecha ? new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-CO', { day: '2-digit', month: 'short' }) : '—';
+        var fechaTxt = '—';
+        if (r.fecha) {
+          var dt = new Date(r.fecha + 'T00:00:00');
+          fechaTxt = dt.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'short' });
+          fechaTxt = fechaTxt.charAt(0).toUpperCase() + fechaTxt.slice(1);
+        }
         var chips = '<span class="par-chip date">📅 ' + fechaTxt + '</span>';
         if (r._b) chips += '<span class="par-chip b-' + r._b + '">' + (r._b === 'proviser' ? 'Proviser' : 'Nass') + '</span>';
         if (r.formato) chips += '<span class="par-chip">' + esc(r.formato) + '</span>';

@@ -1914,9 +1914,13 @@
     if (PARRILLA.updatedAt) setText('parrilla-sub', 'Cronograma de ' + (accountLabels[key] || key) + ' · sincronizado ' + new Date(PARRILLA.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long' }));
     if (!rows.length) { out.innerHTML = '<div class="leads-empty-state">Sin contenidos de ' + (accountLabels[key] || key) + ' en la parrilla.</div>'; return; }
     rows.sort(function (a, b) { return (a.fecha || '').localeCompare(b.fecha || ''); });
-    var weeks = {};
-    rows.forEach(function (r) { var w = parWeekKey(r.fecha) || 'sin-fecha'; (weeks[w] = weeks[w] || []).push(r); });
-    var html = Object.keys(weeks).sort().map(function (w) {
+    var weeks = {}, order = [];
+    rows.forEach(function (r) {
+      var w = (r.semana && String(r.semana).trim()) || parWeekKey(r.fecha) || 'sin-fecha';
+      if (!weeks[w]) { weeks[w] = []; order.push(w); }
+      weeks[w].push(r);
+    });
+    var html = order.map(function (w) {
       var items = weeks[w].map(function (r) {
         var body = '';
         if (r.escenario) body += '<div class="par-k">Escenario</div>' + esc(r.escenario);
@@ -1932,7 +1936,8 @@
           parStatusPill(r.estadoDiseno) +
           '</summary>' + (body ? '<div class="par-body">' + body + '</div>' : '') + '</details>';
       }).join('');
-      return '<div class="par-week"><h3>' + (w === 'sin-fecha' ? 'Sin fecha' : parWeekLabel(w)) + '</h3>' + items + '</div>';
+      var wl = w === 'sin-fecha' ? 'Sin fecha' : (/^\d{4}-\d{2}-\d{2}$/.test(w) ? parWeekLabel(w) : w);
+      return '<div class="par-week"><h3>' + esc(wl) + '</h3>' + items + '</div>';
     }).join('');
     out.innerHTML = html;
   }

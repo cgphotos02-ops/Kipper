@@ -1813,8 +1813,13 @@
       pautaStatPill('Perdidos', ig.lost != null ? fmtNumCO(ig.lost) : '—', 'crit') +
       pautaStatPill('Alcance medio/día', ig.avgDailyReach != null ? fmtNumCO(ig.avgDailyReach) : '—', 'blue') +
       '</div>' + (ig.followersNote ? '<p class="vc-note" style="margin-top:8px">' + ig.followersNote + '</p>' : '');
-    socEmpty('audiencia-gender', 'El desglose por sexo no viene en el informe PDF de Metricool — está solo en el CSV. Se puede añadir cuando lo exportes en ese formato.');
-    socEmpty('audiencia-age', 'El desglose por edad tampoco viene en el PDF (solo en el CSV de Metricool).');
+    var aud = ig.audience || {};
+    if (el('audiencia-gender')) el('audiencia-gender').innerHTML = (aud.gender && aud.gender.length)
+      ? socBars(aud.gender.map(function (r) { return [r[0], r[1]]; }), '%')
+      : '<div class="leads-empty-state">El desglose por sexo no viene en el PDF de Metricool — sí en el CSV de audiencia. Pásamelo y lo lleno.</div>';
+    if (el('audiencia-age')) el('audiencia-age').innerHTML = (aud.age && aud.age.length)
+      ? socBars(aud.age.map(function (r) { return [r[0] + ' años', r[1]]; }), '%') + (aud.ageApprox ? '<p class="vc-note" style="margin-top:8px">Valores aproximados leídos del gráfico de Metricool. Para exactos, pásame el CSV de edad.</p>' : '')
+      : '<div class="leads-empty-state">El desglose por edad viene en el CSV de audiencia de Metricool. Pásamelo y lo lleno.</div>';
     if (el('audiencia-places')) el('audiencia-places').innerHTML = (ig.cities && ig.cities.length)
       ? '<p class="vc-note" style="margin-top:-4px">Principales ciudades (Instagram):</p>' + socBars(ig.cities.map(function (r) { return [r[0], r[1]]; }), '%') +
         (ig.countries && ig.countries.length ? '<p class="vc-note" style="margin-top:10px">Países: ' + ig.countries.join(' · ') + '</p>' : '')

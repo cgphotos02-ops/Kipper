@@ -601,6 +601,8 @@
   .par-check label:hover { border-color: var(--accent); }
   .par-check input { width: 15px; height: 15px; accent-color: var(--good); flex: 0 0 15px; margin: 0; cursor: pointer; }
   .par-check label.on { background: var(--good-soft); color: var(--good-ink); border-color: transparent; }
+  .seg-jump-btn { font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent-soft-ink); }
+  .seg-jump-btn:hover { background: var(--accent); color: #fff; }
 
   .par-brief { border-top: 1px dashed var(--border); }
   .par-brief > summary { list-style: none; cursor: pointer; padding: 9px 14px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); }
@@ -1123,7 +1125,8 @@
   // Mes al que corresponde TODO lo que hay cargado hoy en data/social.json.
   var DATA_MONTH = '2026-08';
   var selectedMonth = DATA_MONTH;
-  try { var _sm = localStorage.getItem('kipper_mes'); if (_sm) selectedMonth = _sm; } catch (e) {}
+  var monthUserSet = false;
+  try { var _sm = localStorage.getItem('kipper_mes'); if (_sm) { selectedMonth = _sm; monthUserSet = true; } } catch (e) {}
 
   var cuentaSel = el('global-cuenta');
   var mesSel = el('global-mes');
@@ -1142,27 +1145,43 @@
     if (!mesSel) return;
     var withData = monthsWithData();
     var now = new Date(), maxY = now.getFullYear(), maxM = now.getMonth() + 1;
-    var opts = [];
+    var keys = {};
     for (var y = 2026; y <= maxY; y++) {
       for (var m = 1; m <= 12; m++) {
         if (y === maxY && m > maxM) break;
-        var k = y + '-' + (m < 10 ? '0' : '') + m;
-        opts.push('<option value="' + k + '"' + (k === selectedMonth ? ' selected' : '') + '>' +
-          monthLabel(k) + (withData[k] ? '' : ' · sin datos') + '</option>');
+        keys[y + '-' + (m < 10 ? '0' : '') + m] = true;
       }
     }
-    mesSel.innerHTML = opts.reverse().join('');
-    if (![].some.call(mesSel.options, function (o) { return o.value === selectedMonth; })) {
-      selectedMonth = DATA_MONTH;
-    }
+    Object.keys(withData).forEach(function (k) { keys[k] = true; });   // incluye meses con datos aunque sean futuros (fechas que se pasan de mes)
+    keys[selectedMonth] = true;
+    var list = Object.keys(keys).sort().reverse();
+    mesSel.innerHTML = list.map(function (k) {
+      return '<option value="' + k + '"' + (k === selectedMonth ? ' selected' : '') + '>' +
+        monthLabel(k) + (withData[k] ? '' : ' · sin datos') + '</option>';
+    }).join('');
     mesSel.value = selectedMonth;
   }
   buildMonthOptions();
   if (mesSel) mesSel.addEventListener('change', function () {
     selectedMonth = mesSel.value;
+    monthUserSet = true;
     try { localStorage.setItem('kipper_mes', selectedMonth); } catch (e) {}
     refreshAccount();
   });
+
+  // Cambia el mes activo (usado por el botón del estado vacío de Seguimiento).
+  function setMonth(k) {
+    selectedMonth = k; monthUserSet = true;
+    try { localStorage.setItem('kipper_mes', k); } catch (e) {}
+    buildMonthOptions();
+    refreshAccount();
+  }
+  // El mes más reciente con piezas en seguimiento.json (o null).
+  function latestSegMonth() {
+    if (!SEG || !SEG.rows) return null;
+    var ms = SEG.rows.map(function (r) { return r.mes; }).filter(Boolean).sort();
+    return ms.length ? ms[ms.length - 1] : null;
+  }
 
   function refreshAccount() {
     setText('home-greeting', 'Buenos días 👋 — ' + accountLabels[currentAccount()]);
@@ -1928,8 +1947,16 @@
     rows.sort(function (a, b) { return (a.fecha || '').localeCompare(b.fecha || ''); });
 
     if (!rows.length) {
+      var monthsHere = {};
+      SEG.rows.forEach(function (r) { if (segBrandKey(r.empresa) === brand && r.mes) monthsHere[r.mes] = (monthsHere[r.mes] || 0) + 1; });
+      // el mes con más piezas para esta marca
+      var other = null, bestN = 0;
+      Object.keys(monthsHere).forEach(function (k) { if (monthsHere[k] > bestN) { bestN = monthsHere[k]; other = k; } });
       out.innerHTML = '<div class="leads-empty-state">No hay contenidos de <b>' + mesTxt + '</b> para ' + (accountLabels[key] || key) + ' en tu Excel.' +
-        (SEG.rows.some(function (r) { return segBrandKey(r.empresa) === brand; }) ? ' Cambia de mes arriba para ver otros.' : '') + '</div>';
+        (other ? '<br><br><button class="seg-jump-btn" type="button" data-mes="' + other + '">📅 Ver ' + monthLabel(other) + ' (' + bestN + ' pieza' + (bestN === 1 ? '' : 's') + ')</button>' : '') +
+        '</div>';
+      var jb = out.querySelector('.seg-jump-btn');
+      if (jb) jb.addEventListener('click', function () { setMonth(this.getAttribute('data-mes')); });
       if (donut) donut.innerHTML = '<div class="leads-empty-state">Se calcula cuando haya contenidos del mes.</div>';
       return;
     }
@@ -2039,7 +2066,12 @@
 
   fetch('data/seguimiento.json', { cache: 'no-store' })
     .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (data) { if (data && data.rows) { SEG = data; buildMonthOptions(); renderSeguimiento(currentAccount()); } })
+    .then(function (data) {
+      if (!data || !data.rows) return;
+      SEG = data;
+      buildMonthOptions();        // ahora los meses con parrilla dejan de decir "· sin datos"
+      renderSeguimiento(currentAccount());
+    })
     .catch(function () { /* sin archivo: estado vacío */ });
 
   // ---------- Pautas: carga los datos guardados en data/pautas.json ----------

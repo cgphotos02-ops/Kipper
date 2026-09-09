@@ -121,7 +121,11 @@ let period = null;
 const rows = [];
 for (let r = 1; r < grid.length; r++) {
   const cells = grid[r];
-  const g = function (i) { return (i >= 0 && i < cells.length ? String(cells[i]).trim() : ''); };
+  const g = function (i) {
+    if (i < 0 || i >= cells.length || cells[i] == null) return '';
+    const s = String(cells[i]).trim();
+    return (s === 'undefined' || s === 'null') ? '' : s;
+  };
   const name = g(C.name);
   if (!name) continue;
   if (!period && (g(C.repStart) || g(C.repEnd))) period = { start: g(C.repStart), end: g(C.repEnd) };

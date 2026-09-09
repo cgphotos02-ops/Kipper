@@ -1,0 +1,90 @@
+{
+  "updatedAt": "2026-09-09",
+  "fuente": "Metas medibles de pauta digital — NASS · PROVISER, agosto 2026",
+  "periodoBase": "Agosto 2026",
+  "presupuestoMesPorCampana": 500000,
+  "conversionClicLead": 0.041,
+  "conversion": {
+    "clics": 4878,
+    "conversaciones": 201,
+    "tasa": 0.041,
+    "nota": "Confirmado en Meta Ads Manager: de 4.878 clics registrados, solo 201 se volvieron una conversación real de WhatsApp."
+  },
+  "glosario": [
+    {
+      "term": "Alcance",
+      "icon": "👀",
+      "frase": "A cuánta gente le llegó el anuncio",
+      "que": "El número de personas distintas que vieron el anuncio al menos una vez. Si una persona lo vio 5 veces, sigue contando como 1.",
+      "pesca": "A cuánta gente le mostramos la carnada."
+    },
+    {
+      "term": "Frecuencia",
+      "icon": "🔁",
+      "frase": "Cuántas veces, en promedio, vio el anuncio la misma persona",
+      "que": "Se calcula dividiendo las impresiones entre el alcance. Si sube mucho, la misma persona lo ve demasiadas veces y se cansa de verlo.",
+      "pesca": "Cuántas veces cada quien vio la carnada."
+    },
+    {
+      "term": "Resultados (Leads)",
+      "icon": "🎯",
+      "frase": "Cuántas personas interesadas realmente escribieron",
+      "que": "Cuántas veces alguien hizo la acción que pide el anuncio: iniciar una conversación de WhatsApp o Messenger. Es la persona interesada real, no solo quien vio el anuncio.",
+      "pesca": "Cuántos «picaron» y escribieron."
+    },
+    {
+      "term": "Costo por Resultado",
+      "icon": "💰",
+      "frase": "Cuánto pagamos por cada persona interesada que escribió",
+      "que": "El dinero invertido dividido entre el número de resultados. Es la fila que dice si la pauta es eficiente: mientras no suba, vamos bien.",
+      "pesca": "Cuánto nos costó cada pez."
+    }
+  ],
+  "campanas": [
+    {
+      "id": "nass-pautas",
+      "marca": "Nass Tecnología",
+      "marcaKey": "nass",
+      "nombre": "Nass Pautas Publicitarias",
+      "resultadoTipo": "Conversaciones de WhatsApp",
+      "mideConversaciones": true,
+      "base":  { "alcance": 27758, "frecuencia": 1.81, "resultados": 153, "costoPorResultado": 1535 },
+      "meta":  { "alcance": 59000, "frecMin": 1.5, "frecMax": 2.5, "resultados": 326, "costoTecho": 1535 },
+      "metaIdeal": { "resultados": 362 }
+    },
+    {
+      "id": "proviser-whatsapp",
+      "marca": "Proviser Seguridad",
+      "marcaKey": "proviser",
+      "nombre": "PROVISER WhatsApp Prospecting",
+      "resultadoTipo": "Conversaciones reales (estimadas a partir de los clics)",
+      "mideConversaciones": false,
+      "nota": "Hoy Meta mide «clic en el enlace». El lead real se estima aplicando la tasa de conversión del 4,1% a los clics.",
+      "base":  { "alcance": 36024, "frecuencia": 1.53, "resultados": 116, "resultadosAprox": true, "clics": 2821, "costoPorResultado": 1927, "costoAprox": true },
+      "meta":  { "alcance": 80000, "frecMin": 1.5, "frecMax": 2.5, "resultados": 260, "resultadosAprox": true, "costoTecho": 1927 },
+      "metaIdeal": { "resultados": 288 }
+    }
+  ],
+  "semaforo": {
+    "frecuencia": [
+      { "nivel": "bien",    "rango": "2,5 o menos",        "que": "La gente ve el anuncio las veces justas." },
+      { "nivel": "revisar", "rango": "Entre 2,5 y 3,5",    "que": "Empieza a repetirse mucho. Vigílalo de cerca." },
+      { "nivel": "actuar",  "rango": "Más de 3,5",         "que": "Se están cansando del anuncio. Cámbialo." }
+    ],
+    "costo": [
+      { "nivel": "bien",    "rango": "En la meta o mejor",              "que": "Cada lead cuesta lo esperado o menos." },
+      { "nivel": "revisar", "rango": "Hasta 20% más caro que la meta",  "que": "Se está encareciendo. Ajusta segmentación o creativo." },
+      { "nivel": "actuar",  "rango": "Más de 20% por encima de la meta","que": "Pausar y ajustar antes de seguir gastando." }
+    ]
+  },
+  "seguimiento": [
+    { "mes": "Ago-26", "campana": "Nass Pautas Publicitarias", "alcance": 27758, "frecuencia": 1.81, "resultados": 153, "costoPorResultado": 1535 },
+    { "mes": "Ago-26", "campana": "PROVISER WhatsApp", "alcance": 36024, "frecuencia": 1.53, "resultados": 116, "resultadosAprox": true, "costoPorResultado": 1927, "costoAprox": true }
+  ],
+  "recomendaciones": [
+    "Decidir sobre <b>Leads NASS</b> y <b>NASS Kit de Seguridad</b>: hoy están en $0 y no suman nada. O se reactivan con un objetivo y presupuesto claros, o se archivan para que no aparezcan en el reporte.",
+    "Configurar <b>PROVISER WhatsApp Prospecting</b> para que mida «conversación de mensajería iniciada» (igual que Nass), en vez de «clic en el enlace». Así el reporte de Meta muestra directo el número real de leads.",
+    "Mientras eso se ajusta, traducir los clics a leads con la tasa real (4,1%). Nunca reportar los clics solos como si fueran el resultado.",
+    "Revisar el semáforo cada 1–2 semanas y actualizar la tabla de seguimiento al cierre de cada mes."
+  ]
+}

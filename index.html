@@ -308,9 +308,9 @@
   .reco-title { font-weight: 700; font-size: 13.5px; }
   .reco-text { font-size: 12.5px; color: var(--ink-muted); margin-top: 2px; line-height: 1.5; }
 
-  .camp-subtabs { display: flex; gap: 6px; margin-bottom: 20px; }
-  .camp-panel { display: none; }
-  .camp-panel.active { display: block; }
+  .camp-subtabs, .pauta-subtabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .camp-panel, .pauta-panel { display: none; }
+  .camp-panel.active, .pauta-panel.active { display: block; }
 
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
   .form-group { display: flex; flex-direction: column; gap: 6px; }
@@ -572,6 +572,53 @@
 
   .pauta-table-ctr { display: inline-block; width: 46px; height: 6px; border-radius: 4px; background: var(--surface-2); overflow: hidden; vertical-align: middle; margin-right: 7px; }
   .pauta-table-ctr i { display: block; height: 100%; background: var(--accent); }
+
+  /* Pautas → Metas: guía para leer los números */
+  .meta-intro { font-size: 13px; line-height: 1.65; color: var(--ink-muted); background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 10px; padding: 13px 16px; margin-bottom: 16px; }
+  .meta-glos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 720px) { .meta-glos-grid { grid-template-columns: 1fr; } }
+  .meta-glos-card { border: 1px solid var(--border); border-radius: 14px; padding: 16px 17px; background: var(--surface-2); }
+  .meta-glos-card .gc-top { display: flex; align-items: center; gap: 10px; }
+  .meta-glos-card .gc-ic { font-size: 22px; flex: 0 0 auto; }
+  .meta-glos-card .gc-term { font-size: 14.5px; font-weight: 800; color: var(--accent-soft-ink); }
+  .meta-glos-card .gc-frase { font-size: 13px; font-weight: 700; color: var(--ink); margin: 9px 0 6px; line-height: 1.4; }
+  .meta-glos-card .gc-que { font-size: 12px; color: var(--ink-muted); line-height: 1.6; }
+  .meta-glos-card .gc-pesca { font-size: 11.5px; color: var(--ink-faint); font-style: italic; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); }
+
+  .meta-goal-card { border: 1px solid var(--border); border-radius: 14px; padding: 18px; background: var(--surface-2); margin-bottom: 14px; }
+  .meta-goal-card .mg-brand { font-size: 11px; font-weight: 800; color: var(--accent-soft-ink); text-transform: uppercase; letter-spacing: .04em; }
+  .meta-goal-card .mg-name { font-size: 14.5px; font-weight: 700; margin: 3px 0 2px; }
+  .meta-goal-card .mg-sub { font-size: 12px; color: var(--ink-faint); }
+  .meta-goal-card .mg-note { font-size: 11.5px; color: var(--warn-ink); background: var(--warn-soft); border-radius: 8px; padding: 7px 10px; margin-top: 9px; line-height: 1.5; }
+  .meta-metric { margin-top: 16px; }
+  .meta-metric .mm-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 5px; }
+  .meta-metric .mm-name { font-size: 12.5px; font-weight: 800; color: var(--ink); }
+  .meta-metric .mm-val { font-size: 12.5px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .meta-metric .mm-what { font-size: 11px; color: var(--ink-faint); margin-bottom: 7px; }
+  .meta-bar { position: relative; height: 22px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); overflow: hidden; }
+  .meta-bar > .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 6px 0 0 6px; }
+  .meta-bar > .base-mark { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink-faint); }
+  .meta-bar-foot { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--ink-faint); margin-top: 3px; }
+  .meta-band { position: relative; height: 26px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); overflow: hidden; }
+  .meta-band > .zone { position: absolute; top: 0; bottom: 0; }
+  .meta-band > .zone.ok { background: var(--good-soft); }
+  .meta-band > .zone.hi { background: var(--warn-soft); }
+  .meta-band > .needle { position: absolute; top: -3px; bottom: -3px; width: 3px; background: var(--ink); border-radius: 2px; }
+  .meta-band > .needle::after { content: ''; position: absolute; left: -3px; top: -5px; border: 4.5px solid transparent; border-top-color: var(--ink); }
+  .meta-band-foot { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--ink-faint); margin-top: 3px; }
+  .meta-verdict { display: inline-block; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px; margin-top: 7px; }
+  .meta-verdict.bien { background: var(--good-soft); color: var(--good-ink); }
+  .meta-verdict.revisar { background: var(--warn-soft); color: var(--warn-ink); }
+  .meta-verdict.actuar { background: var(--crit-soft); color: var(--crit-ink); }
+
+  .meta-sem { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 720px) { .meta-sem { grid-template-columns: 1fr; } }
+  .meta-sem-col h4 { font-size: 12.5px; font-weight: 800; margin: 0 0 8px; color: var(--ink); }
+  .meta-sem-row { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .meta-sem-row:last-child { border-bottom: none; }
+  .meta-sem-row .sr-dot { flex: 0 0 auto; font-size: 13px; }
+  .meta-sem-row .sr-rango { font-weight: 800; color: var(--ink); }
+  .meta-sem-row .sr-que { color: var(--ink-muted); }
 
   /* Parrilla de contenidos — tablero semanal */
   .par-topbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -1030,15 +1077,27 @@
   <!-- PAUTAS -->
   <section class="view" id="view-pautas">
     <h1 class="greeting">Pautas</h1>
-    <div class="date-sub">Estado de tus pautas en Meta Ads — Proviser Seguridad y Nass Tecnología</div>
+    <div class="date-sub">Tus pautas en Meta Ads (Facebook / Instagram) — Proviser Seguridad y Nass Tecnología</div>
 
-    <div class="disclaimer-note">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5h.01"/></svg>
-      Cada marca se mide con su propio resultado: <b>Nass</b> por conversaciones de WhatsApp iniciadas, <b>Proviser</b> por clics al enlace. El panel muestra el resultado tal como viene de cada campaña.
+    <div class="pauta-subtabs" id="pauta-subtabs">
+      <div class="tab active" data-pauta="estado">📊 Cómo van ahora</div>
+      <div class="tab" data-pauta="metas">🎯 Metas y qué significa cada número</div>
     </div>
 
-    <div id="pautas-output">
-      <div class="card"><div class="leads-empty-state">Aún no hay datos cargados.</div></div>
+    <div class="pauta-panel active" id="pauta-estado">
+      <div class="disclaimer-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5h.01"/></svg>
+        Cada marca se mide con su propio resultado: <b>Nass</b> por conversaciones de WhatsApp iniciadas, <b>Proviser</b> por clics al enlace. El panel muestra el resultado tal como viene de cada campaña.
+      </div>
+      <div id="pautas-output">
+        <div class="card"><div class="leads-empty-state">Aún no hay datos cargados.</div></div>
+      </div>
+    </div>
+
+    <div class="pauta-panel" id="pauta-metas">
+      <div id="metas-output">
+        <div class="card"><div class="leads-empty-state">Cargando la guía de metas…</div></div>
+      </div>
     </div>
   </section>
 
@@ -1076,6 +1135,17 @@
       document.querySelectorAll('.camp-panel').forEach(function (p) { p.classList.remove('active'); });
       tab.classList.add('active');
       var p = el('camp-' + tab.dataset.camp);
+      if (p) p.classList.add('active');
+    });
+  });
+
+  // ---------- Pautas: subtabs (Cómo van ahora / Metas) ----------
+  document.querySelectorAll('#pauta-subtabs .tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('#pauta-subtabs .tab').forEach(function (t) { t.classList.remove('active'); });
+      document.querySelectorAll('.pauta-panel').forEach(function (p) { p.classList.remove('active'); });
+      tab.classList.add('active');
+      var p = el('pauta-' + tab.dataset.pauta);
       if (p) p.classList.add('active');
     });
   });
@@ -2074,11 +2144,190 @@
     })
     .catch(function () { /* sin archivo: estado vacío */ });
 
+  // ---------- Pautas → Metas: guía para leer los números (data/metas.json + lo que ya viene de pautas.json) ----------
+  var PAUTAS = null, METAS = null;
+
+  function metaSemZone(f) {
+    if (f == null || !isFinite(f)) return { k: 'bien', t: '—' };
+    if (f > 3.5) return { k: 'actuar', t: 'Cansancio: cambiar el anuncio' };
+    if (f > 2.5) return { k: 'revisar', t: 'Se repite mucho: vigilar' };
+    return { k: 'bien', t: 'La ve las veces justas' };
+  }
+  function metaCostZone(actual, techo) {
+    if (!actual || !techo) return { k: 'bien', t: '—' };
+    if (actual > techo * 1.2) return { k: 'actuar', t: 'Más de 20% por encima: pausar y ajustar' };
+    if (actual > techo * 1.02) return { k: 'revisar', t: 'Por encima de la meta: ajustar' };
+    return { k: 'bien', t: 'En la meta o mejor' };
+  }
+  // barra 0 → meta, con marca de la línea base de agosto
+  function metaBar(actual, meta, base, color) {
+    var pctA = Math.max(0, Math.min(100, (actual / (meta || 1)) * 100));
+    var pctB = Math.max(0, Math.min(100, (base / (meta || 1)) * 100));
+    var same = base == null || Math.abs(base - actual) < 0.5;
+    return '<div class="meta-bar"><span class="fill" style="width:' + pctA.toFixed(1) + '%;background:' + color + '"></span>' +
+      (base != null ? '<span class="base-mark" style="left:' + pctB.toFixed(1) + '%" title="línea base de agosto"></span>' : '') +
+      '</div><div class="meta-bar-foot"><span>0</span>' +
+      (base != null ? '<span>│ ' + (same ? 'agosto (línea base) ' : 'agosto ') + fmtNumCO(base) + '</span>' : '<span></span>') +
+      '<span>meta ' + fmtNumCO(meta) + '</span></div>';
+  }
+  // gauge de frecuencia con banda sana verde (frecMin–frecMax) y zona alta ámbar
+  function metaFreqBand(actual, fMin, fMax) {
+    var lo = 1.0, hi = 3.6, span = hi - lo;
+    var x = function (v) { return Math.max(0, Math.min(100, ((v - lo) / span) * 100)); };
+    return '<div class="meta-band">' +
+      '<span class="zone ok" style="left:' + x(fMin) + '%;width:' + (x(fMax) - x(fMin)) + '%"></span>' +
+      '<span class="zone hi" style="left:' + x(2.5) + '%;width:' + (100 - x(2.5)) + '%"></span>' +
+      (actual != null ? '<span class="needle" style="left:' + x(actual) + '%"></span>' : '') +
+      '</div><div class="meta-band-foot"><span>1,0</span><span>zona sana ' + fmtFreq(fMin) + '–' + fmtFreq(fMax) + '</span><span>3,6+</span></div>';
+  }
+  // gauge de costo: zona verde 0 → techo, zona roja techo → tope; aguja en el costo actual
+  function metaCostBand(actual, techo) {
+    var hi = techo * 1.6;
+    var x = function (v) { return Math.max(0, Math.min(100, (v / hi) * 100)); };
+    return '<div class="meta-band">' +
+      '<span class="zone ok" style="left:0;width:' + x(techo) + '%"></span>' +
+      '<span class="zone hi" style="left:' + x(techo) + '%;width:' + (100 - x(techo)) + '%"></span>' +
+      (actual != null ? '<span class="needle" style="left:' + x(actual) + '%"></span>' : '') +
+      '</div><div class="meta-band-foot"><span>$0</span><span>techo ' + fmtCOP(techo) + '</span><span>' + fmtCOP(hi) + '</span></div>';
+  }
+
+  function renderMetas() {
+    var out = el('metas-output');
+    if (!out) return;
+    if (!METAS || !METAS.campanas) { out.innerHTML = '<div class="card"><div class="leads-empty-state">Aún no hay guía de metas cargada.</div></div>'; return; }
+    var M = METAS;
+    var liveRows = (PAUTAS && PAUTAS.rows) ? PAUTAS.rows : [];
+    var rate = M.conversionClicLead || 0.041;
+    var html = '';
+
+    // ===== A. Cómo leer estos números =====
+    html += '<div class="pauta-softcard"><div class="pauta-section-title">Primero: cómo leer estos números</div>' +
+      '<div class="meta-intro">Piénsalo como ir de pesca 🎣 &nbsp;El <b>Alcance</b> es a cuánta gente le mostramos la carnada; la <b>Frecuencia</b>, cuántas veces la vio cada quien; los <b>Resultados</b>, cuántos «picaron» y escribieron interesados; y el <b>Costo por Resultado</b>, cuánto nos costó cada uno de esos peces.</div>' +
+      '<div class="meta-glos-grid">' +
+      (M.glosario || []).map(function (g) {
+        return '<div class="meta-glos-card"><div class="gc-top"><span class="gc-ic">' + g.icon + '</span><span class="gc-term">' + g.term + '</span></div>' +
+          '<div class="gc-frase">«' + g.frase + '»</div>' +
+          '<div class="gc-que">' + g.que + '</div>' +
+          '<div class="gc-pesca">🎣 ' + g.pesca + '</div></div>';
+      }).join('') +
+      '</div></div>';
+
+    // ===== B. Cómo vamos vs la meta del mes =====
+    html += '<div class="pauta-softcard"><div class="pauta-section-title">Cómo vamos frente a la meta del mes</div>' +
+      '<p class="vc-note" style="margin-top:-8px;text-align:center">Meta calculada con el presupuesto completo de ' + fmtCOP(M.presupuestoMesPorCampana) + ' por campaña al mes. Es la meta «piso»: lo mínimo a igualar o mejorar. La marca gris │ es el dato real de ' + (M.periodoBase || 'la línea base') + '.</p>';
+
+    (M.campanas || []).forEach(function (c) {
+      // ¿hay dato en vivo para esta campaña? (misma marca + activa)
+      var pr = liveRows.filter(function (r) {
+        return pautaBrand(r.name) === c.marca && r.status.k === 'active';
+      }).sort(function (a, b) { return b.spend - a.spend; })[0];
+
+      var reachNow = pr ? pr.reach : c.base.alcance;
+      var freqNow = pr ? pr.freq : c.base.frecuencia;
+      var leadsNow, costNow, clicsNow = null, spendNow = pr ? pr.spend : null;
+      if (c.mideConversaciones) {
+        leadsNow = pr ? pr.results : c.base.resultados;
+        costNow = pr ? pr.cpr : c.base.costoPorResultado;
+      } else {
+        clicsNow = pr ? pr.linkClicks : (c.base.clics || 0);
+        leadsNow = Math.round(clicsNow * rate);
+        costNow = (pr && leadsNow) ? (pr.spend / leadsNow) : c.base.costoPorResultado;
+      }
+      var fresh = !!pr && (!PAUTAS.period || PAUTAS.period.start !== '2026-08-01');
+      var freq = metaSemZone(freqNow);
+      var cost = metaCostZone(costNow, c.meta.costoTecho);
+
+      html += '<div class="meta-goal-card">' +
+        '<div class="mg-brand">' + c.marca + '</div>' +
+        '<div class="mg-name">' + c.nombre + '</div>' +
+        '<div class="mg-sub">Se mide por: <b>' + c.resultadoTipo + '</b>' + (pr ? ' · datos ' + (fresh ? 'del período cargado' : 'de agosto (línea base)') : ' · sin datos en vivo, se muestra la línea base') + '</div>' +
+        (c.nota ? '<div class="mg-note">ℹ️ ' + c.nota + '</div>' : '') +
+
+        '<div class="meta-metric"><div class="mm-head"><span class="mm-name">👀 Alcance</span><span class="mm-val">' + fmtNumCO(reachNow) + ' de ' + fmtNumCO(c.meta.alcance) + ' &nbsp;(' + Math.round((reachNow / c.meta.alcance) * 100) + '%)</span></div>' +
+        '<div class="mm-what">Personas distintas que vieron el anuncio.</div>' +
+        metaBar(reachNow, c.meta.alcance, c.base.alcance, 'var(--accent)') + '</div>' +
+
+        '<div class="meta-metric"><div class="mm-head"><span class="mm-name">🎯 Resultados (leads)</span><span class="mm-val">' + fmtNumCO(leadsNow) + ' de ' + fmtNumCO(c.meta.resultados) + ' &nbsp;(' + Math.round((leadsNow / c.meta.resultados) * 100) + '%)</span></div>' +
+        '<div class="mm-what">Personas interesadas que realmente escribieron' + (c.mideConversaciones ? '.' : ' — estimado: ' + fmtNumCO(clicsNow) + ' clics × ' + fmtPct2(rate * 100) + '.') + '</div>' +
+        metaBar(leadsNow, c.meta.resultados, c.base.resultados, 'var(--good)') + '</div>' +
+
+        '<div class="meta-metric"><div class="mm-head"><span class="mm-name">🔁 Frecuencia</span><span class="mm-val">' + fmtFreq(freqNow) + '</span></div>' +
+        '<div class="mm-what">Veces, en promedio, que la misma persona vio el anuncio. Sana entre ' + fmtFreq(c.meta.frecMin) + ' y ' + fmtFreq(c.meta.frecMax) + '.</div>' +
+        metaFreqBand(freqNow, c.meta.frecMin, c.meta.frecMax) +
+        '<span class="meta-verdict ' + freq.k + '">' + freq.t + '</span></div>' +
+
+        '<div class="meta-metric"><div class="mm-head"><span class="mm-name">💰 Costo por resultado</span><span class="mm-val">' + fmtCOP(costNow) + ' &nbsp;·&nbsp; techo ' + fmtCOP(c.meta.costoTecho) + '</span></div>' +
+        '<div class="mm-what">Lo que cuesta cada lead. Esta es la fila que no debe subir: cuanto más a la izquierda de la línea, mejor.</div>' +
+        metaCostBand(costNow, c.meta.costoTecho) +
+        '<span class="meta-verdict ' + cost.k + '">' + cost.t + '</span></div>' +
+
+        (c.metaIdeal && c.metaIdeal.resultados ? '<p class="vc-note" style="margin:12px 0 0">✨ <b>Meta ideal</b> (si se optimiza y baja el costo por lead un 10%): ≈' + fmtNumCO(c.metaIdeal.resultados) + ' ' + (c.mideConversaciones ? 'conversaciones' : 'conversaciones reales') + ' con el mismo dinero.</p>' : '') +
+        '</div>';
+    });
+    html += '</div>';
+
+    // ===== C. El caso de PROVISER: clics ≠ leads =====
+    if (M.conversion) {
+      var cv = M.conversion;
+      html += '<div class="pauta-softcard"><div class="pauta-section-title">Ojo con PROVISER: un clic no es un lead</div>' +
+        '<div class="pauta-twocol" style="align-items:center">' +
+        '<div>' + pautaDonut(
+          [{ label: 'Escribieron (lead real)', value: cv.conversaciones, color: 'var(--good)', sub: fmtNumCO(cv.conversaciones) },
+           { label: 'Solo hicieron clic', value: cv.clics - cv.conversaciones, color: '#5b6672', sub: fmtNumCO(cv.clics - cv.conversaciones) }],
+          fmtPct2(cv.tasa * 100), 'de los clics') + '</div>' +
+        '<div><p style="font-size:12.5px;line-height:1.7;color:var(--ink-muted);margin:0">' +
+        'Un <b>clic</b> es solo que alguien tocó el anuncio. El <b>lead</b> es que de verdad escribió por WhatsApp. ' +
+        'Meta confirmó que de <b>' + fmtNumCO(cv.clics) + ' clics</b>, solo <b>' + fmtNumCO(cv.conversaciones) + '</b> terminaron en conversación real — ' +
+        '<b>' + fmtPct2(cv.tasa * 100) + '</b>, o sea unos 4 de cada 100.<br><br>' +
+        'Por eso, mientras PROVISER siga midiendo «clic en el enlace», el número real de leads se estima multiplicando los clics por ' + fmtPct2(cv.tasa * 100) + '. ' +
+        'Los clics son mucho más baratos, pero no son el resultado.</p></div>' +
+        '</div></div>';
+    }
+
+    // ===== D. Semáforo =====
+    if (M.semaforo) {
+      var dot = { bien: '🟢', revisar: '🟡', actuar: '🔴' };
+      var col = function (title, rowsArr) {
+        return '<div class="meta-sem-col"><h4>' + title + '</h4>' + rowsArr.map(function (r) {
+          return '<div class="meta-sem-row"><span class="sr-dot">' + dot[r.nivel] + '</span><span><span class="sr-rango">' + r.rango + '</span><br><span class="sr-que">' + r.que + '</span></span></div>';
+        }).join('') + '</div>';
+      };
+      html += '<div class="pauta-softcard"><div class="pauta-section-title">Semáforo — revísalo cada 1–2 semanas</div>' +
+        '<p class="vc-note" style="margin-top:-8px;text-align:center">Sin esperar al cierre de mes: si algo se pone 🟡 o 🔴, se actúa sobre la campaña.</p>' +
+        '<div class="meta-sem">' + col('🔁 Frecuencia', M.semaforo.frecuencia) + col('💰 Costo por resultado vs. meta', M.semaforo.costo) + '</div></div>';
+    }
+
+    // ===== E. Seguimiento mes a mes =====
+    if (M.seguimiento && M.seguimiento.length) {
+      html += '<div class="pauta-softcard"><div class="pauta-section-title">Seguimiento mes a mes</div>' +
+        '<div class="simple-table-wrap"><table class="simple-table">' +
+        '<thead><tr><th>Mes</th><th>Campaña</th><th>Alcance</th><th>Frecuencia</th><th>Resultados</th><th>Costo x resultado</th></tr></thead><tbody>' +
+        M.seguimiento.map(function (s) {
+          return '<tr><td>' + s.mes + '</td><td>' + s.campana + '</td><td>' + fmtNumCO(s.alcance) + '</td><td>' + fmtFreq(s.frecuencia) + '</td><td>' +
+            (s.resultadosAprox ? '≈' : '') + fmtNumCO(s.resultados) + '</td><td>' + (s.costoAprox ? '≈' : '') + fmtCOP(s.costoPorResultado) + '</td></tr>';
+        }).join('') + '</tbody></table></div>' +
+        '<p class="vc-note" style="margin-top:8px">Agosto es la línea base. Al cerrar cada mes se agrega una fila por campaña y se compara contra la meta.</p></div>';
+    }
+
+    // ===== F. Recomendaciones =====
+    if (M.recomendaciones && M.recomendaciones.length) {
+      html += '<div class="pauta-softcard"><div class="pauta-section-title">Qué hacer ahora</div><ol style="margin:0;padding-left:20px;font-size:12.5px;line-height:1.7;color:var(--ink-muted)">' +
+        M.recomendaciones.map(function (r) { return '<li style="margin-bottom:7px">' + r + '</li>'; }).join('') + '</ol></div>';
+    }
+
+    out.innerHTML = html;
+  }
+
   // ---------- Pautas: carga los datos guardados en data/pautas.json ----------
   fetch('data/pautas.json', { cache: 'no-store' })
     .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (data) { if (data && data.rows && data.rows.length) renderPautas(data); })
+    .then(function (data) { if (data && data.rows && data.rows.length) { PAUTAS = data; renderPautas(data); renderMetas(); } })
     .catch(function () { /* sin archivo de datos: se queda el estado vacío */ });
+
+  fetch('data/metas.json', { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) { if (data && data.campanas) { METAS = data; renderMetas(); } })
+    .catch(function () { /* sin archivo: se queda el estado vacío */ });
 
   // ---------- Datos reales de Meta Ads (los escribe el robot de GitHub Actions en data/live-metrics.json) ----------
   fetch('data/live-metrics.json', { cache: 'no-store' })

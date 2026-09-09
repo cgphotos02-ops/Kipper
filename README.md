@@ -25,8 +25,9 @@ Estas herramientas funcionan sin conexión de datos (todo se procesa en el naveg
 | Archivo | Qué es |
 | --- | --- |
 | `index.html` | El panel completo (HTML + CSS + JS en un solo archivo). Selector de marca y de mes en la barra superior. |
-| `data/pautas.json` | Estado de las pautas de Meta que muestra la pestaña **Pautas**. Se genera desde el informe de Meta y se versiona en el repo (persiste entre visitas). |
+| `data/pautas.json` | Estado de las pautas de Meta que muestra **Pautas → Cómo van ahora**. Se genera desde el informe de Meta y se versiona en el repo (persiste entre visitas). |
 | `scripts/gen-pautas.js` | Convierte un informe de campañas de Meta (`.xlsx` o `.csv`) en `data/pautas.json`. |
+| `data/metas.json` | Metas de pauta + glosario en lenguaje sencillo (los 4 números, semáforo, seguimiento mensual, recomendaciones). Alimenta **Pautas → Metas y qué significa cada número**. Se edita a mano desde el documento de metas. |
 | `data/social.json` | Datos de Instagram + Facebook (Metricool) que alimentan **Inicio, Posts, Mi audiencia, Competencia**. Transcrito de los informes PDF de Metricool. |
 | `data/seguimiento.json` | Lista de piezas de la parrilla (una fila por contenido, con mes/semana/marca/formato). La usa **Posts → Seguimiento de contenidos**. Los checks de avance NO están aquí: viven en el navegador. |
 | `scripts/gen-seguimiento.js` | Convierte `ProviserXNass.xlsx` (todas las hojas visibles, una por mes) en `data/seguimiento.json`. Uso: `node scripts/gen-seguimiento.js "ruta/ProviserXNass.xlsx"`. |

@@ -1296,7 +1296,10 @@
     if (typeof SEG !== 'undefined' && SEG && SEG.rows) SEG.rows.forEach(function (r) { if (r.mes) set[r.mes] = true; });
     if (typeof SOCIAL !== 'undefined' && SOCIAL && SOCIAL.accounts) {
       Object.keys(SOCIAL.accounts).forEach(function (k) {
-        var tt = SOCIAL.accounts[k].tiktok;
+        var acc = SOCIAL.accounts[k];
+        if (acc.instagram && acc.instagram.month) set[acc.instagram.month] = true;
+        if (acc.facebook && acc.facebook.month) set[acc.facebook.month] = true;
+        var tt = acc.tiktok;
         if (!tt) return;
         if (tt.daily) tt.daily.forEach(function (r) { if (r.fecha) set[r.fecha.slice(0, 7)] = true; });
         if (tt.contenido && tt.contenido.mes) set[tt.contenido.mes] = true;
@@ -1833,8 +1836,10 @@
     }).join('');
   }
 
-  var SOCIAL_VIEW_IDS = ['home-metas-pills', 'home-ig-stats', 'home-fb-stats', 'home-besttime',
-    'posts-parrilla-donut', 'posts-hashtags', 'posts-series', 'posts-pattern', 'posts-organic-ideas',
+  // Instagram y Facebook pueden estar en meses distintos (cada cuenta/red se actualiza por separado).
+  // home-metas-pills/home-ig-stats/home-fb-stats/home-besttime se gestionan aparte porque mezclan
+  // las dos redes según la pestaña Todo/Instagram/Facebook; todo lo demás es 100% de Instagram.
+  var POSTS_AUD_COMP_IDS = ['posts-parrilla-donut', 'posts-hashtags', 'posts-series', 'posts-pattern', 'posts-organic-ideas',
     'audiencia-marzo-kpis', 'audiencia-gender', 'audiencia-age', 'audiencia-places', 'audiencia-besttime',
     'referentes-competencia', 'referentes-share'];
 
@@ -2063,15 +2068,13 @@
     renderTikTokPosts(a.tiktok || {});
     renderTikTokAudiencia(a.tiktok || {});
 
-    // ---- Filtro por mes (Instagram / Facebook) ----
-    var dataMonth = SOCIAL.month || (typeof DATA_MONTH !== 'undefined' ? DATA_MONTH : null);
-    if (typeof selectedMonth !== 'undefined' && dataMonth && selectedMonth !== dataMonth) {
-      var msg = 'Sin datos de ' + monthLabel(selectedMonth) + '. Lo que has cargado corresponde a ' + monthLabel(dataMonth) + '.';
-      SOCIAL_VIEW_IDS.forEach(function (id) { socEmpty(id, msg); });
-      setText('audiencia-period', monthLabel(selectedMonth) + ' · sin datos');
-      if (el('referentes-competencia-title')) setText('referentes-competencia-title', 'Competencia · ' + monthLabel(selectedMonth));
-      return;
-    }
+    // ---- Filtro por mes: Instagram y Facebook pueden estar en meses distintos ----
+    var igMonth = ig.month || (typeof DATA_MONTH !== 'undefined' ? DATA_MONTH : null);
+    var fbMonth = fb.month || (typeof DATA_MONTH !== 'undefined' ? DATA_MONTH : null);
+    var igMatch = !igMonth || selectedMonth === igMonth;
+    var fbMatch = !fbMonth || selectedMonth === fbMonth;
+    var igEff = igMatch ? ig : {};
+    var fbEff = fbMatch ? fb : {};
 
     // ---- INICIO (según la pestaña Todo / Instagram / Facebook) ----
     var num = function (x) { return (x == null || isNaN(x)) ? null : x; };
@@ -2080,48 +2083,74 @@
     var delta = function (d) { return d == null ? '—' : (d >= 0 ? '+' : '') + fmtNumCO(d); };
 
     if (el('home-metas-pills')) {
-      var pills;
-      if (net === 'ig') {
-        pills = pill('Seguidores IG', num(ig.followers), 'accent') +
-          pautaStatPill('Crecimiento', delta(ig.followersDelta), (ig.followersDelta || 0) >= 0 ? 'good' : 'crit') +
-          pill('Visualizaciones', num(ig.views), 'blue') +
-          pill('Alcance medio/día', num(ig.avgDailyReach), 'blue') +
-          pill('Cuentas con interacción', num(ig.engagedAccounts), 'accent');
-      } else if (net === 'fb') {
-        pills = pill('Seguidores FB', num(fb.followers), 'accent') +
-          pautaStatPill('Crecimiento', delta(fb.followersDelta), (fb.followersDelta || 0) >= 0 ? 'good' : 'crit') +
-          pill('Visualizaciones', num(fb.views), 'blue') +
-          pill('Visitas a página', num(fb.pageVisits), 'blue') +
-          pill('Publicaciones', num(fb.postsInPeriod), 'accent');
+      if (net === 'ig' && !igMatch) {
+        el('home-metas-pills').innerHTML = '<div class="leads-empty-state">Sin datos de Instagram en ' + monthLabel(selectedMonth) + '. Los cargados son de ' + monthLabel(igMonth) + '.</div>';
+      } else if (net === 'fb' && !fbMatch) {
+        el('home-metas-pills').innerHTML = '<div class="leads-empty-state">Sin datos de Facebook en ' + monthLabel(selectedMonth) + '. Los cargados son de ' + monthLabel(fbMonth) + '.</div>';
+      } else if (net === 'todo' && !igMatch && !fbMatch) {
+        el('home-metas-pills').innerHTML = '<div class="leads-empty-state">Sin datos de Instagram ni Facebook en ' + monthLabel(selectedMonth) + '.</div>';
       } else {
-        pills = pill('Seguidores (IG+FB)', sumN(num(ig.followers), num(fb.followers)), 'accent') +
-          pautaStatPill('Crecimiento', delta(sumN(num(ig.followersDelta), num(fb.followersDelta))), (sumN(num(ig.followersDelta), num(fb.followersDelta)) || 0) >= 0 ? 'good' : 'crit') +
-          pill('Visualizaciones', sumN(num(ig.views), num(fb.views)), 'blue') +
-          pill('Publicaciones', sumN(num(ig.postsInPeriod), num(fb.postsInPeriod)), 'blue') +
-          pill('Alcance IG/día', num(ig.avgDailyReach), 'accent');
+        var pills;
+        if (net === 'ig') {
+          pills = pill('Seguidores IG', num(ig.followers), 'accent') +
+            pautaStatPill('Crecimiento', delta(ig.followersDelta), (ig.followersDelta || 0) >= 0 ? 'good' : 'crit') +
+            pill('Visualizaciones', num(ig.views), 'blue') +
+            pill('Alcance medio/día', num(ig.avgDailyReach), 'blue') +
+            pill('Cuentas con interacción', num(ig.engagedAccounts), 'accent');
+        } else if (net === 'fb') {
+          pills = pill('Seguidores FB', num(fb.followers), 'accent') +
+            pautaStatPill('Crecimiento', delta(fb.followersDelta), (fb.followersDelta || 0) >= 0 ? 'good' : 'crit') +
+            pill('Visualizaciones', num(fb.views), 'blue') +
+            pill('Visitas a página', num(fb.pageVisits), 'blue') +
+            pill('Publicaciones', num(fb.postsInPeriod), 'accent');
+        } else {
+          pills = pill('Seguidores (IG+FB)', sumN(num(igEff.followers), num(fbEff.followers)), 'accent') +
+            pautaStatPill('Crecimiento', delta(sumN(num(igEff.followersDelta), num(fbEff.followersDelta))), (sumN(num(igEff.followersDelta), num(fbEff.followersDelta)) || 0) >= 0 ? 'good' : 'crit') +
+            pill('Visualizaciones', sumN(num(igEff.views), num(fbEff.views)), 'blue') +
+            pill('Publicaciones', sumN(num(igEff.postsInPeriod), num(fbEff.postsInPeriod)), 'blue') +
+            pill('Alcance IG/día', num(igEff.avgDailyReach), 'accent') +
+            (!igMatch || !fbMatch ? '<p class="vc-note" style="width:100%;margin:8px 0 0">' + (!igMatch ? 'Instagram sin datos de ' + monthLabel(selectedMonth) + '. ' : '') + (!fbMatch ? 'Facebook sin datos de ' + monthLabel(selectedMonth) + '.' : '') + '</p>' : '');
+        }
+        el('home-metas-pills').innerHTML = '<div class="pauta-pillrow" style="justify-content:flex-start">' + pills + '</div>';
       }
-      el('home-metas-pills').innerHTML = '<div class="pauta-pillrow" style="justify-content:flex-start">' + pills + '</div>';
     }
 
-    if (el('home-ig-stats')) el('home-ig-stats').innerHTML =
-      '<div class="net-followers">' + (ig.followers != null ? fmtNumCO(ig.followers) : '—') + '</div>' +
-      '<div class="net-label">Seguidores · @' + (ig.username || '') + '</div>' +
-      (ig.followersDelta != null ? '<span class="net-delta">' + (ig.followersDelta >= 0 ? '+' : '') + ig.followersDelta + ' en el período</span>' : '') +
-      '<div class="net-er">' + (ig.postsInPeriod != null ? ig.postsInPeriod + ' posts · ' : '') + (ig.avgDailyReach != null ? fmtNumCO(ig.avgDailyReach) + ' alcance/día' : '') + '</div>';
-    if (el('home-fb-stats')) el('home-fb-stats').innerHTML =
-      '<div class="net-followers">' + (fb.followers != null ? fmtNumCO(fb.followers) : '—') + '</div>' +
-      '<div class="net-label">Seguidores · Facebook</div>' +
-      (fb.followersDelta != null ? '<span class="net-delta">' + (fb.followersDelta >= 0 ? '+' : '') + fb.followersDelta + ' en el período</span>' : '') +
-      '<div class="net-er">' + (fb.views != null ? fmtNumCO(fb.views) + ' visualizaciones · ' : '') + (fb.pageVisits != null ? fmtNumCO(fb.pageVisits) + ' visitas' : '') + '</div>';
+    if (el('home-ig-stats')) {
+      if (!igMatch) socEmpty('home-ig-stats', 'Sin datos de Instagram en ' + monthLabel(selectedMonth) + '. Los cargados son de ' + monthLabel(igMonth) + '.');
+      else el('home-ig-stats').innerHTML =
+        '<div class="net-followers">' + (ig.followers != null ? fmtNumCO(ig.followers) : '—') + '</div>' +
+        '<div class="net-label">Seguidores · @' + (ig.username || '') + '</div>' +
+        (ig.followersDelta != null ? '<span class="net-delta">' + (ig.followersDelta >= 0 ? '+' : '') + ig.followersDelta + ' en el período</span>' : '') +
+        '<div class="net-er">' + (ig.postsInPeriod != null ? ig.postsInPeriod + ' posts · ' : '') + (ig.avgDailyReach != null ? fmtNumCO(ig.avgDailyReach) + ' alcance/día' : '') + '</div>';
+    }
+    if (el('home-fb-stats')) {
+      if (!fbMatch) socEmpty('home-fb-stats', 'Sin datos de Facebook en ' + monthLabel(selectedMonth) + '. Los cargados son de ' + monthLabel(fbMonth) + '.');
+      else el('home-fb-stats').innerHTML =
+        '<div class="net-followers">' + (fb.followers != null ? fmtNumCO(fb.followers) : '—') + '</div>' +
+        '<div class="net-label">Seguidores · Facebook</div>' +
+        (fb.followersDelta != null ? '<span class="net-delta">' + (fb.followersDelta >= 0 ? '+' : '') + fb.followersDelta + ' en el período</span>' : '') +
+        '<div class="net-er">' + (fb.views != null ? fmtNumCO(fb.views) + ' visualizaciones · ' : '') + (fb.pageVisits != null ? fmtNumCO(fb.pageVisits) + ' visitas' : '') + '</div>';
+    }
 
     if (el('home-besttime')) {
       if (net === 'fb') {
-        el('home-besttime').innerHTML = '<div class="leads-empty-state">Metricool no calcula "mejor hora" para Facebook. La de Instagram: <b>' + (ig.bestTime || '—') + '</b>.</div>';
+        el('home-besttime').innerHTML = '<div class="leads-empty-state">Metricool no calcula "mejor hora" para Facebook. La de Instagram: <b>' + (igEff.bestTime || '—') + '</b>.</div>';
+      } else if (!igMatch) {
+        el('home-besttime').innerHTML = '<div class="leads-empty-state">Sin datos de Instagram en ' + monthLabel(selectedMonth) + '. Los cargados son de ' + monthLabel(igMonth) + '.</div>';
       } else {
         el('home-besttime').innerHTML = ig.bestTime
           ? '<div class="hero-stat"><div class="hero-number">' + ig.bestTime + '</div><div class="hero-sub">Franja de más actividad de tus seguidores en Instagram (Metricool)</div></div>'
           : '<div class="leads-empty-state">Sin dato de mejor hora.</div>';
       }
+    }
+
+    if (!igMatch) {
+      // Posts, Mi audiencia y Competencia son 100% de Instagram.
+      var igMsg = 'Sin datos de Instagram en ' + monthLabel(selectedMonth) + '. Los cargados son de ' + monthLabel(igMonth) + '.';
+      POSTS_AUD_COMP_IDS.forEach(function (id) { socEmpty(id, igMsg); });
+      setText('audiencia-period', monthLabel(selectedMonth) + ' · sin datos de Instagram');
+      if (el('referentes-competencia-title')) setText('referentes-competencia-title', 'Competencia · ' + monthLabel(selectedMonth));
+      return;
     }
 
     // ---- POSTS ----
@@ -2187,7 +2216,7 @@
       '</div>' + (ig.followersNote ? '<p class="vc-note" style="margin-top:8px">' + ig.followersNote + '</p>' : '');
     var aud = ig.audience || {};
     if (el('audiencia-gender')) el('audiencia-gender').innerHTML = (aud.gender && aud.gender.length)
-      ? socBars(aud.gender.map(function (r) { return [r[0], r[1]]; }), '%')
+      ? socBars(aud.gender.map(function (r) { return [r[0], r[1]]; }), '%') + (aud.genderApprox ? '<p class="vc-note" style="margin-top:8px">' + (aud.genderNote || 'Valores aproximados leídos del gráfico de Metricool.') + '</p>' : '')
       : '<div class="leads-empty-state">El desglose por sexo no viene en el PDF de Metricool — sí en el CSV de audiencia. Pásamelo y lo lleno.</div>';
     if (el('audiencia-age')) el('audiencia-age').innerHTML = (aud.age && aud.age.length)
       ? socBars(aud.age.map(function (r) { return [r[0] + ' años', r[1]]; }), '%') + (aud.ageApprox ? '<p class="vc-note" style="margin-top:8px">Valores aproximados leídos del gráfico de Metricool. Para exactos, pásame el CSV de edad.</p>' : '')

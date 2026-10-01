@@ -750,37 +750,39 @@
       "label": "Nass Tecnología",
       "instagram": {
         "username": "nasstecnologia",
-        "followers": null,
-        "following": null,
-        "followersDelta": null,
-        "acquired": 23,
-        "lost": 13,
-        "views": 9838,
-        "avgDailyReach": 470,
-        "engagedAccounts": 5,
-        "postsInPeriod": 6,
-        "bestTime": "18:00–20:00",
-        "followersNote": "El conteo de seguidores solo existe desde la conexión de la cuenta (3 sep 2026). El informe de agosto no lo trae.",
+        "month": "2026-09",
+        "followers": 1723,
+        "following": 2858,
+        "followersDelta": 8,
+        "acquired": 17,
+        "lost": 9,
+        "engagement": 0.89,
+        "engagementNote": "estimado con los posts del período (interacciones de posts+reels del período ÷ seguidores, misma fórmula que la tabla de competidores)",
+        "views": 10200,
+        "avgDailyReach": 198,
+        "engagedAccounts": 111,
+        "postsInPeriod": 7,
+        "bestTime": null,
         "cities": [
           [
-            "Santiago de Cali",
-            33.12
+            "Santiago de Cali, Valle del Cauca",
+            33.25
           ],
           [
-            "Bogotá",
-            8.77
+            "Bogotá, Distrito Especial",
+            8.76
           ],
           [
-            "Medellín",
-            3.55
+            "Medellín, Antioquia",
+            3.49
           ],
           [
-            "Jamundí",
-            2.96
+            "Jamundí, Valle del Cauca",
+            2.9
           ],
           [
-            "Palmira",
-            2.13
+            "Palmira, Valle del Cauca",
+            2.01
           ]
         ],
         "countries": [
@@ -792,84 +794,80 @@
           "Estados Unidos",
           "México"
         ],
+        "audience": {
+          "gender": [
+            [
+              "Hombres",
+              52
+            ],
+            [
+              "Mujeres",
+              28
+            ],
+            [
+              "Sin especificar",
+              20
+            ]
+          ],
+          "genderApprox": true,
+          "genderNote": "Aproximado, leído del gráfico de género (Metricool no mostró los % exactos en esta captura).",
+          "age": [
+            [
+              "13-17",
+              1
+            ],
+            [
+              "18-24",
+              4
+            ],
+            [
+              "25-34",
+              25
+            ],
+            [
+              "35-44",
+              33
+            ],
+            [
+              "45-54",
+              22
+            ],
+            [
+              "55-64",
+              6
+            ],
+            [
+              "65+",
+              5
+            ]
+          ],
+          "ageApprox": true
+        },
         "content": {
           "posts": {
-            "count": 4,
-            "engagement": 121.02,
-            "interactions": 38,
-            "avgReach": 79,
-            "views": 623,
-            "likes": 37,
-            "comments": 1
+            "count": 3,
+            "engagement": 229.17,
+            "interactions": 44,
+            "avgReach": 64,
+            "views": 380,
+            "likes": 40,
+            "comments": 0,
+            "saves": 2,
+            "shares": 2
           },
           "reels": {
             "count": 2,
-            "engagement": 61.98,
-            "interactions": 30,
-            "avgReach": 242,
-            "views": 681,
-            "likes": 25,
-            "saves": 3,
-            "shares": 2
+            "engagement": 142.24,
+            "interactions": 33,
+            "avgReach": 116,
+            "views": 340
           },
           "stories": {
-            "count": 0
+            "count": 2
           }
         },
-        "topPosts": [
-          {
-            "date": "2026-08-08",
-            "kind": "Reel",
-            "reach": 275,
-            "caption": "No dejes tu seguridad al azar. Tener cámaras no basta si no tienen un buen respaldo"
-          },
-          {
-            "date": "2026-08-20",
-            "kind": "Reel",
-            "reach": 209,
-            "caption": "¿Sabías que un sistema de seguridad híbrido es tu mejor aliado financiero y operativo?"
-          },
-          {
-            "date": "2026-08-03",
-            "kind": "Imagen",
-            "reach": 107,
-            "caption": "Publicación del 3 de agosto"
-          },
-          {
-            "date": "2026-08-13",
-            "kind": "Imagen",
-            "reach": 79,
-            "caption": "¡Hoy celebramos 16 años de innovación, confianza y crecimiento!"
-          },
-          {
-            "date": "2026-08-04",
-            "kind": "Imagen",
-            "reach": 60,
-            "caption": "Este mes celebramos 16 años protegiendo lo que más importa"
-          }
-        ],
-        "hashtags": [
-          [
-            "#confianza",
-            1
-          ],
-          [
-            "#juntoscrecemos",
-            1
-          ],
-          [
-            "#innovación",
-            1
-          ],
-          [
-            "#tecnología",
-            1
-          ],
-          [
-            "#aniversario",
-            1
-          ]
-        ],
+        "topPosts": [],
+        "hashtags": [],
         "competitors": [
           {
             "name": "TANGO Colombia",

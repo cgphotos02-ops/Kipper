@@ -309,9 +309,9 @@
   .reco-title { font-weight: 700; font-size: 13.5px; }
   .reco-text { font-size: 12.5px; color: var(--ink-muted); margin-top: 2px; line-height: 1.5; }
 
-  .camp-subtabs, .pauta-subtabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
-  .camp-panel, .pauta-panel { display: none; }
-  .camp-panel.active, .pauta-panel.active { display: block; }
+  .camp-subtabs, .pauta-subtabs, .net-subtabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .camp-panel, .pauta-panel, .net-panel { display: none; }
+  .camp-panel.active, .pauta-panel.active, .net-panel.active { display: block; }
 
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
   .form-group { display: flex; flex-direction: column; gap: 6px; }
@@ -852,50 +852,55 @@
       <div id="posts-seg-donut"><div class="leads-empty-state">Se calcula cuando haya contenidos del mes.</div></div>
     </div>
 
-    <h2 class="section-h" style="margin:26px 0 4px;font-size:14px;color:var(--ink-muted)">📈 Análisis de lo publicado</h2>
-
-    <div class="filter-row" id="posts-fmt-tabs">
-      <div class="tab active" data-fmt="todos">Todos</div>
-      <div class="tab" data-fmt="Reels">Reels</div>
-      <div class="tab" data-fmt="Imágenes">Imágenes</div>
-      <div class="tab" data-fmt="Historias">Historias</div>
+    <div class="net-subtabs" id="posts-subtabs">
+      <div class="tab active" data-posts="ig">📸 Instagram</div>
+      <div class="tab" data-posts="tt">🎵 TikTok</div>
     </div>
 
-    <div class="card">
-      <h2>🎬 Mezcla de contenido</h2>
-      <div class="leads-empty-state" id="posts-parrilla-donut">Aún no conectado. La distribución de piezas por formato aparece aquí cuando haya publicaciones cargadas.</div>
+    <div class="net-panel active" id="posts-ig">
+      <div class="filter-row" id="posts-fmt-tabs">
+        <div class="tab active" data-fmt="todos">Todos</div>
+        <div class="tab" data-fmt="Reels">Reels</div>
+        <div class="tab" data-fmt="Imágenes">Imágenes</div>
+        <div class="tab" data-fmt="Historias">Historias</div>
+      </div>
+
+      <div class="card">
+        <h2>🎬 Mezcla de contenido</h2>
+        <div class="leads-empty-state" id="posts-parrilla-donut">Aún no conectado. La distribución de piezas por formato aparece aquí cuando haya publicaciones cargadas.</div>
+      </div>
+
+      <div class="card">
+        <h2>🏷️ Hashtags usados</h2>
+        <div class="leads-empty-state" id="posts-hashtags">Aún no conectado.</div>
+      </div>
+
+      <div class="card">
+        <h2>📊 Resumen por formato</h2>
+        <div class="leads-empty-state" id="posts-series">Aún no conectado.</div>
+      </div>
+
+      <div class="card">
+        <h2>🎯 Patrón de tu contenido</h2>
+        <div class="leads-empty-state" id="posts-pattern">Aún no conectado.</div>
+      </div>
+
+      <div class="card">
+        <h2>💡 Tus posts con más alcance</h2>
+        <div class="leads-empty-state" id="posts-organic-ideas">Aún no conectado. Las propuestas de contenido aparecen aquí cuando haya datos de la cuenta.</div>
+      </div>
     </div>
 
-    <div class="card">
-      <h2>🏷️ Hashtags usados</h2>
-      <div class="leads-empty-state" id="posts-hashtags">Aún no conectado.</div>
-    </div>
+    <div class="net-panel" id="posts-tt">
+      <div class="card">
+        <h2>🏆 Tus mejores publicaciones en TikTok</h2>
+        <div id="posts-tiktok-top"><div class="leads-empty-state">Aún no conectado.</div></div>
+      </div>
 
-    <div class="card">
-      <h2>📊 Resumen por formato</h2>
-      <div class="leads-empty-state" id="posts-series">Aún no conectado.</div>
-    </div>
-
-    <div class="card">
-      <h2>🎯 Patrón de tu contenido</h2>
-      <div class="leads-empty-state" id="posts-pattern">Aún no conectado.</div>
-    </div>
-
-    <div class="card">
-      <h2>💡 Tus posts con más alcance</h2>
-      <div class="leads-empty-state" id="posts-organic-ideas">Aún no conectado. Las propuestas de contenido aparecen aquí cuando haya datos de la cuenta.</div>
-    </div>
-
-    <h2 class="section-h" style="margin:26px 0 4px;font-size:14px;color:var(--ink-muted)">🎵 TikTok</h2>
-
-    <div class="card">
-      <h2>🏆 Tus mejores publicaciones en TikTok</h2>
-      <div id="posts-tiktok-top"><div class="leads-empty-state">Aún no conectado.</div></div>
-    </div>
-
-    <div class="card">
-      <h2>📈 Vistas por día en TikTok</h2>
-      <div id="posts-tiktok-chart"><div class="leads-empty-state">Aún no conectado.</div></div>
+      <div class="card">
+        <h2>📈 Vistas por día en TikTok</h2>
+        <div id="posts-tiktok-chart"><div class="leads-empty-state">Aún no conectado.</div></div>
+      </div>
     </div>
   </section>
 
@@ -904,45 +909,52 @@
     <h1 class="greeting">Mi audiencia</h1>
     <div class="date-sub" id="audiencia-period">Quién te sigue y cuándo está más activa</div>
 
-    <div class="card">
-      <h2>📊 Cumplimiento vs. meta</h2>
-      <div class="leads-empty-state" id="audiencia-marzo-kpis">Aún no hay metas definidas ni datos conectados para esta marca.</div>
+    <div class="net-subtabs" id="audiencia-subtabs">
+      <div class="tab active" data-aud="ig">📸 Instagram</div>
+      <div class="tab" data-aud="tt">🎵 TikTok</div>
     </div>
 
-    <div class="card">
-      <h2>⚥ Sexo</h2>
-      <div class="leads-empty-state" id="audiencia-gender">Todavía no tenemos el desglose de sexo/edad/país para esta cuenta. Conéctala y aparece aquí.</div>
-    </div>
-    <div class="card">
-      <h2>🎂 Rango de edad</h2>
-      <div class="leads-empty-state" id="audiencia-age">Aún no conectado.</div>
-    </div>
-    <div class="card">
-      <h2>🌎 Principales países</h2>
-      <div class="leads-empty-state" id="audiencia-places">Aún no conectado.</div>
-    </div>
-    <div class="card">
-      <h2>⏰ Cuándo está más activa tu audiencia</h2>
-      <div class="leads-empty-state" id="audiencia-besttime">Aún no conectado. Se calcula con la actividad de tus seguidores en Instagram.</div>
+    <div class="net-panel active" id="audiencia-ig">
+      <div class="card">
+        <h2>📊 Cumplimiento vs. meta</h2>
+        <div class="leads-empty-state" id="audiencia-marzo-kpis">Aún no hay metas definidas ni datos conectados para esta marca.</div>
+      </div>
+
+      <div class="card">
+        <h2>⚥ Sexo</h2>
+        <div class="leads-empty-state" id="audiencia-gender">Todavía no tenemos el desglose de sexo/edad/país para esta cuenta. Conéctala y aparece aquí.</div>
+      </div>
+      <div class="card">
+        <h2>🎂 Rango de edad</h2>
+        <div class="leads-empty-state" id="audiencia-age">Aún no conectado.</div>
+      </div>
+      <div class="card">
+        <h2>🌎 Principales países</h2>
+        <div class="leads-empty-state" id="audiencia-places">Aún no conectado.</div>
+      </div>
+      <div class="card">
+        <h2>⏰ Cuándo está más activa tu audiencia</h2>
+        <div class="leads-empty-state" id="audiencia-besttime">Aún no conectado. Se calcula con la actividad de tus seguidores en Instagram.</div>
+      </div>
     </div>
 
-    <h2 class="section-h" style="margin:26px 0 4px;font-size:14px;color:var(--ink-muted)">🎵 TikTok</h2>
-
-    <div class="card">
-      <h2>👀 Espectadores y seguidores en TikTok</h2>
-      <div id="audiencia-tiktok-resumen"><div class="leads-empty-state">Aún no conectado.</div></div>
-    </div>
-    <div class="card">
-      <h2>⚥ Sexo (TikTok)</h2>
-      <div id="audiencia-tiktok-gender"><div class="leads-empty-state">Aún no conectado.</div></div>
-    </div>
-    <div class="card">
-      <h2>🎂 Rango de edad (TikTok)</h2>
-      <div id="audiencia-tiktok-age"><div class="leads-empty-state">Aún no conectado.</div></div>
-    </div>
-    <div class="card">
-      <h2>⏰ Cuándo está más activa tu audiencia en TikTok</h2>
-      <div id="audiencia-tiktok-besttime"><div class="leads-empty-state">Aún no conectado.</div></div>
+    <div class="net-panel" id="audiencia-tt">
+      <div class="card">
+        <h2>👀 Espectadores y seguidores en TikTok</h2>
+        <div id="audiencia-tiktok-resumen"><div class="leads-empty-state">Aún no conectado.</div></div>
+      </div>
+      <div class="card">
+        <h2>⚥ Sexo (TikTok)</h2>
+        <div id="audiencia-tiktok-gender"><div class="leads-empty-state">Aún no conectado.</div></div>
+      </div>
+      <div class="card">
+        <h2>🎂 Rango de edad (TikTok)</h2>
+        <div id="audiencia-tiktok-age"><div class="leads-empty-state">Aún no conectado.</div></div>
+      </div>
+      <div class="card">
+        <h2>⏰ Cuándo está más activa tu audiencia en TikTok</h2>
+        <div id="audiencia-tiktok-besttime"><div class="leads-empty-state">Aún no conectado.</div></div>
+      </div>
     </div>
   </section>
 
@@ -1178,6 +1190,28 @@
       document.querySelectorAll('.pauta-panel').forEach(function (p) { p.classList.remove('active'); });
       tab.classList.add('active');
       var p = el('pauta-' + tab.dataset.pauta);
+      if (p) p.classList.add('active');
+    });
+  });
+
+  // ---------- Posts: subtabs (Instagram / TikTok) ----------
+  document.querySelectorAll('#posts-subtabs .tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('#posts-subtabs .tab').forEach(function (t) { t.classList.remove('active'); });
+      document.querySelectorAll('#posts-ig, #posts-tt').forEach(function (p) { p.classList.remove('active'); });
+      tab.classList.add('active');
+      var p = el('posts-' + tab.dataset.posts);
+      if (p) p.classList.add('active');
+    });
+  });
+
+  // ---------- Mi audiencia: subtabs (Instagram / TikTok) ----------
+  document.querySelectorAll('#audiencia-subtabs .tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('#audiencia-subtabs .tab').forEach(function (t) { t.classList.remove('active'); });
+      document.querySelectorAll('#audiencia-ig, #audiencia-tt').forEach(function (p) { p.classList.remove('active'); });
+      tab.classList.add('active');
+      var p = el('audiencia-' + tab.dataset.aud);
       if (p) p.classList.add('active');
     });
   });

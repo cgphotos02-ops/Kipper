@@ -176,8 +176,13 @@
   .net-icon.tiktok { background: linear-gradient(135deg,#0a0a0a,#262626); box-shadow: inset 0 0 0 1.5px #fe2c55; }
 
   /* TikTok: tarjetas de estadística con delta, y tarjetas de "mejor momento" */
-  .tt-stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  @media (max-width: 520px) { .tt-stat-grid { grid-template-columns: 1fr; } }
+  .tt-stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+  .tt-traffic-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .tt-traffic-row:last-child { border-bottom: none; }
+  .tt-traffic-row .tr-name { width: 130px; flex: 0 0 130px; font-weight: 700; }
+  .tt-traffic-row .tr-track { flex: 1; height: 8px; border-radius: 4px; background: var(--surface); overflow: hidden; }
+  .tt-traffic-row .tr-fill { height: 100%; border-radius: 4px; background: var(--accent); }
+  .tt-traffic-row .tr-pct { width: 54px; flex: 0 0 54px; text-align: right; font-size: 12px; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
   .tt-stat-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
   .tt-stat-card .net-followers { font-size: 24px; }
   .tt-activity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -941,6 +946,16 @@
     </div>
 
     <div class="net-panel active" id="tiktok-posts">
+      <div class="card" id="tiktok-content-card">
+        <h2>📊 Resumen de contenido en TikTok</h2>
+        <div id="posts-tiktok-content"><div class="leads-empty-state">Aún no conectado.</div></div>
+      </div>
+
+      <div class="card" id="tiktok-traffic-card">
+        <h2>🧭 Fuente de tráfico en TikTok</h2>
+        <div id="posts-tiktok-traffic"><div class="leads-empty-state">Aún no conectado.</div></div>
+      </div>
+
       <div class="card" id="tiktok-top-card">
         <h2>🏆 Tus mejores publicaciones en TikTok</h2>
         <div id="posts-tiktok-top"><div class="leads-empty-state">Aún no conectado.</div></div>
@@ -1868,11 +1883,45 @@
         '</div></div></div></div>';
     }).join('') + '</div>';
   }
+  var TT_STAT_LABELS = [
+    { k: 'visualizacionesVideos', label: 'Visualizaciones de videos' },
+    { k: 'visualizacionesPerfil', label: 'Visualizaciones de perfil' },
+    { k: 'meGusta', label: 'Me gusta' },
+    { k: 'comentarios', label: 'Comentarios' },
+    { k: 'compartidos', label: 'Veces compartido' }
+  ];
   function renderTikTokPosts(tt) {
     var chartEl = el('posts-tiktok-chart'), topEl = el('posts-tiktok-top');
+    var contentEl = el('posts-tiktok-content'), trafficEl = el('posts-tiktok-traffic');
     var chartCard = el('tiktok-chart-card'), topCard = el('tiktok-top-card'), emptyEl = el('tiktok-posts-empty');
+    var contentCard = el('tiktok-content-card'), trafficCard = el('tiktok-traffic-card');
     var hasChart = !!(tt && tt.daily && tt.daily.length);
     var hasTop = !!(tt && tt.topPosts);
+    var cont = (tt && tt.contenido) || null;
+    var hasStats = !!(cont && cont.stats);
+    var hasTraffic = !!(cont && cont.fuenteTrafico && cont.fuenteTrafico.length);
+
+    if (contentCard) contentCard.style.display = hasStats ? '' : 'none';
+    if (contentEl && hasStats) {
+      var cards = TT_STAT_LABELS.map(function (s) {
+        var d = cont.stats[s.k] || {};
+        return '<div class="tt-stat-card"><div class="net-followers">' + fmtNumCO(d.total) + '</div><div class="net-label">' + s.label + '</div>' +
+          (d.delta != null ? '<span class="net-delta">+' + fmtNumCO(d.delta) + (d.deltaPct != null ? ' (' + fmtPctSigned(d.deltaPct).replace('+', '') + ')' : '') + '</span>' : '') + '</div>';
+      }).join('');
+      contentEl.innerHTML = (cont.periodo ? '<p class="vc-note" style="margin:-4px 0 12px;text-align:center"><b style="color:var(--accent-soft-ink)">' + cont.periodo + '</b></p>' : '') +
+        '<div class="tt-stat-grid">' + cards + '</div>' +
+        (cont.ventana ? '<p class="vc-note" style="margin-top:12px">' + cont.ventana + '</p>' : '');
+    }
+
+    if (trafficCard) trafficCard.style.display = hasTraffic ? '' : 'none';
+    if (trafficEl && hasTraffic) {
+      var maxT = Math.max.apply(null, cont.fuenteTrafico.map(function (r) { return r[1]; }).concat([1]));
+      trafficEl.innerHTML = cont.fuenteTrafico.map(function (r) {
+        return '<div class="tt-traffic-row"><div class="tr-name">' + r[0] + '</div>' +
+          '<div class="tr-track"><div class="tr-fill" style="width:' + Math.max(1, (r[1] / maxT) * 100) + '%"></div></div>' +
+          '<div class="tr-pct">' + fmtPct2(r[1]) + '</div></div>';
+      }).join('') + '<p class="vc-note" style="margin-top:10px">De dónde vienen las reproducciones de tus videos.</p>';
+    }
 
     if (chartCard) chartCard.style.display = hasChart ? '' : 'none';
     if (chartEl && hasChart) {
@@ -1898,7 +1947,7 @@
       });
     }
 
-    if (emptyEl) emptyEl.style.display = (!hasChart && !hasTop) ? '' : 'none';
+    if (emptyEl) emptyEl.style.display = (!hasChart && !hasTop && !hasStats && !hasTraffic) ? '' : 'none';
   }
 
   // -------- Mi audiencia → TikTok --------
@@ -1930,10 +1979,10 @@
       };
       resumenEl.innerHTML = (aud.periodo ? '<p class="vc-note" style="margin:-4px 0 12px;text-align:center"><b style="color:var(--accent-soft-ink)">' + aud.periodo + '</b></p>' : '') +
         '<div class="tt-stat-grid">' +
-        card(esp.total, 'Espectadores', esp.crecimientoPct) +
-        card(esp.nuevos, 'Espectadores nuevos', null) +
+        card(esp.total, 'Espectadores', esp.totalDeltaPct) +
+        card(esp.nuevos, 'Espectadores nuevos', esp.nuevosDeltaPct) +
         card(seg.total, 'Seguidores (todo el tiempo)', null) +
-        card(seg.netos, 'Seguidores nuevos · ' + (seg.ventana || ''), null) +
+        card(seg.netos, 'Seguidores nuevos · ' + (seg.ventana || ''), seg.netosDeltaPct) +
         '</div>' +
         (esp.nota ? '<p class="vc-note" style="margin-top:12px">📈 ' + esp.nota + (esp.ventana ? ' <span style="color:var(--ink-faint)">(' + esp.ventana + ')</span>' : '') + '</p>' : '');
     }
@@ -1958,7 +2007,8 @@
       var cards = '';
       if (ae.dia) cards += '<div class="tt-activity-card"><span class="ta-icon">👀</span><div class="ta-time">' + ae.dia + (ae.horaDesde ? ' · ' + ae.horaDesde + '–' + ae.horaHasta : '') + '</div><div class="ta-label">Pico de espectadores' + (ae.ventana ? ' · ' + ae.ventana : '') + '</div><div class="ta-note">' + (ae.nota || '') + '</div></div>';
       if (as.dia) cards += '<div class="tt-activity-card"><span class="ta-icon">⭐</span><div class="ta-time">' + as.dia + (as.hora ? ' · ' + as.hora : '') + '</div><div class="ta-label">Pico de seguidores' + (as.ventana ? ' · ' + as.ventana : '') + '</div><div class="ta-note">' + (as.nota || '') + '</div></div>';
-      bestEl.innerHTML = '<div class="tt-activity-grid">' + cards + '</div>';
+      var onlyOne = !(ae.dia && as.dia);
+      bestEl.innerHTML = '<div class="tt-activity-grid"' + (onlyOne ? ' style="grid-template-columns:1fr"' : '') + '>' + cards + '</div>';
     }
   }
 

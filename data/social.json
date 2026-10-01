@@ -302,8 +302,8 @@
         }
       },
       "tiktok": {
-        "source": "TikTok — Overview.xlsx (serie diaria)",
-        "updatedAt": "2026-10-01T16:45:46.307Z",
+        "source": "TikTok Business Suite (capturas)",
+        "updatedAt": "2026-10-01",
         "daily": [
           {
             "fecha": "2026-08-31",
@@ -545,7 +545,202 @@
             "comments": 2,
             "shares": 2
           }
-        ]
+        ],
+        "contenido": {
+          "updatedAt": "2026-10-01",
+          "periodo": "Septiembre 2026",
+          "ventana": "Últimos 60 días",
+          "stats": {
+            "visualizacionesVideos": {
+              "total": 29800,
+              "delta": 23100,
+              "deltaPct": 347.6
+            },
+            "visualizacionesPerfil": {
+              "total": 407,
+              "delta": 220,
+              "deltaPct": 117.6
+            },
+            "meGusta": {
+              "total": 940,
+              "delta": 870,
+              "deltaPct": 1242.9
+            },
+            "comentarios": {
+              "total": 29,
+              "delta": 15,
+              "deltaPct": 107.1
+            },
+            "compartidos": {
+              "total": 42,
+              "delta": 29,
+              "deltaPct": 223.1
+            }
+          },
+          "fuenteTrafico": [
+            [
+              "Para ti",
+              82.9
+            ],
+            [
+              "Perfil personal",
+              8.5
+            ],
+            [
+              "Buscar",
+              8.4
+            ],
+            [
+              "Siguiendo",
+              0.2
+            ],
+            [
+              "Sonido",
+              0
+            ]
+          ]
+        },
+        "topPosts": {
+          "updatedAt": "2026-10-01",
+          "ventana": "Visualizaciones de los últimos 60 días",
+          "porVisualizaciones": [
+            {
+              "titulo": "La seguridad no debería empezar por el precio, sino por entender qué...",
+              "valor": 7300,
+              "totalViews": 7700,
+              "fechaRelativa": "hace 1 sem."
+            },
+            {
+              "titulo": "En Proviser diseñamos esquemas de seguridad adaptados a la operación...",
+              "valor": 6100,
+              "totalViews": 6800,
+              "fechaRelativa": "hace 2 sem."
+            },
+            {
+              "titulo": "🎯 ¿Buscas una oportunidad en seguridad privada? En PROVISER...",
+              "valor": 2000,
+              "totalViews": 220000,
+              "fechaRelativa": "28 ago 2025"
+            }
+          ],
+          "porNuevosEspectadores": [
+            {
+              "titulo": "La seguridad no debería empezar por el precio, sino por entender qué...",
+              "valor": 3300,
+              "totalViews": 7700,
+              "fechaRelativa": "hace 1 sem."
+            },
+            {
+              "titulo": "😊 En Proviser sabemos que una buena actitud también hace parte d...",
+              "valor": 3100,
+              "totalViews": 7000,
+              "fechaRelativa": "hace 3 m"
+            },
+            {
+              "titulo": "En Proviser diseñamos esquemas de seguridad adaptados a la operación...",
+              "valor": 2300,
+              "totalViews": 6800,
+              "fechaRelativa": "hace 2 sem."
+            }
+          ],
+          "porMeGusta": [
+            {
+              "titulo": "¿Tienes un sistema de seguridad o solo varias soluciones?",
+              "valor": 163,
+              "totalViews": 987,
+              "fechaRelativa": "hace 4 d"
+            },
+            {
+              "titulo": "La seguridad no debería empezar por el precio, sino por entender qué...",
+              "valor": 156,
+              "totalViews": 7700,
+              "fechaRelativa": "hace 1 sem."
+            },
+            {
+              "titulo": "La seguridad no termina cuando inicia el servicio, seguimos...",
+              "valor": 140,
+              "totalViews": 1700,
+              "fechaRelativa": "hace 2 sem."
+            }
+          ],
+          "porNuevosSeguidores": [
+            {
+              "titulo": "La seguridad no debería empezar por el precio, sino por entender qué...",
+              "valor": 31,
+              "totalViews": 7700,
+              "fechaRelativa": "hace 1 sem."
+            },
+            {
+              "titulo": "En Proviser diseñamos esquemas de seguridad adaptados a la operación...",
+              "valor": 28,
+              "totalViews": 6800,
+              "fechaRelativa": "hace 2 sem."
+            },
+            {
+              "titulo": "🎯 ¿Buscas una oportunidad en seguridad privada? En PROVISER...",
+              "valor": 14,
+              "totalViews": 220000,
+              "fechaRelativa": "28 ago 2025"
+            }
+          ]
+        },
+        "audiencia": {
+          "updatedAt": "2026-10-01",
+          "periodo": "Septiembre 2026",
+          "espectadores": {
+            "total": 18300,
+            "totalDeltaPct": 43.2,
+            "nuevos": 12100,
+            "nuevosDeltaPct": 107.18,
+            "ventana": "Ventana de 60 días (2 ago – 30 sep); el crecimiento fue casi todo de septiembre",
+            "nota": "Pico fuerte el 25 de septiembre, luego se estabiliza por encima del nivel de agosto."
+          },
+          "seguidores": {
+            "total": 5100,
+            "netos": 61,
+            "netosDeltaPct": 916.7,
+            "ventana": "Septiembre 2026"
+          },
+          "sexo": [
+            [
+              "Hombres",
+              74
+            ],
+            [
+              "Mujeres",
+              26
+            ],
+            [
+              "Otro",
+              0
+            ]
+          ],
+          "edad": [
+            [
+              "18-24",
+              11.5
+            ],
+            [
+              "25-34",
+              40.7
+            ],
+            [
+              "35-44",
+              30.1
+            ],
+            [
+              "45-54",
+              12.8
+            ]
+          ],
+          "actividadEspectadores": {
+            "dia": "29 de septiembre",
+            "horaDesde": "13:00",
+            "horaHasta": "14:00",
+            "ventana": "Últimos 7 días",
+            "nota": "En los últimos 7 días, tus espectadores estuvieron más activos el 29 sep entre la 1pm y las 2pm."
+          }
+        }
       }
     },
     "nass": {
@@ -828,9 +1023,10 @@
           "espectadores": {
             "total": 3900,
             "nuevos": 3900,
-            "crecimientoPct": 35418.18,
             "ventana": "Ventana de 60 días (2 ago – 30 sep); el crecimiento fue casi todo de septiembre",
-            "nota": "Crecimiento explosivo desde el 24 de septiembre — antes era casi plano."
+            "nota": "Crecimiento explosivo desde el 24 de septiembre — antes era casi plano.",
+            "nuevosDeltaPct": 35100,
+            "totalDeltaPct": 35418.18
           },
           "seguidores": {
             "total": 159,

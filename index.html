@@ -763,6 +763,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       Mi audiencia
     </button>
+    <button class="nav-item" data-view="tiktok">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V4h4a4 4 0 0 0 4 4v3a7 7 0 0 1-4-1.3V17a5 5 0 1 1-4-4.9"/></svg>
+      TikTok
+    </button>
     <button class="nav-item" data-view="competencia">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20c0-3 2.5-5 6-5s6 2 6 5M14 20c0-2 1.8-3.5 4.5-3.5S23 18 23 20"/></svg>
       Competencia
@@ -852,46 +856,78 @@
       <div id="posts-seg-donut"><div class="leads-empty-state">Se calcula cuando haya contenidos del mes.</div></div>
     </div>
 
-    <div class="net-subtabs" id="posts-subtabs">
-      <div class="tab active" data-posts="ig">📸 Instagram</div>
-      <div class="tab" data-posts="tt">🎵 TikTok</div>
+    <div class="filter-row" id="posts-fmt-tabs">
+      <div class="tab active" data-fmt="todos">Todos</div>
+      <div class="tab" data-fmt="Reels">Reels</div>
+      <div class="tab" data-fmt="Imágenes">Imágenes</div>
+      <div class="tab" data-fmt="Historias">Historias</div>
     </div>
 
-    <div class="net-panel active" id="posts-ig">
-      <div class="filter-row" id="posts-fmt-tabs">
-        <div class="tab active" data-fmt="todos">Todos</div>
-        <div class="tab" data-fmt="Reels">Reels</div>
-        <div class="tab" data-fmt="Imágenes">Imágenes</div>
-        <div class="tab" data-fmt="Historias">Historias</div>
-      </div>
-
-      <div class="card">
-        <h2>🎬 Mezcla de contenido</h2>
-        <div class="leads-empty-state" id="posts-parrilla-donut">Aún no conectado. La distribución de piezas por formato aparece aquí cuando haya publicaciones cargadas.</div>
-      </div>
-
-      <div class="card">
-        <h2>🏷️ Hashtags usados</h2>
-        <div class="leads-empty-state" id="posts-hashtags">Aún no conectado.</div>
-      </div>
-
-      <div class="card">
-        <h2>📊 Resumen por formato</h2>
-        <div class="leads-empty-state" id="posts-series">Aún no conectado.</div>
-      </div>
-
-      <div class="card">
-        <h2>🎯 Patrón de tu contenido</h2>
-        <div class="leads-empty-state" id="posts-pattern">Aún no conectado.</div>
-      </div>
-
-      <div class="card">
-        <h2>💡 Tus posts con más alcance</h2>
-        <div class="leads-empty-state" id="posts-organic-ideas">Aún no conectado. Las propuestas de contenido aparecen aquí cuando haya datos de la cuenta.</div>
-      </div>
+    <div class="card">
+      <h2>🎬 Mezcla de contenido</h2>
+      <div class="leads-empty-state" id="posts-parrilla-donut">Aún no conectado. La distribución de piezas por formato aparece aquí cuando haya publicaciones cargadas.</div>
     </div>
 
-    <div class="net-panel" id="posts-tt">
+    <div class="card">
+      <h2>🏷️ Hashtags usados</h2>
+      <div class="leads-empty-state" id="posts-hashtags">Aún no conectado.</div>
+    </div>
+
+    <div class="card">
+      <h2>📊 Resumen por formato</h2>
+      <div class="leads-empty-state" id="posts-series">Aún no conectado.</div>
+    </div>
+
+    <div class="card">
+      <h2>🎯 Patrón de tu contenido</h2>
+      <div class="leads-empty-state" id="posts-pattern">Aún no conectado.</div>
+    </div>
+
+    <div class="card">
+      <h2>💡 Tus posts con más alcance</h2>
+      <div class="leads-empty-state" id="posts-organic-ideas">Aún no conectado. Las propuestas de contenido aparecen aquí cuando haya datos de la cuenta.</div>
+    </div>
+  </section>
+
+  <!-- MI AUDIENCIA -->
+  <section class="view" id="view-audiencia">
+    <h1 class="greeting">Mi audiencia</h1>
+    <div class="date-sub" id="audiencia-period">Quién te sigue y cuándo está más activa</div>
+
+    <div class="card">
+      <h2>📊 Cumplimiento vs. meta</h2>
+      <div class="leads-empty-state" id="audiencia-marzo-kpis">Aún no hay metas definidas ni datos conectados para esta marca.</div>
+    </div>
+
+    <div class="card">
+      <h2>⚥ Sexo</h2>
+      <div class="leads-empty-state" id="audiencia-gender">Todavía no tenemos el desglose de sexo/edad/país para esta cuenta. Conéctala y aparece aquí.</div>
+    </div>
+    <div class="card">
+      <h2>🎂 Rango de edad</h2>
+      <div class="leads-empty-state" id="audiencia-age">Aún no conectado.</div>
+    </div>
+    <div class="card">
+      <h2>🌎 Principales países</h2>
+      <div class="leads-empty-state" id="audiencia-places">Aún no conectado.</div>
+    </div>
+    <div class="card">
+      <h2>⏰ Cuándo está más activa tu audiencia</h2>
+      <div class="leads-empty-state" id="audiencia-besttime">Aún no conectado. Se calcula con la actividad de tus seguidores en Instagram.</div>
+    </div>
+  </section>
+
+  <!-- TIKTOK -->
+  <section class="view" id="view-tiktok">
+    <h1 class="greeting">TikTok</h1>
+    <div class="date-sub">Tu desempeño en TikTok — Proviser Seguridad y Nass Tecnología</div>
+
+    <div class="net-subtabs" id="tiktok-subtabs">
+      <div class="tab active" data-tiktok="posts">🏆 Publicaciones</div>
+      <div class="tab" data-tiktok="audiencia">👥 Audiencia</div>
+    </div>
+
+    <div class="net-panel active" id="tiktok-posts">
       <div class="card">
         <h2>🏆 Tus mejores publicaciones en TikTok</h2>
         <div id="posts-tiktok-top"><div class="leads-empty-state">Aún no conectado.</div></div>
@@ -902,43 +938,8 @@
         <div id="posts-tiktok-chart"><div class="leads-empty-state">Aún no conectado.</div></div>
       </div>
     </div>
-  </section>
 
-  <!-- MI AUDIENCIA -->
-  <section class="view" id="view-audiencia">
-    <h1 class="greeting">Mi audiencia</h1>
-    <div class="date-sub" id="audiencia-period">Quién te sigue y cuándo está más activa</div>
-
-    <div class="net-subtabs" id="audiencia-subtabs">
-      <div class="tab active" data-aud="ig">📸 Instagram</div>
-      <div class="tab" data-aud="tt">🎵 TikTok</div>
-    </div>
-
-    <div class="net-panel active" id="audiencia-ig">
-      <div class="card">
-        <h2>📊 Cumplimiento vs. meta</h2>
-        <div class="leads-empty-state" id="audiencia-marzo-kpis">Aún no hay metas definidas ni datos conectados para esta marca.</div>
-      </div>
-
-      <div class="card">
-        <h2>⚥ Sexo</h2>
-        <div class="leads-empty-state" id="audiencia-gender">Todavía no tenemos el desglose de sexo/edad/país para esta cuenta. Conéctala y aparece aquí.</div>
-      </div>
-      <div class="card">
-        <h2>🎂 Rango de edad</h2>
-        <div class="leads-empty-state" id="audiencia-age">Aún no conectado.</div>
-      </div>
-      <div class="card">
-        <h2>🌎 Principales países</h2>
-        <div class="leads-empty-state" id="audiencia-places">Aún no conectado.</div>
-      </div>
-      <div class="card">
-        <h2>⏰ Cuándo está más activa tu audiencia</h2>
-        <div class="leads-empty-state" id="audiencia-besttime">Aún no conectado. Se calcula con la actividad de tus seguidores en Instagram.</div>
-      </div>
-    </div>
-
-    <div class="net-panel" id="audiencia-tt">
+    <div class="net-panel" id="tiktok-audiencia">
       <div class="card">
         <h2>👀 Espectadores y seguidores en TikTok</h2>
         <div id="audiencia-tiktok-resumen"><div class="leads-empty-state">Aún no conectado.</div></div>
@@ -1194,24 +1195,13 @@
     });
   });
 
-  // ---------- Posts: subtabs (Instagram / TikTok) ----------
-  document.querySelectorAll('#posts-subtabs .tab').forEach(function (tab) {
+  // ---------- TikTok: subtabs (Publicaciones / Audiencia) ----------
+  document.querySelectorAll('#tiktok-subtabs .tab').forEach(function (tab) {
     tab.addEventListener('click', function () {
-      document.querySelectorAll('#posts-subtabs .tab').forEach(function (t) { t.classList.remove('active'); });
-      document.querySelectorAll('#posts-ig, #posts-tt').forEach(function (p) { p.classList.remove('active'); });
+      document.querySelectorAll('#tiktok-subtabs .tab').forEach(function (t) { t.classList.remove('active'); });
+      document.querySelectorAll('#tiktok-posts, #tiktok-audiencia').forEach(function (p) { p.classList.remove('active'); });
       tab.classList.add('active');
-      var p = el('posts-' + tab.dataset.posts);
-      if (p) p.classList.add('active');
-    });
-  });
-
-  // ---------- Mi audiencia: subtabs (Instagram / TikTok) ----------
-  document.querySelectorAll('#audiencia-subtabs .tab').forEach(function (tab) {
-    tab.addEventListener('click', function () {
-      document.querySelectorAll('#audiencia-subtabs .tab').forEach(function (t) { t.classList.remove('active'); });
-      document.querySelectorAll('#audiencia-ig, #audiencia-tt').forEach(function (p) { p.classList.remove('active'); });
-      tab.classList.add('active');
-      var p = el('audiencia-' + tab.dataset.aud);
+      var p = el('tiktok-' + tab.dataset.tiktok);
       if (p) p.classList.add('active');
     });
   });

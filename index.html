@@ -1294,6 +1294,16 @@
     var set = {};
     set[DATA_MONTH] = true;
     if (typeof SEG !== 'undefined' && SEG && SEG.rows) SEG.rows.forEach(function (r) { if (r.mes) set[r.mes] = true; });
+    if (typeof SOCIAL !== 'undefined' && SOCIAL && SOCIAL.accounts) {
+      Object.keys(SOCIAL.accounts).forEach(function (k) {
+        var tt = SOCIAL.accounts[k].tiktok;
+        if (!tt) return;
+        if (tt.daily) tt.daily.forEach(function (r) { if (r.fecha) set[r.fecha.slice(0, 7)] = true; });
+        if (tt.contenido && tt.contenido.mes) set[tt.contenido.mes] = true;
+        if (tt.topPosts && tt.topPosts.mes) set[tt.topPosts.mes] = true;
+        if (tt.audiencia && tt.audiencia.mes) set[tt.audiencia.mes] = true;
+      });
+    }
     return set;
   }
   function hasSocialData(k) { return k === DATA_MONTH; }
@@ -1883,6 +1893,29 @@
         '</div></div></div></div>';
     }).join('') + '</div>';
   }
+  // ---- Filtro por mes para TikTok (cada marca puede tener sus datos en meses distintos) ----
+  function ttMonthRows(tt) {
+    if (!tt || !tt.daily || !tt.daily.length || typeof selectedMonth === 'undefined') return [];
+    return tt.daily.filter(function (r) { return r.fecha && r.fecha.slice(0, 7) === selectedMonth; });
+  }
+  function ttAvailableMonths(tt) {
+    var set = {};
+    if (tt && tt.daily) tt.daily.forEach(function (r) { if (r.fecha) set[r.fecha.slice(0, 7)] = true; });
+    if (tt && tt.contenido && tt.contenido.mes) set[tt.contenido.mes] = true;
+    if (tt && tt.topPosts && tt.topPosts.mes) set[tt.topPosts.mes] = true;
+    if (tt && tt.audiencia && tt.audiencia.mes) set[tt.audiencia.mes] = true;
+    return Object.keys(set).sort();
+  }
+  function ttEmptyMonthHtml(tt) {
+    var months = ttAvailableMonths(tt);
+    var other = months.length ? months[months.length - 1] : null;
+    return 'Sin datos de TikTok en ' + monthLabel(selectedMonth) + '.' +
+      (other ? '<br><br><button class="seg-jump-btn tt-jump-btn" type="button" data-mes="' + other + '">📅 Ver ' + monthLabel(other) + '</button>' : '');
+  }
+  function ttWireJumpBtn(container) {
+    var jb = container.querySelector('.tt-jump-btn');
+    if (jb) jb.addEventListener('click', function () { setMonth(this.getAttribute('data-mes')); });
+  }
   var TT_STAT_LABELS = [
     { k: 'visualizacionesVideos', label: 'Visualizaciones de videos' },
     { k: 'visualizacionesPerfil', label: 'Visualizaciones de perfil' },
@@ -1895,9 +1928,12 @@
     var contentEl = el('posts-tiktok-content'), trafficEl = el('posts-tiktok-traffic');
     var chartCard = el('tiktok-chart-card'), topCard = el('tiktok-top-card'), emptyEl = el('tiktok-posts-empty');
     var contentCard = el('tiktok-content-card'), trafficCard = el('tiktok-traffic-card');
-    var hasChart = !!(tt && tt.daily && tt.daily.length);
-    var hasTop = !!(tt && tt.topPosts);
-    var cont = (tt && tt.contenido) || null;
+
+    var dailyRows = ttMonthRows(tt);
+    var hasChart = dailyRows.length > 0;
+    var top = (tt && tt.topPosts && tt.topPosts.mes === selectedMonth) ? tt.topPosts : null;
+    var hasTop = !!top;
+    var cont = (tt && tt.contenido && tt.contenido.mes === selectedMonth) ? tt.contenido : null;
     var hasStats = !!(cont && cont.stats);
     var hasTraffic = !!(cont && cont.fuenteTrafico && cont.fuenteTrafico.length);
 
@@ -1925,9 +1961,9 @@
 
     if (chartCard) chartCard.style.display = hasChart ? '' : 'none';
     if (chartEl && hasChart) {
-      var totV = tt.daily.reduce(function (s, r) { return s + r.views; }, 0);
-      chartEl.innerHTML = tiktokChart(tt.daily) +
-        '<p class="vc-note" style="margin-top:6px;text-align:center">' + tt.daily.length + ' días cargados (' + fmtDiaMes(tt.daily[0].fecha) + ' – ' + fmtDiaMes(tt.daily[tt.daily.length - 1].fecha) + ') · ' + fmtNumCO(totV) + ' vistas en total. El punto marcado es tu mejor día.</p>';
+      var totV = dailyRows.reduce(function (s, r) { return s + r.views; }, 0);
+      chartEl.innerHTML = tiktokChart(dailyRows) +
+        '<p class="vc-note" style="margin-top:6px;text-align:center">' + dailyRows.length + ' días cargados (' + fmtDiaMes(dailyRows[0].fecha) + ' – ' + fmtDiaMes(dailyRows[dailyRows.length - 1].fecha) + ') · ' + fmtNumCO(totV) + ' vistas en total. El punto marcado es tu mejor día.</p>';
     }
 
     if (topCard) topCard.style.display = hasTop ? '' : 'none';
@@ -1936,9 +1972,9 @@
       var tabsHtml = '<div class="filter-row" id="posts-tiktok-top-tabs">' + TT_TOP_TABS.map(function (t) {
         return '<div class="tab' + (t.k === ttTopActiveTab ? ' active' : '') + '" data-tttab="' + t.k + '">' + t.icon + ' ' + t.label + '</div>';
       }).join('') + '</div>';
-      var upd = tt.topPosts.updatedAt ? new Date(tt.topPosts.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-      topEl.innerHTML = tabsHtml + ttTopPostsCards(tt.topPosts[active.field], active) +
-        (tt.topPosts.ventana ? '<p class="vc-note" style="margin-top:12px">' + tt.topPosts.ventana + (upd ? ' · actualizado ' + upd : '') + '</p>' : '');
+      var upd = top.updatedAt ? new Date(top.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+      topEl.innerHTML = tabsHtml + ttTopPostsCards(top[active.field], active) +
+        (top.ventana ? '<p class="vc-note" style="margin-top:12px">' + top.ventana + (upd ? ' · actualizado ' + upd : '') + '</p>' : '');
       topEl.querySelectorAll('#posts-tiktok-top-tabs .tab').forEach(function (tb) {
         tb.addEventListener('click', function () {
           ttTopActiveTab = tb.getAttribute('data-tttab');
@@ -1947,13 +1983,18 @@
       });
     }
 
-    if (emptyEl) emptyEl.style.display = (!hasChart && !hasTop && !hasStats && !hasTraffic) ? '' : 'none';
+    if (emptyEl) {
+      var anyPosts = hasChart || hasTop || hasStats || hasTraffic;
+      emptyEl.style.display = anyPosts ? 'none' : '';
+      if (!anyPosts) { emptyEl.innerHTML = ttEmptyMonthHtml(tt); ttWireJumpBtn(emptyEl); }
+    }
   }
 
   // -------- Mi audiencia → TikTok --------
   function fmtPctSigned(n) { return (n == null || !isFinite(n)) ? '—' : '+' + (Math.round(n * 10) / 10).toLocaleString('es-CO') + '%'; }
   function renderTikTokAudiencia(tt) {
-    var aud = (tt && tt.audiencia) || null;
+    var audRaw = (tt && tt.audiencia) || null;
+    var aud = (audRaw && audRaw.mes === selectedMonth) ? audRaw : null;
     var resumenEl = el('audiencia-tiktok-resumen'), genderEl = el('audiencia-tiktok-gender'),
       ageEl = el('audiencia-tiktok-age'), bestEl = el('audiencia-tiktok-besttime');
     var resumenCard = el('tiktok-resumen-card'), genderCard = el('tiktok-gender-card'),
@@ -1964,7 +2005,7 @@
       if (genderCard) genderCard.style.display = 'none';
       if (ageCard) ageCard.style.display = 'none';
       if (bestCard) bestCard.style.display = 'none';
-      if (emptyEl) emptyEl.style.display = '';
+      if (emptyEl) { emptyEl.style.display = ''; emptyEl.innerHTML = ttEmptyMonthHtml(tt); ttWireJumpBtn(emptyEl); }
       return;
     }
     if (emptyEl) emptyEl.style.display = 'none';
@@ -2233,7 +2274,7 @@
 
   fetch('data/social.json', { cache: 'no-store' })
     .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (data) { if (data && data.accounts) { SOCIAL = data; renderSocial(currentAccount()); } })
+    .then(function (data) { if (data && data.accounts) { SOCIAL = data; buildMonthOptions(); renderSocial(currentAccount()); } })
     .catch(function () { /* sin archivo: se quedan los estados vacíos */ });
 
   // ---------- Seguimiento de contenidos (data/seguimiento.json, generado del Excel) ----------

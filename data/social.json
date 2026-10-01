@@ -598,7 +598,8 @@
               "Sonido",
               0
             ]
-          ]
+          ],
+          "mes": "2026-09"
         },
         "topPosts": {
           "updatedAt": "2026-10-01",
@@ -682,7 +683,8 @@
               "totalViews": 220000,
               "fechaRelativa": "28 ago 2025"
             }
-          ]
+          ],
+          "mes": "2026-09"
         },
         "audiencia": {
           "updatedAt": "2026-10-01",
@@ -739,7 +741,8 @@
             "horaHasta": "14:00",
             "ventana": "Últimos 7 días",
             "nota": "En los últimos 7 días, tus espectadores estuvieron más activos el 29 sep entre la 1pm y las 2pm."
-          }
+          },
+          "mes": "2026-09"
         }
       }
     },
@@ -1016,7 +1019,8 @@
               "totalViews": 616,
               "fechaRelativa": "hace 1 sem"
             }
-          ]
+          ],
+          "mes": "2026-09"
         },
         "audiencia": {
           "updatedAt": "2026-10-01",
@@ -1082,7 +1086,8 @@
             "nota": "Durante los últimos 7 días, la mayoría de tus seguidores estuvieron activos el 30 de septiembre a las 6pm.",
             "ventana": "Últimos 7 días"
           },
-          "periodo": "Septiembre 2026"
+          "periodo": "Septiembre 2026",
+          "mes": "2026-09"
         }
       }
     }

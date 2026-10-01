@@ -12,9 +12,11 @@ El cronograma de contenidos (parrilla) se lleva aparte, en Excel.
 
 En la barra superior se elige la **marca** y el **mes**. Hoy los datos de Instagram/Facebook cargados corresponden
 a **agosto 2026** (`data/social.json` → campo `month`). Los meses sin datos aparecen en el selector marcados como
-"sin datos" y las tarjetas muestran un aviso. **TikTok** es la excepción: es una pestaña más en Inicio (Todo /
-Instagram / Facebook / TikTok) pero con su propia serie diaria — no depende del mes de Instagram/Facebook, así
-que puede tener datos en un mes distinto (hoy, septiembre 2026 para Proviser; Nass aún sin conectar).
+"sin datos" y las tarjetas muestran un aviso. **TikTok no vive en Inicio**: sus datos aparecen en
+**Posts** (mejores publicaciones + vistas por día) y **Mi audiencia** (espectadores/seguidores, sexo, edad,
+momentos de mayor actividad), con sus propias ventanas (60 días, 7 días, todo el tiempo) — no dependen del mes
+elegido arriba. Hoy: Nass con publicaciones top + audiencia; Proviser con la serie diaria de vistas (falta aún
+sus publicaciones top y su audiencia).
 
 Estas herramientas funcionan sin conexión de datos (todo se procesa en el navegador):
 
@@ -30,8 +32,8 @@ Estas herramientas funcionan sin conexión de datos (todo se procesa en el naveg
 | `data/pautas.json` | Estado de las pautas de Meta que muestra **Pautas → Cómo van ahora**. Se genera desde el informe de Meta y se versiona en el repo (persiste entre visitas). |
 | `scripts/gen-pautas.js` | Convierte un informe de campañas de Meta (`.xlsx` o `.csv`) en `data/pautas.json`. |
 | `data/metas.json` | Metas de pauta + glosario en lenguaje sencillo (los 4 números, semáforo, seguimiento mensual, recomendaciones). Alimenta **Pautas → Metas y qué significa cada número**. Se edita a mano desde el documento de metas. |
-| `data/social.json` | Datos de Instagram + Facebook (Metricool) que alimentan **Inicio, Posts, Mi audiencia, Competencia**. Transcrito de los informes PDF de Metricool. También guarda, por marca, `tiktok.daily` (serie diaria de TikTok: vistas, visitas al perfil, me gusta, comentarios, compartidos). |
-| `scripts/gen-tiktok.js` | Convierte el export "Overview.xlsx" de TikTok (serie diaria) y lo mete en `data/social.json` → `accounts.<marca>.tiktok.daily`. Uso: `node scripts/gen-tiktok.js "ruta/Overview.xlsx" proviser` (o `nass`). Los días del archivo reemplazan esos mismos días; el resto se conserva. |
+| `data/social.json` | Datos de Instagram + Facebook (Metricool) que alimentan **Inicio, Posts, Mi audiencia, Competencia**. Transcrito de los informes PDF de Metricool. También guarda, por marca, el nodo `tiktok`: `daily` (serie diaria: vistas, visitas al perfil, me gusta, comentarios, compartidos — de "Overview.xlsx"), `topPosts` (mejores publicaciones por visualizaciones / nuevos espectadores / me gusta / nuevos seguidores) y `audiencia` (espectadores, seguidores, sexo, edad, momentos de mayor actividad) — estos dos últimos transcritos a mano de las capturas de TikTok Business Suite. |
+| `scripts/gen-tiktok.js` | Convierte el export "Overview.xlsx" de TikTok (serie diaria) y lo mete en `data/social.json` → `accounts.<marca>.tiktok.daily`. Uso: `node scripts/gen-tiktok.js "ruta/Overview.xlsx" proviser` (o `nass`). Los días del archivo reemplazan esos mismos días; el resto se conserva. `topPosts` y `audiencia` no tienen script — se transcriben a mano de las capturas de TikTok Business Suite. |
 | `data/seguimiento.json` | Lista de piezas de la parrilla (una fila por contenido, con mes/semana/marca/formato). La usa **Posts → Seguimiento de contenidos**. Los checks de avance NO están aquí: viven en el navegador. |
 | `scripts/gen-seguimiento.js` | Convierte `ProviserXNass.xlsx` (todas las hojas visibles, una por mes) en `data/seguimiento.json`. Uso: `node scripts/gen-seguimiento.js "ruta/ProviserXNass.xlsx"`. |
 | `data/live-metrics.json` | Datos de Meta Ads por marca. Vacío hasta conectar. Lo reescribe el flujo de Actions. |

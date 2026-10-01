@@ -736,9 +736,155 @@
         }
       },
       "tiktok": {
-        "source": "TikTok — pendiente de conectar",
-        "updatedAt": null,
-        "daily": []
+        "source": "TikTok Business Suite (capturas)",
+        "updatedAt": "2026-10-01",
+        "daily": [],
+        "topPosts": {
+          "updatedAt": "2026-10-01",
+          "ventana": "Últimos 60 días",
+          "porVisualizaciones": [
+            {
+              "titulo": "En NASS integramos tecnología, monitoreo y respaldo para que tu...",
+              "valor": 3600,
+              "totalViews": 3600,
+              "fechaRelativa": "hace 4 d"
+            },
+            {
+              "titulo": "Solicita tu cotización #SeguridadElectrónica #Monitoreo...",
+              "valor": 2200,
+              "totalViews": 2200,
+              "fechaRelativa": "hace 1 sem"
+            },
+            {
+              "titulo": "En NASS analizamos tu espacio para diseñar una solución que realmente...",
+              "valor": 669,
+              "totalViews": 670,
+              "fechaRelativa": "hace 1 sem"
+            }
+          ],
+          "porNuevosEspectadores": [
+            {
+              "titulo": "En NASS integramos tecnología, monitoreo y respaldo para que tu...",
+              "valor": 2500,
+              "totalViews": 3600,
+              "fechaRelativa": "hace 4 d"
+            },
+            {
+              "titulo": "Solicita tu cotización #SeguridadElectrónica #Monitoreo...",
+              "valor": 1400,
+              "totalViews": 2200,
+              "fechaRelativa": "hace 1 sem"
+            },
+            {
+              "titulo": "Tener más cámaras no siempre equivale a estar mejor protegido. A...",
+              "valor": 488,
+              "totalViews": 616,
+              "fechaRelativa": "hace 1 sem"
+            }
+          ],
+          "porMeGusta": [
+            {
+              "titulo": "Tener más cámaras no siempre equivale a estar mejor protegido. A...",
+              "valor": 98,
+              "totalViews": 616,
+              "fechaRelativa": "hace 1 sem"
+            },
+            {
+              "titulo": "En NASS integramos tecnología, monitoreo y respaldo para que tu...",
+              "valor": 83,
+              "totalViews": 3600,
+              "fechaRelativa": "hace 4 d"
+            },
+            {
+              "titulo": "Solicita tu cotización #SeguridadElectrónica #Monitoreo...",
+              "valor": 55,
+              "totalViews": 2200,
+              "fechaRelativa": "hace 1 sem"
+            }
+          ],
+          "porNuevosSeguidores": [
+            {
+              "titulo": "En NASS integramos tecnología, monitoreo y respaldo para que tu...",
+              "valor": 89,
+              "totalViews": 3600,
+              "fechaRelativa": "hace 4 d"
+            },
+            {
+              "titulo": "Solicita tu cotización #SeguridadElectrónica #Monitoreo...",
+              "valor": 38,
+              "totalViews": 2200,
+              "fechaRelativa": "hace 1 sem"
+            },
+            {
+              "titulo": "Tener más cámaras no siempre equivale a estar mejor protegido. A...",
+              "valor": 9,
+              "totalViews": 616,
+              "fechaRelativa": "hace 1 sem"
+            }
+          ]
+        },
+        "audiencia": {
+          "updatedAt": "2026-10-01",
+          "espectadores": {
+            "total": 3900,
+            "nuevos": 3900,
+            "crecimientoPct": 35418.18,
+            "ventana": "Últimos 60 días",
+            "nota": "Crecimiento explosivo desde el 24 de septiembre — antes era casi plano."
+          },
+          "seguidores": {
+            "total": 159,
+            "netos": 134,
+            "ventana": "Septiembre 2026 (todo el tiempo: 159)"
+          },
+          "sexo": [
+            [
+              "Hombres",
+              86
+            ],
+            [
+              "Mujeres",
+              14
+            ],
+            [
+              "Otro",
+              0
+            ]
+          ],
+          "edad": [
+            [
+              "18-24",
+              11.5
+            ],
+            [
+              "25-34",
+              23.7
+            ],
+            [
+              "35-44",
+              33.5
+            ],
+            [
+              "45-54",
+              14.5
+            ],
+            [
+              "55+",
+              16.8
+            ]
+          ],
+          "actividadEspectadores": {
+            "dia": "29 de septiembre",
+            "horaDesde": "17:00",
+            "horaHasta": "18:00",
+            "nota": "En los últimos 7 días, tus espectadores estuvieron más activos el 29 sep entre las 5pm y las 6pm."
+          },
+          "actividadSeguidores": {
+            "dia": "30 de septiembre",
+            "hora": "18:00",
+            "nota": "Durante los últimos 7 días, la mayoría de tus seguidores estuvieron activos el 30 de septiembre a las 6pm."
+          }
+        }
       }
     }
   }

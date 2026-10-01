@@ -941,34 +941,37 @@
     </div>
 
     <div class="net-panel active" id="tiktok-posts">
-      <div class="card">
+      <div class="card" id="tiktok-top-card">
         <h2>🏆 Tus mejores publicaciones en TikTok</h2>
         <div id="posts-tiktok-top"><div class="leads-empty-state">Aún no conectado.</div></div>
       </div>
 
-      <div class="card">
+      <div class="card" id="tiktok-chart-card">
         <h2>📈 Vistas por día en TikTok</h2>
         <div id="posts-tiktok-chart"><div class="leads-empty-state">Aún no conectado.</div></div>
       </div>
+
+      <div class="leads-empty-state" id="tiktok-posts-empty" style="display:none">Aún no has cargado datos de publicaciones de TikTok para esta marca.</div>
     </div>
 
     <div class="net-panel" id="tiktok-audiencia">
-      <div class="card">
+      <div class="card" id="tiktok-resumen-card">
         <h2>👀 Espectadores y seguidores en TikTok</h2>
         <div id="audiencia-tiktok-resumen"><div class="leads-empty-state">Aún no conectado.</div></div>
       </div>
-      <div class="card">
+      <div class="card" id="tiktok-gender-card">
         <h2>⚥ Sexo (TikTok)</h2>
         <div id="audiencia-tiktok-gender"><div class="leads-empty-state">Aún no conectado.</div></div>
       </div>
-      <div class="card">
+      <div class="card" id="tiktok-age-card">
         <h2>🎂 Rango de edad (TikTok)</h2>
         <div id="audiencia-tiktok-age"><div class="leads-empty-state">Aún no conectado.</div></div>
       </div>
-      <div class="card">
+      <div class="card" id="tiktok-besttime-card">
         <h2>⏰ Cuándo está más activa tu audiencia en TikTok</h2>
         <div id="audiencia-tiktok-besttime"><div class="leads-empty-state">Aún no conectado.</div></div>
       </div>
+      <div class="leads-empty-state" id="tiktok-audiencia-empty" style="display:none">Aún no has cargado datos de audiencia de TikTok para esta marca.</div>
     </div>
   </section>
 
@@ -1867,34 +1870,35 @@
   }
   function renderTikTokPosts(tt) {
     var chartEl = el('posts-tiktok-chart'), topEl = el('posts-tiktok-top');
-    if (chartEl) {
-      if (tt && tt.daily && tt.daily.length) {
-        var totV = tt.daily.reduce(function (s, r) { return s + r.views; }, 0);
-        chartEl.innerHTML = tiktokChart(tt.daily) +
-          '<p class="vc-note" style="margin-top:6px;text-align:center">' + tt.daily.length + ' días cargados (' + fmtDiaMes(tt.daily[0].fecha) + ' – ' + fmtDiaMes(tt.daily[tt.daily.length - 1].fecha) + ') · ' + fmtNumCO(totV) + ' vistas en total. El punto marcado es tu mejor día.</p>';
-      } else {
-        chartEl.innerHTML = '<div class="leads-empty-state">Aún no has cargado la serie diaria de TikTok para esta marca (export "Overview.xlsx").</div>';
-      }
+    var chartCard = el('tiktok-chart-card'), topCard = el('tiktok-top-card'), emptyEl = el('tiktok-posts-empty');
+    var hasChart = !!(tt && tt.daily && tt.daily.length);
+    var hasTop = !!(tt && tt.topPosts);
+
+    if (chartCard) chartCard.style.display = hasChart ? '' : 'none';
+    if (chartEl && hasChart) {
+      var totV = tt.daily.reduce(function (s, r) { return s + r.views; }, 0);
+      chartEl.innerHTML = tiktokChart(tt.daily) +
+        '<p class="vc-note" style="margin-top:6px;text-align:center">' + tt.daily.length + ' días cargados (' + fmtDiaMes(tt.daily[0].fecha) + ' – ' + fmtDiaMes(tt.daily[tt.daily.length - 1].fecha) + ') · ' + fmtNumCO(totV) + ' vistas en total. El punto marcado es tu mejor día.</p>';
     }
-    if (topEl) {
-      if (!tt || !tt.topPosts) {
-        topEl.innerHTML = '<div class="leads-empty-state">Aún no has cargado las publicaciones de TikTok para esta marca.</div>';
-      } else {
-        var active = TT_TOP_TABS.filter(function (t) { return t.k === ttTopActiveTab; })[0] || TT_TOP_TABS[0];
-        var tabsHtml = '<div class="filter-row" id="posts-tiktok-top-tabs">' + TT_TOP_TABS.map(function (t) {
-          return '<div class="tab' + (t.k === ttTopActiveTab ? ' active' : '') + '" data-tttab="' + t.k + '">' + t.icon + ' ' + t.label + '</div>';
-        }).join('') + '</div>';
-        var upd = tt.topPosts.updatedAt ? new Date(tt.topPosts.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-        topEl.innerHTML = tabsHtml + ttTopPostsCards(tt.topPosts[active.field], active) +
-          (tt.topPosts.ventana ? '<p class="vc-note" style="margin-top:12px">' + tt.topPosts.ventana + (upd ? ' · actualizado ' + upd : '') + '</p>' : '');
-        topEl.querySelectorAll('#posts-tiktok-top-tabs .tab').forEach(function (tb) {
-          tb.addEventListener('click', function () {
-            ttTopActiveTab = tb.getAttribute('data-tttab');
-            renderTikTokPosts(tt);
-          });
+
+    if (topCard) topCard.style.display = hasTop ? '' : 'none';
+    if (topEl && hasTop) {
+      var active = TT_TOP_TABS.filter(function (t) { return t.k === ttTopActiveTab; })[0] || TT_TOP_TABS[0];
+      var tabsHtml = '<div class="filter-row" id="posts-tiktok-top-tabs">' + TT_TOP_TABS.map(function (t) {
+        return '<div class="tab' + (t.k === ttTopActiveTab ? ' active' : '') + '" data-tttab="' + t.k + '">' + t.icon + ' ' + t.label + '</div>';
+      }).join('') + '</div>';
+      var upd = tt.topPosts.updatedAt ? new Date(tt.topPosts.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+      topEl.innerHTML = tabsHtml + ttTopPostsCards(tt.topPosts[active.field], active) +
+        (tt.topPosts.ventana ? '<p class="vc-note" style="margin-top:12px">' + tt.topPosts.ventana + (upd ? ' · actualizado ' + upd : '') + '</p>' : '');
+      topEl.querySelectorAll('#posts-tiktok-top-tabs .tab').forEach(function (tb) {
+        tb.addEventListener('click', function () {
+          ttTopActiveTab = tb.getAttribute('data-tttab');
+          renderTikTokPosts(tt);
         });
-      }
+      });
     }
+
+    if (emptyEl) emptyEl.style.display = (!hasChart && !hasTop) ? '' : 'none';
   }
 
   // -------- Mi audiencia → TikTok --------
@@ -1903,16 +1907,23 @@
     var aud = (tt && tt.audiencia) || null;
     var resumenEl = el('audiencia-tiktok-resumen'), genderEl = el('audiencia-tiktok-gender'),
       ageEl = el('audiencia-tiktok-age'), bestEl = el('audiencia-tiktok-besttime');
+    var resumenCard = el('tiktok-resumen-card'), genderCard = el('tiktok-gender-card'),
+      ageCard = el('tiktok-age-card'), bestCard = el('tiktok-besttime-card'), emptyEl = el('tiktok-audiencia-empty');
+
     if (!aud) {
-      var msg = '<div class="leads-empty-state">Aún no has cargado la audiencia de TikTok para esta marca.</div>';
-      if (resumenEl) resumenEl.innerHTML = msg;
-      if (genderEl) genderEl.innerHTML = msg;
-      if (ageEl) ageEl.innerHTML = msg;
-      if (bestEl) bestEl.innerHTML = msg;
+      if (resumenCard) resumenCard.style.display = 'none';
+      if (genderCard) genderCard.style.display = 'none';
+      if (ageCard) ageCard.style.display = 'none';
+      if (bestCard) bestCard.style.display = 'none';
+      if (emptyEl) emptyEl.style.display = '';
       return;
     }
-    if (resumenEl) {
-      var esp = aud.espectadores || {}, seg = aud.seguidores || {};
+    if (emptyEl) emptyEl.style.display = 'none';
+
+    var esp = aud.espectadores || {}, seg = aud.seguidores || {};
+    var hasResumen = !!(aud.espectadores || aud.seguidores);
+    if (resumenCard) resumenCard.style.display = hasResumen ? '' : 'none';
+    if (resumenEl && hasResumen) {
       var card = function (n, label, delta) {
         return '<div class="tt-stat-card"><div class="net-followers">' + fmtNumCO(n) + '</div><div class="net-label">' + label + '</div>' +
           (delta != null ? '<span class="net-delta">' + fmtPctSigned(delta) + '</span>' : '') + '</div>';
@@ -1926,21 +1937,28 @@
         '</div>' +
         (esp.nota ? '<p class="vc-note" style="margin-top:12px">📈 ' + esp.nota + (esp.ventana ? ' <span style="color:var(--ink-faint)">(' + esp.ventana + ')</span>' : '') + '</p>' : '');
     }
-    if (genderEl) {
-      if (aud.sexo && aud.sexo.length) {
-        var palSex = ['#1f7fc4', '#5fa8dc', '#aedeea'];
-        var segs = aud.sexo.map(function (r, i) { return { label: r[0], value: r[1], color: palSex[i % palSex.length], sub: r[1] + '%' }; });
-        var top = aud.sexo.slice().sort(function (a, b) { return b[1] - a[1]; })[0];
-        genderEl.innerHTML = pautaDonut(segs, top[1] + '%', top[0].toLowerCase());
-      } else genderEl.innerHTML = '<div class="leads-empty-state">Sin datos.</div>';
+
+    var hasGender = !!(aud.sexo && aud.sexo.length);
+    if (genderCard) genderCard.style.display = hasGender ? '' : 'none';
+    if (genderEl && hasGender) {
+      var palSex = ['#1f7fc4', '#5fa8dc', '#aedeea'];
+      var segs = aud.sexo.map(function (r, i) { return { label: r[0], value: r[1], color: palSex[i % palSex.length], sub: r[1] + '%' }; });
+      var top = aud.sexo.slice().sort(function (a, b) { return b[1] - a[1]; })[0];
+      genderEl.innerHTML = pautaDonut(segs, top[1] + '%', top[0].toLowerCase());
     }
-    if (ageEl) ageEl.innerHTML = (aud.edad && aud.edad.length) ? socBars(aud.edad.map(function (r) { return [r[0] + ' años', r[1]]; }), '%') : '<div class="leads-empty-state">Sin datos.</div>';
-    if (bestEl) {
-      var ae = aud.actividadEspectadores || {}, as = aud.actividadSeguidores || {};
+
+    var hasAge = !!(aud.edad && aud.edad.length);
+    if (ageCard) ageCard.style.display = hasAge ? '' : 'none';
+    if (ageEl && hasAge) ageEl.innerHTML = socBars(aud.edad.map(function (r) { return [r[0] + ' años', r[1]]; }), '%');
+
+    var ae = aud.actividadEspectadores || {}, as = aud.actividadSeguidores || {};
+    var hasActivity = !!(ae.dia || as.dia);
+    if (bestCard) bestCard.style.display = hasActivity ? '' : 'none';
+    if (bestEl && hasActivity) {
       var cards = '';
       if (ae.dia) cards += '<div class="tt-activity-card"><span class="ta-icon">👀</span><div class="ta-time">' + ae.dia + (ae.horaDesde ? ' · ' + ae.horaDesde + '–' + ae.horaHasta : '') + '</div><div class="ta-label">Pico de espectadores' + (ae.ventana ? ' · ' + ae.ventana : '') + '</div><div class="ta-note">' + (ae.nota || '') + '</div></div>';
       if (as.dia) cards += '<div class="tt-activity-card"><span class="ta-icon">⭐</span><div class="ta-time">' + as.dia + (as.hora ? ' · ' + as.hora : '') + '</div><div class="ta-label">Pico de seguidores' + (as.ventana ? ' · ' + as.ventana : '') + '</div><div class="ta-note">' + (as.nota || '') + '</div></div>';
-      bestEl.innerHTML = cards ? '<div class="tt-activity-grid">' + cards + '</div>' : '<div class="leads-empty-state">Sin datos.</div>';
+      bestEl.innerHTML = '<div class="tt-activity-grid">' + cards + '</div>';
     }
   }
 

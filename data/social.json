@@ -741,7 +741,7 @@
         "daily": [],
         "topPosts": {
           "updatedAt": "2026-10-01",
-          "ventana": "Últimos 60 días",
+          "ventana": "Visualizaciones de los últimos 60 días",
           "porVisualizaciones": [
             {
               "titulo": "En NASS integramos tecnología, monitoreo y respaldo para que tu...",
@@ -829,13 +829,13 @@
             "total": 3900,
             "nuevos": 3900,
             "crecimientoPct": 35418.18,
-            "ventana": "Últimos 60 días",
+            "ventana": "Ventana de 60 días (2 ago – 30 sep); el crecimiento fue casi todo de septiembre",
             "nota": "Crecimiento explosivo desde el 24 de septiembre — antes era casi plano."
           },
           "seguidores": {
             "total": 159,
             "netos": 134,
-            "ventana": "Septiembre 2026 (todo el tiempo: 159)"
+            "ventana": "Septiembre 2026"
           },
           "sexo": [
             [
@@ -877,13 +877,16 @@
             "dia": "29 de septiembre",
             "horaDesde": "17:00",
             "horaHasta": "18:00",
-            "nota": "En los últimos 7 días, tus espectadores estuvieron más activos el 29 sep entre las 5pm y las 6pm."
+            "nota": "En los últimos 7 días, tus espectadores estuvieron más activos el 29 sep entre las 5pm y las 6pm.",
+            "ventana": "Últimos 7 días"
           },
           "actividadSeguidores": {
             "dia": "30 de septiembre",
             "hora": "18:00",
-            "nota": "Durante los últimos 7 días, la mayoría de tus seguidores estuvieron activos el 30 de septiembre a las 6pm."
-          }
+            "nota": "Durante los últimos 7 días, la mayoría de tus seguidores estuvieron activos el 30 de septiembre a las 6pm.",
+            "ventana": "Últimos 7 días"
+          },
+          "periodo": "Septiembre 2026"
         }
       }
     }

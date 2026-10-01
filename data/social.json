@@ -882,17 +882,18 @@
         ]
       },
       "facebook": {
-        "followers": 3599,
-        "followersDelta": 2,
-        "acquired": 5,
+        "month": "2026-09",
+        "followers": 3597,
+        "followersDelta": 3,
+        "acquired": 6,
         "lost": 3,
-        "views": 42780,
-        "pageVisits": 140,
-        "postsInPeriod": 2,
+        "views": 60400,
+        "pageVisits": 197,
+        "postsInPeriod": 7,
         "cities": [
           [
             "Cali",
-            58.57
+            58.6
           ],
           [
             "Bogotá",
@@ -900,34 +901,34 @@
           ],
           [
             "Jamundí",
-            2.05
-          ],
-          [
-            "Yumbo",
-            1.19
+            2
           ],
           [
             "Candelaria",
-            1.19
+            1.28
+          ],
+          [
+            "Yumbo",
+            1.17
           ]
         ],
         "content": {
           "posts": {
-            "count": 1,
-            "engagement": 111.11,
-            "interactions": 2,
-            "avgReach": 18,
-            "views": 25
+            "count": 3,
+            "engagement": 86.96,
+            "interactions": 4,
+            "avgReach": 15,
+            "views": 86,
+            "reactions": 2,
+            "shares": 2
           },
           "reels": {
-            "count": 1,
-            "interactions": 3,
-            "videoViews": 298,
-            "likes": 2,
-            "actions": 1
+            "count": 3,
+            "interactions": 4,
+            "videoViews": 360
           },
           "stories": {
-            "count": 0
+            "count": 1
           }
         }
       },

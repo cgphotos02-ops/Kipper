@@ -1035,7 +1035,8 @@
           "seguidores": {
             "total": 159,
             "netos": 134,
-            "ventana": "Septiembre 2026"
+            "ventana": "Septiembre 2026",
+            "netosDeltaPct": 13300
           },
           "sexo": [
             [
@@ -1054,23 +1055,19 @@
           "edad": [
             [
               "18-24",
-              11.5
+              10.2
             ],
             [
               "25-34",
-              23.7
+              31.1
             ],
             [
               "35-44",
-              33.5
+              30.6
             ],
             [
               "45-54",
-              14.5
-            ],
-            [
-              "55+",
-              16.8
+              18.9
             ]
           ],
           "actividadEspectadores": {
@@ -1088,6 +1085,61 @@
           },
           "periodo": "Septiembre 2026",
           "mes": "2026-09"
+        },
+        "contenido": {
+          "updatedAt": "2026-10-01",
+          "periodo": "Septiembre 2026",
+          "mes": "2026-09",
+          "ventana": "Últimos 60 días",
+          "stats": {
+            "visualizacionesVideos": {
+              "total": 6100,
+              "delta": 6100,
+              "deltaPct": 55572.7
+            },
+            "visualizacionesPerfil": {
+              "total": 33,
+              "delta": 33,
+              "deltaPct": null
+            },
+            "meGusta": {
+              "total": 262,
+              "delta": 262,
+              "deltaPct": null
+            },
+            "comentarios": {
+              "total": 0,
+              "delta": 0,
+              "deltaPct": null
+            },
+            "compartidos": {
+              "total": 2,
+              "delta": 2,
+              "deltaPct": null
+            }
+          },
+          "fuenteTrafico": [
+            [
+              "Para ti",
+              93
+            ],
+            [
+              "Perfil personal",
+              5.4
+            ],
+            [
+              "Siguiendo",
+              1.3
+            ],
+            [
+              "Buscar",
+              0.3
+            ],
+            [
+              "Sonido",
+              0
+            ]
+          ]
         }
       }
     }

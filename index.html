@@ -125,7 +125,7 @@
   h1.greeting { font-size: 26px; margin: 0 0 2px; letter-spacing: -0.01em; }
   .date-sub { color: var(--ink-muted); font-size: 13.5px; margin-bottom: 20px; }
 
-  .tabs { display: flex; gap: 6px; margin-bottom: 20px; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
   .tab {
     padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
     border: 1px solid var(--border); background: var(--surface); color: var(--ink-muted); cursor: pointer;
@@ -173,6 +173,7 @@
   }
   .net-icon.ig { background: linear-gradient(135deg,#29abc7,#1c7d94); }
   .net-icon.tt { background: linear-gradient(135deg,#1f7fc4,#14568a); }
+  .net-icon.tiktok { background: linear-gradient(135deg,#0a0a0a,#262626); box-shadow: inset 0 0 0 1.5px #fe2c55; }
   .net-followers { font-size: 20px; font-weight: 800; }
   .net-label { font-size: 11.5px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; }
   .net-delta { font-size: 11px; font-weight: 700; color: var(--good-ink); background: var(--good-soft); border-radius: 6px; padding: 1px 6px; display: inline-block; margin-top: 3px; }
@@ -804,6 +805,7 @@
       <div class="tab active" data-network="todo">Todo</div>
       <div class="tab" data-network="ig">Instagram</div>
       <div class="tab" data-network="fb">Facebook</div>
+      <div class="tab" data-network="tt">TikTok</div>
     </div>
 
     <div class="card">
@@ -826,10 +828,14 @@
           <div class="leads-empty-state" id="home-fb-stats" style="text-align:left;padding:6px 0">Sin página de Facebook conectada.</div>
         </div>
       </div>
+      <div class="card" id="home-tiktok-card" style="display:none;grid-column:1 / -1">
+        <h2>🎵 TikTok — vistas por día</h2>
+        <div class="leads-empty-state" id="home-tiktok-chart">Aún no conectado.</div>
+      </div>
     </div>
 
     <div class="card">
-      <h2>⏰ Mejor hora para publicar</h2>
+      <h2 id="home-besttime-title">⏰ Mejor hora para publicar</h2>
       <div class="leads-empty-state" id="home-besttime">Aún no conectado. Se calcula con la actividad real de tus seguidores.</div>
     </div>
   </section>
@@ -1155,20 +1161,22 @@
     chip.addEventListener('click', function () { chip.classList.toggle('selected'); });
   });
 
-  // ---------- Inicio: filtro Todo / Instagram / Facebook ----------
+  // ---------- Inicio: filtro Todo / Instagram / Facebook / TikTok ----------
   var socialNet = 'todo';
   document.querySelectorAll('#home-network-tabs .tab').forEach(function (tabEl) {
     tabEl.addEventListener('click', function () {
       document.querySelectorAll('#home-network-tabs .tab').forEach(function (t) { t.classList.remove('active'); });
       tabEl.classList.add('active');
       socialNet = tabEl.getAttribute('data-network');
-      var igCard = el('home-ig-card'), fbCard = el('home-fb-card');
+      var igCard = el('home-ig-card'), fbCard = el('home-fb-card'), ttCard = el('home-tiktok-card');
       if (igCard && fbCard) {
-        igCard.style.display = (socialNet === 'fb') ? 'none' : '';
-        fbCard.style.display = (socialNet === 'ig') ? 'none' : '';
+        igCard.style.display = (socialNet === 'fb' || socialNet === 'tt') ? 'none' : '';
+        fbCard.style.display = (socialNet === 'ig' || socialNet === 'tt') ? 'none' : '';
         igCard.style.gridColumn = (socialNet === 'ig') ? '1 / -1' : '';
         fbCard.style.gridColumn = (socialNet === 'fb') ? '1 / -1' : '';
       }
+      if (ttCard) ttCard.style.display = (socialNet === 'tt') ? '' : 'none';
+      setText('home-besttime-title', socialNet === 'tt' ? '📈 Tu mejor día en TikTok' : '⏰ Mejor hora para publicar');
       renderSocial(currentAccount());
     });
   });
@@ -1741,22 +1749,107 @@
     'audiencia-marzo-kpis', 'audiencia-gender', 'audiencia-age', 'audiencia-places', 'audiencia-besttime',
     'referentes-competencia', 'referentes-share'];
 
+  // ---------- TikTok (serie diaria: data/social.json → accounts.<marca>.tiktok.daily) ----------
+  function fmtDiaMes(iso) {
+    if (!iso) return '—';
+    var d = new Date(iso + 'T00:00:00');
+    if (isNaN(d)) return iso;
+    var s = d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long' });
+    return s;
+  }
+  // Gráfica de área simple para muchos puntos (sin etiqueta por punto; pica el mejor día)
+  function tiktokChart(rows) {
+    var w = 560, h = 170, padX = 18, padT = 18, padB = 22;
+    var vals = rows.map(function (r) { return r.views; });
+    var mx = Math.max.apply(null, vals.concat([1]));
+    var sx = rows.length > 1 ? (w - padX * 2) / (rows.length - 1) : 0;
+    var sy = function (v) { return h - padB - (v / mx) * (h - padT - padB); };
+    var pts = rows.map(function (r, i) { return [padX + i * sx, sy(r.views)]; });
+    var d = pts.map(function (c, i) { return (i ? 'L' : 'M') + c[0].toFixed(1) + ',' + c[1].toFixed(1); }).join(' ');
+    var area = d + ' L' + pts[pts.length - 1][0].toFixed(1) + ',' + (h - padB) + ' L' + pts[0][0].toFixed(1) + ',' + (h - padB) + ' Z';
+    var maxI = vals.indexOf(mx);
+    var step = Math.max(1, Math.round(rows.length / 6));
+    var ticks = pts.map(function (c, i) {
+      if (i % step !== 0 && i !== pts.length - 1) return '';
+      return '<text x="' + c[0].toFixed(1) + '" y="' + (h - 5) + '" text-anchor="middle" font-size="9" fill="var(--ink-faint)">' + (+rows[i].fecha.slice(8, 10)) + '</text>';
+    }).join('');
+    var peak = mx > 0 ? '<circle cx="' + pts[maxI][0].toFixed(1) + '" cy="' + pts[maxI][1].toFixed(1) + '" r="4.5" fill="var(--good-ink)" stroke="var(--surface-2)" stroke-width="1.5"></circle>' +
+      '<text x="' + pts[maxI][0].toFixed(1) + '" y="' + Math.max(10, pts[maxI][1] - 9).toFixed(1) + '" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--ink)">' + fmtNumCO(mx) + '</text>' : '';
+    return '<div class="chart-line-wrap"><svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="xMidYMid meet">' +
+      '<path d="' + area + '" fill="var(--accent-soft)"></path>' +
+      '<path d="' + d + '" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round"></path>' +
+      ticks + peak + '</svg></div>';
+  }
+  function ttMonthRows(tt) {
+    if (!tt || !tt.daily || !tt.daily.length || typeof selectedMonth === 'undefined') return [];
+    return tt.daily.filter(function (r) { return r.fecha && r.fecha.slice(0, 7) === selectedMonth; });
+  }
+  function renderTikTokTab(tt, net) {
+    var chartEl = el('home-tiktok-chart');
+    var rows = ttMonthRows(tt);
+    if (chartEl) {
+      if (!tt || !tt.daily || !tt.daily.length) {
+        chartEl.innerHTML = '<div class="leads-empty-state">Aún no has conectado TikTok para esta marca.</div>';
+      } else if (!rows.length) {
+        var meses = Array.from(new Set(tt.daily.map(function (r) { return r.fecha.slice(0, 7); }))).sort();
+        chartEl.innerHTML = '<div class="leads-empty-state">Sin datos de TikTok en ' + monthLabel(selectedMonth) + '.' +
+          (meses.length ? ' Hay datos cargados de: ' + meses.map(monthLabel).join(', ') + '.' : '') + '</div>';
+      } else {
+        var totV = rows.reduce(function (s, r) { return s + r.views; }, 0);
+        chartEl.innerHTML = tiktokChart(rows) +
+          '<p class="vc-note" style="margin-top:6px;text-align:center">' + rows.length + ' días con datos en ' + monthLabel(selectedMonth) + ' · ' + fmtNumCO(totV) + ' vistas en total. El punto marcado es tu mejor día.</p>';
+      }
+    }
+    if (net !== 'tt') return;
+
+    if (el('home-metas-pills')) {
+      if (!rows.length) {
+        el('home-metas-pills').innerHTML = '<div class="leads-empty-state">' +
+          (tt && tt.daily && tt.daily.length ? 'Sin datos de TikTok en ' + monthLabel(selectedMonth) + '.' : 'Aún no has conectado TikTok para esta marca.') + '</div>';
+      } else {
+        var sum = function (k) { return rows.reduce(function (s, r) { return s + (r[k] || 0); }, 0); };
+        var pills = pautaStatPill('Vistas de video', fmtNumCO(sum('views')), 'accent') +
+          pautaStatPill('Me gusta', fmtNumCO(sum('likes')), 'good') +
+          pautaStatPill('Comentarios', fmtNumCO(sum('comments')), 'blue') +
+          pautaStatPill('Compartidos', fmtNumCO(sum('shares')), 'blue') +
+          pautaStatPill('Visitas al perfil', fmtNumCO(sum('profileViews')), 'accent');
+        el('home-metas-pills').innerHTML = '<div class="pauta-pillrow" style="justify-content:flex-start">' + pills + '</div>';
+      }
+    }
+    if (el('home-besttime')) {
+      if (!rows.length) {
+        el('home-besttime').innerHTML = '<div class="leads-empty-state">Se calcula con los días cargados del mes.</div>';
+      } else {
+        var best = rows.slice().sort(function (x, y) { return y.views - x.views; })[0];
+        el('home-besttime').innerHTML = '<div class="hero-stat"><div class="hero-number">' + fmtNumCO(best.views) + ' vistas</div>' +
+          '<div class="hero-sub">Tu video del ' + fmtDiaMes(best.fecha) + ' fue el de mejor rendimiento del mes' +
+          (best.likes ? ' · ' + fmtNumCO(best.likes) + ' me gusta' : '') + '</div></div>';
+      }
+    }
+  }
+
   function renderSocial(key) {
     if (!SOCIAL || !SOCIAL.accounts || !SOCIAL.accounts[key]) return;
     var a = SOCIAL.accounts[key], ig = a.instagram || {}, fb = a.facebook || {};
+    var net = (typeof socialNet !== 'undefined') ? socialNet : 'todo';
 
-    // ---- Filtro por mes ----
+    // ---- Filtro por mes (Instagram / Facebook) ----
     var dataMonth = SOCIAL.month || (typeof DATA_MONTH !== 'undefined' ? DATA_MONTH : null);
-    if (typeof selectedMonth !== 'undefined' && dataMonth && selectedMonth !== dataMonth) {
+    var monthMismatch = !!(typeof selectedMonth !== 'undefined' && dataMonth && selectedMonth !== dataMonth);
+    if (monthMismatch) {
       var msg = 'Sin datos de ' + monthLabel(selectedMonth) + '. Lo que has cargado corresponde a ' + monthLabel(dataMonth) + '.';
       SOCIAL_VIEW_IDS.forEach(function (id) { socEmpty(id, msg); });
       setText('audiencia-period', monthLabel(selectedMonth) + ' · sin datos');
       if (el('referentes-competencia-title')) setText('referentes-competencia-title', 'Competencia · ' + monthLabel(selectedMonth));
-      return;
     }
 
+    // ---- TikTok: trae su propia serie diaria, no depende del mes de Instagram/Facebook ----
+    renderTikTokTab(a.tiktok || {}, net);
+    if (net === 'tt') return; // ya pintó sus propios paneles; el resto de Inicio es de Instagram/Facebook
+
+    if (monthMismatch) return;
+
     // ---- INICIO (según la pestaña Todo / Instagram / Facebook) ----
-    var net = (typeof socialNet !== 'undefined') ? socialNet : 'todo';
     var num = function (x) { return (x == null || isNaN(x)) ? null : x; };
     var sumN = function () { var vs = [].slice.call(arguments).filter(function (v) { return v != null; }); return vs.length ? vs.reduce(function (s, v) { return s + v; }, 0) : null; };
     var pill = function (k, v, cls) { return pautaStatPill(k, v != null ? (typeof v === 'number' ? fmtNumCO(v) : v) : '—', cls); };

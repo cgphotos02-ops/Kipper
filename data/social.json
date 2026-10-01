@@ -22,32 +22,230 @@
         "engagedAccounts": 228,
         "postsInPeriod": 8,
         "bestTime": "18:00–21:00",
-        "cities": [["Santiago de Cali", 28.17], ["Bogotá", 15.85], ["Medellín", 4.36], ["Palmira", 2.83], ["Jamundí", 2.76]],
-        "countries": ["Colombia", "España", "Venezuela", "Estados Unidos", "Argentina", "México", "Chile"],
+        "cities": [
+          [
+            "Santiago de Cali",
+            28.17
+          ],
+          [
+            "Bogotá",
+            15.85
+          ],
+          [
+            "Medellín",
+            4.36
+          ],
+          [
+            "Palmira",
+            2.83
+          ],
+          [
+            "Jamundí",
+            2.76
+          ]
+        ],
+        "countries": [
+          "Colombia",
+          "España",
+          "Venezuela",
+          "Estados Unidos",
+          "Argentina",
+          "México",
+          "Chile"
+        ],
         "audience": {
-          "gender": [["Hombres", 54.18], ["Mujeres", 32.37], ["Sin especificar", 13.45]],
-          "age": [["13-17", 0.5], ["18-24", 5.5], ["25-34", 36.5], ["35-44", 34], ["45-54", 16.5], ["55-64", 5], ["65+", 1]],
+          "gender": [
+            [
+              "Hombres",
+              54.18
+            ],
+            [
+              "Mujeres",
+              32.37
+            ],
+            [
+              "Sin especificar",
+              13.45
+            ]
+          ],
+          "age": [
+            [
+              "13-17",
+              0.5
+            ],
+            [
+              "18-24",
+              5.5
+            ],
+            [
+              "25-34",
+              36.5
+            ],
+            [
+              "35-44",
+              34
+            ],
+            [
+              "45-54",
+              16.5
+            ],
+            [
+              "55-64",
+              5
+            ],
+            [
+              "65+",
+              1
+            ]
+          ],
           "ageApprox": true
         },
         "content": {
-          "posts":   { "count": 1, "engagement": 35.35, "interactions": 14, "avgReach": 396, "views": 804, "likes": 13, "comments": 0, "saves": 1, "shares": 0 },
-          "reels":   { "count": 4, "engagement": 86.96, "interactions": 192, "avgReach": 552, "views": 3745, "likes": 181, "comments": 5, "saves": 1, "shares": 5 },
-          "stories": { "count": 3, "impressions": 588, "avgReach": 193 }
+          "posts": {
+            "count": 1,
+            "engagement": 35.35,
+            "interactions": 14,
+            "avgReach": 396,
+            "views": 804,
+            "likes": 13,
+            "comments": 0,
+            "saves": 1,
+            "shares": 0
+          },
+          "reels": {
+            "count": 4,
+            "engagement": 86.96,
+            "interactions": 192,
+            "avgReach": 552,
+            "views": 3745,
+            "likes": 181,
+            "comments": 5,
+            "saves": 1,
+            "shares": 5
+          },
+          "stories": {
+            "count": 3,
+            "impressions": 588,
+            "avgReach": 193
+          }
         },
         "topPosts": [
-          { "date": "2026-08-29", "kind": "Reel", "reach": 707, "views": 1064, "likes": 42, "comments": 0, "saves": 0, "shares": 2, "retention": 41.4, "caption": "¿La seguridad de tu empresa proyecta el prestigio de tu marca?", "url": "https://www.instagram.com/reel/DcoRlCKRFoL/" },
-          { "date": "2026-08-13", "kind": "Reel", "reach": 568, "views": 1031, "likes": 59, "comments": 5, "saves": 0, "shares": 0, "retention": 44.4, "caption": "Los momentos de prueba nos recuerdan de qué estamos hechos", "url": "https://www.instagram.com/reel/Db_1AJ3Ioda/" },
-          { "date": "2026-08-08", "kind": "Reel", "reach": 511, "views": 883, "likes": 38, "comments": 0, "saves": 1, "shares": 2, "retention": 48.8, "caption": "La seguridad de tu compañía exige estrategias sólidas y reacción inmediata", "url": "https://www.instagram.com/reel/Dbyj4ZxIXUO/" },
-          { "date": "2026-08-20", "kind": "Reel", "reach": 422, "views": 767, "likes": 42, "comments": 0, "saves": 0, "shares": 1, "retention": 46.4, "caption": "En los momentos difíciles es cuando demostramos de qué estamos hechos", "url": "https://www.instagram.com/reel/DcSE1tatKWj/" },
-          { "date": "2026-08-11", "kind": "Imagen", "reach": 396, "views": 804, "likes": 13, "comments": 0, "saves": 1, "shares": 0, "caption": "El sismo del pasado lunes 10 de agosto nos recordó que… ESTAMOS CONTIGO" }
+          {
+            "date": "2026-08-29",
+            "kind": "Reel",
+            "reach": 707,
+            "views": 1064,
+            "likes": 42,
+            "comments": 0,
+            "saves": 0,
+            "shares": 2,
+            "retention": 41.4,
+            "caption": "¿La seguridad de tu empresa proyecta el prestigio de tu marca?",
+            "url": "https://www.instagram.com/reel/DcoRlCKRFoL/"
+          },
+          {
+            "date": "2026-08-13",
+            "kind": "Reel",
+            "reach": 568,
+            "views": 1031,
+            "likes": 59,
+            "comments": 5,
+            "saves": 0,
+            "shares": 0,
+            "retention": 44.4,
+            "caption": "Los momentos de prueba nos recuerdan de qué estamos hechos",
+            "url": "https://www.instagram.com/reel/Db_1AJ3Ioda/"
+          },
+          {
+            "date": "2026-08-08",
+            "kind": "Reel",
+            "reach": 511,
+            "views": 883,
+            "likes": 38,
+            "comments": 0,
+            "saves": 1,
+            "shares": 2,
+            "retention": 48.8,
+            "caption": "La seguridad de tu compañía exige estrategias sólidas y reacción inmediata",
+            "url": "https://www.instagram.com/reel/Dbyj4ZxIXUO/"
+          },
+          {
+            "date": "2026-08-20",
+            "kind": "Reel",
+            "reach": 422,
+            "views": 767,
+            "likes": 42,
+            "comments": 0,
+            "saves": 0,
+            "shares": 1,
+            "retention": 46.4,
+            "caption": "En los momentos difíciles es cuando demostramos de qué estamos hechos",
+            "url": "https://www.instagram.com/reel/DcSE1tatKWj/"
+          },
+          {
+            "date": "2026-08-11",
+            "kind": "Imagen",
+            "reach": 396,
+            "views": 804,
+            "likes": 13,
+            "comments": 0,
+            "saves": 1,
+            "shares": 0,
+            "caption": "El sismo del pasado lunes 10 de agosto nos recordó que… ESTAMOS CONTIGO"
+          }
         ],
         "hashtags": [],
         "competitors": [
-          { "name": "Grupo Atlas Seguridad", "handle": "@grupoatlasseguridad", "followers": 10365, "posts": 2, "reels": 2, "avgLikes": 79.5, "avgComments": 3.25, "engagement": 0.79 },
-          { "name": "Alarmas Telesentinel", "handle": "@telesentinel_colombia", "followers": 9940, "posts": 9, "reels": 4, "avgLikes": 20.77, "avgComments": 0.38, "engagement": 0.21 },
-          { "name": "Oszford Seguridad Privada Cali", "handle": "@seguridadprivadaoszford", "followers": 4966, "posts": 0, "reels": 10, "avgLikes": 557.7, "avgComments": 7.1, "engagement": 11.36 },
-          { "name": "Seguridad Omega", "handle": "@seguridadomegaco", "followers": 2841, "posts": 4, "reels": 0, "avgLikes": 37.75, "avgComments": 0.75, "engagement": 1.34 },
-          { "name": "Sotech Seguridad y Tecnología", "handle": "@sotechdecolombia", "followers": 347, "posts": 0, "reels": 0, "avgLikes": null, "avgComments": null, "engagement": null }
+          {
+            "name": "Grupo Atlas Seguridad",
+            "handle": "@grupoatlasseguridad",
+            "followers": 10365,
+            "posts": 2,
+            "reels": 2,
+            "avgLikes": 79.5,
+            "avgComments": 3.25,
+            "engagement": 0.79
+          },
+          {
+            "name": "Alarmas Telesentinel",
+            "handle": "@telesentinel_colombia",
+            "followers": 9940,
+            "posts": 9,
+            "reels": 4,
+            "avgLikes": 20.77,
+            "avgComments": 0.38,
+            "engagement": 0.21
+          },
+          {
+            "name": "Oszford Seguridad Privada Cali",
+            "handle": "@seguridadprivadaoszford",
+            "followers": 4966,
+            "posts": 0,
+            "reels": 10,
+            "avgLikes": 557.7,
+            "avgComments": 7.1,
+            "engagement": 11.36
+          },
+          {
+            "name": "Seguridad Omega",
+            "handle": "@seguridadomegaco",
+            "followers": 2841,
+            "posts": 4,
+            "reels": 0,
+            "avgLikes": 37.75,
+            "avgComments": 0.75,
+            "engagement": 1.34
+          },
+          {
+            "name": "Sotech Seguridad y Tecnología",
+            "handle": "@sotechdecolombia",
+            "followers": 347,
+            "posts": 0,
+            "reels": 0,
+            "avgLikes": null,
+            "avgComments": null,
+            "engagement": null
+          }
         ]
       },
       "facebook": {
@@ -58,12 +256,296 @@
         "views": 67700,
         "pageVisits": 1295,
         "postsInPeriod": 5,
-        "cities": [["Cali", 33.06], ["Bogotá", 11.04], ["Medellín", 2.11], ["Jamundí", 1.94], ["Cartagena", 1.86]],
+        "cities": [
+          [
+            "Cali",
+            33.06
+          ],
+          [
+            "Bogotá",
+            11.04
+          ],
+          [
+            "Medellín",
+            2.11
+          ],
+          [
+            "Jamundí",
+            1.94
+          ],
+          [
+            "Cartagena",
+            1.86
+          ]
+        ],
         "content": {
-          "posts":   { "count": 1, "engagement": 56.52, "interactions": 39, "avgReach": 690, "views": 1125, "reactions": 16, "shares": 1, "clicks": 22 },
-          "reels":   { "count": 3, "interactions": 205, "videoViews": 5571, "likes": 176, "actions": 29 },
-          "stories": { "count": 1 }
+          "posts": {
+            "count": 1,
+            "engagement": 56.52,
+            "interactions": 39,
+            "avgReach": 690,
+            "views": 1125,
+            "reactions": 16,
+            "shares": 1,
+            "clicks": 22
+          },
+          "reels": {
+            "count": 3,
+            "interactions": 205,
+            "videoViews": 5571,
+            "likes": 176,
+            "actions": 29
+          },
+          "stories": {
+            "count": 1
+          }
         }
+      },
+      "tiktok": {
+        "source": "TikTok — Overview.xlsx (serie diaria)",
+        "updatedAt": "2026-10-01T16:45:46.307Z",
+        "daily": [
+          {
+            "fecha": "2026-08-31",
+            "views": 263,
+            "profileViews": 4,
+            "likes": 0,
+            "comments": 2,
+            "shares": 0
+          },
+          {
+            "fecha": "2026-09-01",
+            "views": 175,
+            "profileViews": 3,
+            "likes": 2,
+            "comments": 0,
+            "shares": 0
+          },
+          {
+            "fecha": "2026-09-02",
+            "views": 206,
+            "profileViews": 4,
+            "likes": 1,
+            "comments": 0,
+            "shares": 0
+          },
+          {
+            "fecha": "2026-09-03",
+            "views": 233,
+            "profileViews": 13,
+            "likes": 2,
+            "comments": 0,
+            "shares": 0
+          },
+          {
+            "fecha": "2026-09-04",
+            "views": 243,
+            "profileViews": 8,
+            "likes": 4,
+            "comments": 0,
+            "shares": 3
+          },
+          {
+            "fecha": "2026-09-05",
+            "views": 158,
+            "profileViews": 0,
+            "likes": 0,
+            "comments": 0,
+            "shares": 0
+          },
+          {
+            "fecha": "2026-09-06",
+            "views": 133,
+            "profileViews": 1,
+            "likes": 2,
+            "comments": 1,
+            "shares": 0
+          },
+          {
+            "fecha": "2026-09-07",
+            "views": 193,
+            "profileViews": 2,
+            "likes": 0,
+            "comments": 0,
+            "shares": 1
+          },
+          {
+            "fecha": "2026-09-08",
+            "views": 216,
+            "profileViews": 7,
+            "likes": 2,
+            "comments": 0,
+            "shares": 1
+          },
+          {
+            "fecha": "2026-09-09",
+            "views": 214,
+            "profileViews": 3,
+            "likes": 2,
+            "comments": 0,
+            "shares": 0
+          },
+          {
+            "fecha": "2026-09-10",
+            "views": 116,
+            "profileViews": 6,
+            "likes": 4,
+            "comments": 0,
+            "shares": 0
+          },
+          {
+            "fecha": "2026-09-11",
+            "views": 230,
+            "profileViews": 8,
+            "likes": 3,
+            "comments": 0,
+            "shares": 0
+          },
+          {
+            "fecha": "2026-09-12",
+            "views": 370,
+            "profileViews": 6,
+            "likes": 2,
+            "comments": 0,
+            "shares": 0
+          },
+          {
+            "fecha": "2026-09-13",
+            "views": 139,
+            "profileViews": 5,
+            "likes": 2,
+            "comments": 0,
+            "shares": 1
+          },
+          {
+            "fecha": "2026-09-14",
+            "views": 222,
+            "profileViews": 11,
+            "likes": 0,
+            "comments": 1,
+            "shares": 0
+          },
+          {
+            "fecha": "2026-09-15",
+            "views": 275,
+            "profileViews": 7,
+            "likes": 9,
+            "comments": 0,
+            "shares": 0
+          },
+          {
+            "fecha": "2026-09-16",
+            "views": 869,
+            "profileViews": 11,
+            "likes": 9,
+            "comments": 5,
+            "shares": 0
+          },
+          {
+            "fecha": "2026-09-17",
+            "views": 1110,
+            "profileViews": 18,
+            "likes": 17,
+            "comments": 0,
+            "shares": 0
+          },
+          {
+            "fecha": "2026-09-18",
+            "views": 1089,
+            "profileViews": 23,
+            "likes": 22,
+            "comments": 2,
+            "shares": 2
+          },
+          {
+            "fecha": "2026-09-19",
+            "views": 1621,
+            "profileViews": 17,
+            "likes": 36,
+            "comments": 1,
+            "shares": 4
+          },
+          {
+            "fecha": "2026-09-20",
+            "views": 1158,
+            "profileViews": 18,
+            "likes": 17,
+            "comments": 2,
+            "shares": 0
+          },
+          {
+            "fecha": "2026-09-21",
+            "views": 1010,
+            "profileViews": 16,
+            "likes": 21,
+            "comments": 2,
+            "shares": 2
+          },
+          {
+            "fecha": "2026-09-22",
+            "views": 785,
+            "profileViews": 12,
+            "likes": 8,
+            "comments": 2,
+            "shares": 1
+          },
+          {
+            "fecha": "2026-09-23",
+            "views": 1910,
+            "profileViews": 24,
+            "likes": 35,
+            "comments": 1,
+            "shares": 3
+          },
+          {
+            "fecha": "2026-09-24",
+            "views": 5056,
+            "profileViews": 40,
+            "likes": 131,
+            "comments": 3,
+            "shares": 4
+          },
+          {
+            "fecha": "2026-09-25",
+            "views": 4015,
+            "profileViews": 41,
+            "likes": 134,
+            "comments": 2,
+            "shares": 8
+          },
+          {
+            "fecha": "2026-09-26",
+            "views": 1489,
+            "profileViews": 18,
+            "likes": 41,
+            "comments": 1,
+            "shares": 2
+          },
+          {
+            "fecha": "2026-09-27",
+            "views": 1187,
+            "profileViews": 12,
+            "likes": 22,
+            "comments": 1,
+            "shares": 4
+          },
+          {
+            "fecha": "2026-09-28",
+            "views": 1439,
+            "profileViews": 20,
+            "likes": 30,
+            "comments": 1,
+            "shares": 2
+          },
+          {
+            "fecha": "2026-09-29",
+            "views": 1562,
+            "profileViews": 19,
+            "likes": 183,
+            "comments": 2,
+            "shares": 2
+          }
+        ]
       }
     },
     "nass": {
@@ -81,24 +563,126 @@
         "postsInPeriod": 6,
         "bestTime": "18:00–20:00",
         "followersNote": "El conteo de seguidores solo existe desde la conexión de la cuenta (3 sep 2026). El informe de agosto no lo trae.",
-        "cities": [["Santiago de Cali", 33.12], ["Bogotá", 8.77], ["Medellín", 3.55], ["Jamundí", 2.96], ["Palmira", 2.13]],
-        "countries": ["Colombia", "Argentina", "Brasil", "Venezuela", "España", "Estados Unidos", "México"],
+        "cities": [
+          [
+            "Santiago de Cali",
+            33.12
+          ],
+          [
+            "Bogotá",
+            8.77
+          ],
+          [
+            "Medellín",
+            3.55
+          ],
+          [
+            "Jamundí",
+            2.96
+          ],
+          [
+            "Palmira",
+            2.13
+          ]
+        ],
+        "countries": [
+          "Colombia",
+          "Argentina",
+          "Brasil",
+          "Venezuela",
+          "España",
+          "Estados Unidos",
+          "México"
+        ],
         "content": {
-          "posts":   { "count": 4, "engagement": 121.02, "interactions": 38, "avgReach": 79, "views": 623, "likes": 37, "comments": 1 },
-          "reels":   { "count": 2, "engagement": 61.98, "interactions": 30, "avgReach": 242, "views": 681, "likes": 25, "saves": 3, "shares": 2 },
-          "stories": { "count": 0 }
+          "posts": {
+            "count": 4,
+            "engagement": 121.02,
+            "interactions": 38,
+            "avgReach": 79,
+            "views": 623,
+            "likes": 37,
+            "comments": 1
+          },
+          "reels": {
+            "count": 2,
+            "engagement": 61.98,
+            "interactions": 30,
+            "avgReach": 242,
+            "views": 681,
+            "likes": 25,
+            "saves": 3,
+            "shares": 2
+          },
+          "stories": {
+            "count": 0
+          }
         },
         "topPosts": [
-          { "date": "2026-08-08", "kind": "Reel", "reach": 275, "caption": "No dejes tu seguridad al azar. Tener cámaras no basta si no tienen un buen respaldo" },
-          { "date": "2026-08-20", "kind": "Reel", "reach": 209, "caption": "¿Sabías que un sistema de seguridad híbrido es tu mejor aliado financiero y operativo?" },
-          { "date": "2026-08-03", "kind": "Imagen", "reach": 107, "caption": "Publicación del 3 de agosto" },
-          { "date": "2026-08-13", "kind": "Imagen", "reach": 79, "caption": "¡Hoy celebramos 16 años de innovación, confianza y crecimiento!" },
-          { "date": "2026-08-04", "kind": "Imagen", "reach": 60, "caption": "Este mes celebramos 16 años protegiendo lo que más importa" }
+          {
+            "date": "2026-08-08",
+            "kind": "Reel",
+            "reach": 275,
+            "caption": "No dejes tu seguridad al azar. Tener cámaras no basta si no tienen un buen respaldo"
+          },
+          {
+            "date": "2026-08-20",
+            "kind": "Reel",
+            "reach": 209,
+            "caption": "¿Sabías que un sistema de seguridad híbrido es tu mejor aliado financiero y operativo?"
+          },
+          {
+            "date": "2026-08-03",
+            "kind": "Imagen",
+            "reach": 107,
+            "caption": "Publicación del 3 de agosto"
+          },
+          {
+            "date": "2026-08-13",
+            "kind": "Imagen",
+            "reach": 79,
+            "caption": "¡Hoy celebramos 16 años de innovación, confianza y crecimiento!"
+          },
+          {
+            "date": "2026-08-04",
+            "kind": "Imagen",
+            "reach": 60,
+            "caption": "Este mes celebramos 16 años protegiendo lo que más importa"
+          }
         ],
-        "hashtags": [["#confianza", 1], ["#juntoscrecemos", 1], ["#innovación", 1], ["#tecnología", 1], ["#aniversario", 1]],
+        "hashtags": [
+          [
+            "#confianza",
+            1
+          ],
+          [
+            "#juntoscrecemos",
+            1
+          ],
+          [
+            "#innovación",
+            1
+          ],
+          [
+            "#tecnología",
+            1
+          ],
+          [
+            "#aniversario",
+            1
+          ]
+        ],
         "competitors": [
-          { "name": "TANGO Colombia", "followers": null, "engagement": null },
-          { "name": "SYTEC", "followers": null, "engagement": null }
+          {
+            "name": "TANGO Colombia",
+            "followers": null,
+            "engagement": null
+          },
+          {
+            "name": "SYTEC",
+            "followers": null,
+            "engagement": null
+          }
         ]
       },
       "facebook": {
@@ -109,12 +693,52 @@
         "views": 42780,
         "pageVisits": 140,
         "postsInPeriod": 2,
-        "cities": [["Cali", 58.57], ["Bogotá", 3.11], ["Jamundí", 2.05], ["Yumbo", 1.19], ["Candelaria", 1.19]],
+        "cities": [
+          [
+            "Cali",
+            58.57
+          ],
+          [
+            "Bogotá",
+            3.11
+          ],
+          [
+            "Jamundí",
+            2.05
+          ],
+          [
+            "Yumbo",
+            1.19
+          ],
+          [
+            "Candelaria",
+            1.19
+          ]
+        ],
         "content": {
-          "posts":   { "count": 1, "engagement": 111.11, "interactions": 2, "avgReach": 18, "views": 25 },
-          "reels":   { "count": 1, "interactions": 3, "videoViews": 298, "likes": 2, "actions": 1 },
-          "stories": { "count": 0 }
+          "posts": {
+            "count": 1,
+            "engagement": 111.11,
+            "interactions": 2,
+            "avgReach": 18,
+            "views": 25
+          },
+          "reels": {
+            "count": 1,
+            "interactions": 3,
+            "videoViews": 298,
+            "likes": 2,
+            "actions": 1
+          },
+          "stories": {
+            "count": 0
+          }
         }
+      },
+      "tiktok": {
+        "source": "TikTok — pendiente de conectar",
+        "updatedAt": null,
+        "daily": []
       }
     }
   }

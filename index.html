@@ -1297,20 +1297,18 @@
     if (typeof SOCIAL !== 'undefined' && SOCIAL && SOCIAL.accounts) {
       Object.keys(SOCIAL.accounts).forEach(function (k) {
         var acc = SOCIAL.accounts[k];
-        if (acc.instagram && acc.instagram.month) set[acc.instagram.month] = true;
-        if (acc.facebook && acc.facebook.month) set[acc.facebook.month] = true;
+        if (acc.instagram) Object.keys(acc.instagram).forEach(function (m) { set[m] = true; });
+        if (acc.facebook) Object.keys(acc.facebook).forEach(function (m) { set[m] = true; });
         var tt = acc.tiktok;
         if (!tt) return;
         if (tt.daily) tt.daily.forEach(function (r) { if (r.fecha) set[r.fecha.slice(0, 7)] = true; });
-        if (tt.contenido && tt.contenido.mes) set[tt.contenido.mes] = true;
-        if (tt.topPosts && tt.topPosts.mes) set[tt.topPosts.mes] = true;
-        if (tt.audiencia && tt.audiencia.mes) set[tt.audiencia.mes] = true;
+        if (tt.contenido) Object.keys(tt.contenido).forEach(function (m) { set[m] = true; });
+        if (tt.topPosts) Object.keys(tt.topPosts).forEach(function (m) { set[m] = true; });
+        if (tt.audiencia) Object.keys(tt.audiencia).forEach(function (m) { set[m] = true; });
       });
     }
     return set;
   }
-  function hasSocialData(k) { return k === DATA_MONTH; }
-
   function buildMonthOptions() {
     if (!mesSel) return;
     var withData = monthsWithData();
@@ -1354,10 +1352,14 @@
   }
 
   function refreshAccount() {
+    var acc = (typeof SOCIAL !== 'undefined' && SOCIAL && SOCIAL.accounts) ? SOCIAL.accounts[currentAccount()] : null;
+    var igMonths = acc && acc.instagram ? Object.keys(acc.instagram).sort() : [];
+    var hasThisMonth = igMonths.indexOf(selectedMonth) > -1;
+    var latest = igMonths.length ? igMonths[igMonths.length - 1] : DATA_MONTH;
     setText('home-greeting', 'Buenos días 👋 — ' + accountLabels[currentAccount()]);
     setText('today-date', '📅 Estás viendo: ' + monthLabel(selectedMonth) +
-      (hasSocialData(selectedMonth) ? '' : ' — sin métricas de este mes (las cargadas son de ' + monthLabel(DATA_MONTH) + ')'));
-    setText('profile-updated', 'Métricas: ' + monthLabel(DATA_MONTH));
+      (hasThisMonth ? '' : ' — sin métricas de Instagram este mes para esta marca (las cargadas son de ' + monthLabel(latest) + ')'));
+    setText('profile-updated', 'Métricas: ' + monthLabel(hasThisMonth ? selectedMonth : latest));
     renderSocial(currentAccount());
     renderSeguimiento(currentAccount());
   }
@@ -1906,20 +1908,28 @@
   function ttAvailableMonths(tt) {
     var set = {};
     if (tt && tt.daily) tt.daily.forEach(function (r) { if (r.fecha) set[r.fecha.slice(0, 7)] = true; });
-    if (tt && tt.contenido && tt.contenido.mes) set[tt.contenido.mes] = true;
-    if (tt && tt.topPosts && tt.topPosts.mes) set[tt.topPosts.mes] = true;
-    if (tt && tt.audiencia && tt.audiencia.mes) set[tt.audiencia.mes] = true;
+    if (tt && tt.contenido) Object.keys(tt.contenido).forEach(function (m) { set[m] = true; });
+    if (tt && tt.topPosts) Object.keys(tt.topPosts).forEach(function (m) { set[m] = true; });
+    if (tt && tt.audiencia) Object.keys(tt.audiencia).forEach(function (m) { set[m] = true; });
     return Object.keys(set).sort();
   }
-  function ttEmptyMonthHtml(tt) {
-    var months = ttAvailableMonths(tt);
+  // ---- Jump-button genérico: "Sin datos de <red> en <mes>" + botón a otro mes que sí tenga ----
+  function monthJumpHtml(platformLabel, months) {
     var other = months.length ? months[months.length - 1] : null;
-    return 'Sin datos de TikTok en ' + monthLabel(selectedMonth) + '.' +
-      (other ? '<br><br><button class="seg-jump-btn tt-jump-btn" type="button" data-mes="' + other + '">📅 Ver ' + monthLabel(other) + '</button>' : '');
+    return 'Sin datos de ' + platformLabel + ' en ' + monthLabel(selectedMonth) + '.' +
+      (other ? '<br><br><button class="seg-jump-btn mo-jump-btn" type="button" data-mes="' + other + '">📅 Ver ' + monthLabel(other) + '</button>' : '');
   }
-  function ttWireJumpBtn(container) {
-    var jb = container.querySelector('.tt-jump-btn');
+  function wireMonthJumpBtn(container) {
+    var jb = container.querySelector('.mo-jump-btn');
     if (jb) jb.addEventListener('click', function () { setMonth(this.getAttribute('data-mes')); });
+  }
+  function ttEmptyMonthHtml(tt) { return monthJumpHtml('TikTok', ttAvailableMonths(tt)); }
+  function ttWireJumpBtn(container) { wireMonthJumpBtn(container); }
+  function socEmptyJump(id, platformLabel, months) {
+    var e = el(id);
+    if (!e) return;
+    e.innerHTML = '<div class="leads-empty-state">' + monthJumpHtml(platformLabel, months) + '</div>';
+    wireMonthJumpBtn(e);
   }
   var TT_STAT_LABELS = [
     { k: 'visualizacionesVideos', label: 'Visualizaciones de videos' },
@@ -1936,9 +1946,9 @@
 
     var dailyRows = ttMonthRows(tt);
     var hasChart = dailyRows.length > 0;
-    var top = (tt && tt.topPosts && tt.topPosts.mes === selectedMonth) ? tt.topPosts : null;
+    var top = (tt && tt.topPosts) ? tt.topPosts[selectedMonth] : null;
     var hasTop = !!top;
-    var cont = (tt && tt.contenido && tt.contenido.mes === selectedMonth) ? tt.contenido : null;
+    var cont = (tt && tt.contenido) ? tt.contenido[selectedMonth] : null;
     var hasStats = !!(cont && cont.stats);
     var hasTraffic = !!(cont && cont.fuenteTrafico && cont.fuenteTrafico.length);
 
@@ -1998,8 +2008,7 @@
   // -------- Mi audiencia → TikTok --------
   function fmtPctSigned(n) { return (n == null || !isFinite(n)) ? '—' : '+' + (Math.round(n * 10) / 10).toLocaleString('es-CO') + '%'; }
   function renderTikTokAudiencia(tt) {
-    var audRaw = (tt && tt.audiencia) || null;
-    var aud = (audRaw && audRaw.mes === selectedMonth) ? audRaw : null;
+    var aud = (tt && tt.audiencia) ? (tt.audiencia[selectedMonth] || null) : null;
     var resumenEl = el('audiencia-tiktok-resumen'), genderEl = el('audiencia-tiktok-gender'),
       ageEl = el('audiencia-tiktok-age'), bestEl = el('audiencia-tiktok-besttime');
     var resumenCard = el('tiktok-resumen-card'), genderCard = el('tiktok-gender-card'),
@@ -2060,7 +2069,7 @@
 
   function renderSocial(key) {
     if (!SOCIAL || !SOCIAL.accounts || !SOCIAL.accounts[key]) return;
-    var a = SOCIAL.accounts[key], ig = a.instagram || {}, fb = a.facebook || {};
+    var a = SOCIAL.accounts[key];
     var net = (typeof socialNet !== 'undefined') ? socialNet : 'todo';
 
     // ---- TikTok (en Posts y Mi audiencia): trae sus propias ventanas (60 días, todo el tiempo…),
@@ -2068,11 +2077,15 @@
     renderTikTokPosts(a.tiktok || {});
     renderTikTokAudiencia(a.tiktok || {});
 
-    // ---- Filtro por mes: Instagram y Facebook pueden estar en meses distintos ----
-    var igMonth = ig.month || (typeof DATA_MONTH !== 'undefined' ? DATA_MONTH : null);
-    var fbMonth = fb.month || (typeof DATA_MONTH !== 'undefined' ? DATA_MONTH : null);
-    var igMatch = !igMonth || selectedMonth === igMonth;
-    var fbMatch = !fbMonth || selectedMonth === fbMonth;
+    // ---- Instagram/Facebook: cada mes se guarda aparte (accounts.<marca>.instagram["2026-09"], etc.)
+    //      para no perder meses anteriores al cargar uno nuevo. Se elige el que coincida con el mes
+    //      activo; si no hay, se muestra "sin datos" con un botón para saltar al mes más reciente cargado.
+    var igByMonth = a.instagram || {}, fbByMonth = a.facebook || {};
+    var igMonths = Object.keys(igByMonth).sort(), fbMonths = Object.keys(fbByMonth).sort();
+    var igMatch = !!igByMonth[selectedMonth];
+    var fbMatch = !!fbByMonth[selectedMonth];
+    var ig = igMatch ? igByMonth[selectedMonth] : (igByMonth[igMonths[igMonths.length - 1]] || {});
+    var fb = fbMatch ? fbByMonth[selectedMonth] : (fbByMonth[fbMonths[fbMonths.length - 1]] || {});
     var igEff = igMatch ? ig : {};
     var fbEff = fbMatch ? fb : {};
 
@@ -2084,9 +2097,9 @@
 
     if (el('home-metas-pills')) {
       if (net === 'ig' && !igMatch) {
-        el('home-metas-pills').innerHTML = '<div class="leads-empty-state">Sin datos de Instagram en ' + monthLabel(selectedMonth) + '. Los cargados son de ' + monthLabel(igMonth) + '.</div>';
+        socEmptyJump('home-metas-pills', 'Instagram', igMonths);
       } else if (net === 'fb' && !fbMatch) {
-        el('home-metas-pills').innerHTML = '<div class="leads-empty-state">Sin datos de Facebook en ' + monthLabel(selectedMonth) + '. Los cargados son de ' + monthLabel(fbMonth) + '.</div>';
+        socEmptyJump('home-metas-pills', 'Facebook', fbMonths);
       } else if (net === 'todo' && !igMatch && !fbMatch) {
         el('home-metas-pills').innerHTML = '<div class="leads-empty-state">Sin datos de Instagram ni Facebook en ' + monthLabel(selectedMonth) + '.</div>';
       } else {
@@ -2116,7 +2129,7 @@
     }
 
     if (el('home-ig-stats')) {
-      if (!igMatch) socEmpty('home-ig-stats', 'Sin datos de Instagram en ' + monthLabel(selectedMonth) + '. Los cargados son de ' + monthLabel(igMonth) + '.');
+      if (!igMatch) socEmptyJump('home-ig-stats', 'Instagram', igMonths);
       else el('home-ig-stats').innerHTML =
         '<div class="net-followers">' + (ig.followers != null ? fmtNumCO(ig.followers) : '—') + '</div>' +
         '<div class="net-label">Seguidores · @' + (ig.username || '') + '</div>' +
@@ -2124,7 +2137,7 @@
         '<div class="net-er">' + (ig.postsInPeriod != null ? ig.postsInPeriod + ' posts · ' : '') + (ig.avgDailyReach != null ? fmtNumCO(ig.avgDailyReach) + ' alcance/día' : '') + '</div>';
     }
     if (el('home-fb-stats')) {
-      if (!fbMatch) socEmpty('home-fb-stats', 'Sin datos de Facebook en ' + monthLabel(selectedMonth) + '. Los cargados son de ' + monthLabel(fbMonth) + '.');
+      if (!fbMatch) socEmptyJump('home-fb-stats', 'Facebook', fbMonths);
       else el('home-fb-stats').innerHTML =
         '<div class="net-followers">' + (fb.followers != null ? fmtNumCO(fb.followers) : '—') + '</div>' +
         '<div class="net-label">Seguidores · Facebook</div>' +
@@ -2136,7 +2149,7 @@
       if (net === 'fb') {
         el('home-besttime').innerHTML = '<div class="leads-empty-state">Metricool no calcula "mejor hora" para Facebook. La de Instagram: <b>' + (igEff.bestTime || '—') + '</b>.</div>';
       } else if (!igMatch) {
-        el('home-besttime').innerHTML = '<div class="leads-empty-state">Sin datos de Instagram en ' + monthLabel(selectedMonth) + '. Los cargados son de ' + monthLabel(igMonth) + '.</div>';
+        socEmptyJump('home-besttime', 'Instagram', igMonths);
       } else {
         el('home-besttime').innerHTML = ig.bestTime
           ? '<div class="hero-stat"><div class="hero-number">' + ig.bestTime + '</div><div class="hero-sub">Franja de más actividad de tus seguidores en Instagram (Metricool)</div></div>'
@@ -2146,8 +2159,7 @@
 
     if (!igMatch) {
       // Posts, Mi audiencia y Competencia son 100% de Instagram.
-      var igMsg = 'Sin datos de Instagram en ' + monthLabel(selectedMonth) + '. Los cargados son de ' + monthLabel(igMonth) + '.';
-      POSTS_AUD_COMP_IDS.forEach(function (id) { socEmpty(id, igMsg); });
+      POSTS_AUD_COMP_IDS.forEach(function (id) { socEmptyJump(id, 'Instagram', igMonths); });
       setText('audiencia-period', monthLabel(selectedMonth) + ' · sin datos de Instagram');
       if (el('referentes-competencia-title')) setText('referentes-competencia-title', 'Competencia · ' + monthLabel(selectedMonth));
       return;

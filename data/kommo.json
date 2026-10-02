@@ -1,7 +1,7 @@
 {
   "diagnostico": {
     "porEmbudo": {
-      "Embudo de ventas": 662
+      "Embudo de ventas": 279
     },
     "etiquetas": [
       [
@@ -27,10 +27,6 @@
       [
         "Empresas",
         12
-      ],
-      [
-        "Externo",
-        11
       ],
       [
         "Conjunto Residencial",
@@ -80,43 +76,7 @@
     "fuentes": [
       [
         "fuente 75089",
-        456
-      ],
-      [
-        "fuente 26938",
-        104
-      ],
-      [
-        "fuente 73685",
-        47
-      ],
-      [
-        "fuente 73697",
-        19
-      ],
-      [
-        "fuente 75091",
-        17
-      ],
-      [
-        "fuente 73693",
-        7
-      ],
-      [
-        "fuente 73689",
-        5
-      ],
-      [
-        "fuente 73699",
-        4
-      ],
-      [
-        "fuente 73695",
-        2
-      ],
-      [
-        "fuente 80001",
-        1
+        279
       ]
     ],
     "fuentesError": null,
@@ -130,51 +90,244 @@
       }
     },
     "fuenteOrigen": {
-      "26938": {
-        "com.amocrm.amocrmwa": 104
-      },
-      "73685": {
-        "facebook": 47
-      },
-      "73689": {
-        "facebook": 5
-      },
-      "73693": {
-        "instagram_business": 7
-      },
-      "73695": {
-        "instagram_business": 2
-      },
-      "73697": {
-        "instagram_business": 19
-      },
-      "73699": {
-        "instagram_business": 4
-      },
       "75089": {
-        "waba": 456,
-        "com.amocrm.amocrmwa": 13
-      },
-      "75091": {
-        "waba": 17
-      },
-      "80001": {
-        "com.amocrm.amocrmwa": 1
+        "waba": 279,
+        "com.amocrm.amocrmwa": 6
       }
     },
     "fuentesDetalle": [],
     "leadsClasificadosPorTexto": 0,
     "leadsConNombreUtil": 0
   },
-  "generatedAt": "2026-10-02T16:58:03.655Z",
+  "generatedAt": "2026-10-02T17:00:56.187Z",
   "source": "kommo",
   "staleDays": 7,
-  "unassigned": 662,
+  "unassigned": 279,
+  "descartados": {
+    "gestionHumana": 414,
+    "internos": 0,
+    "sinPasarPorElBot": 383
+  },
   "pipelines": [
     "Embudo de ventas",
     "Embudo gestión humana"
   ],
   "accounts": {
+    "todas": {
+      "months": {
+        "2026-06": {
+          "total": 2,
+          "won": 0,
+          "lost": 2,
+          "open": 0,
+          "stale": 0,
+          "winRate": 0,
+          "lossRate": 100,
+          "closedWinRate": 0,
+          "sales": 0,
+          "avgDaysToWin": null,
+          "byOwner": [
+            {
+              "total": 2,
+              "won": 0,
+              "lost": 2,
+              "open": 0,
+              "sales": 0,
+              "name": "KipperSAS"
+            }
+          ],
+          "byOrigin": [
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 1,
+              "open": 0,
+              "sales": 0,
+              "name": "Hablar con asesor"
+            },
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 1,
+              "open": 0,
+              "sales": 0,
+              "name": "Hogar"
+            }
+          ],
+          "lostReasons": [
+            {
+              "name": "Sin motivo registrado",
+              "count": 2
+            }
+          ],
+          "byStage": []
+        },
+        "2026-08": {
+          "total": 117,
+          "won": 0,
+          "lost": 117,
+          "open": 0,
+          "stale": 0,
+          "winRate": 0,
+          "lossRate": 100,
+          "closedWinRate": 0,
+          "sales": 0,
+          "avgDaysToWin": null,
+          "byOwner": [
+            {
+              "total": 117,
+              "won": 0,
+              "lost": 117,
+              "open": 0,
+              "sales": 0,
+              "name": "KipperSAS"
+            }
+          ],
+          "byOrigin": [
+            {
+              "total": 62,
+              "won": 0,
+              "lost": 62,
+              "open": 0,
+              "sales": 0,
+              "name": "Hogar"
+            },
+            {
+              "total": 36,
+              "won": 0,
+              "lost": 36,
+              "open": 0,
+              "sales": 0,
+              "name": "Hablar con asesor"
+            },
+            {
+              "total": 8,
+              "won": 0,
+              "lost": 8,
+              "open": 0,
+              "sales": 0,
+              "name": "Comercio u Oficina"
+            },
+            {
+              "total": 6,
+              "won": 0,
+              "lost": 6,
+              "open": 0,
+              "sales": 0,
+              "name": "Otro"
+            },
+            {
+              "total": 3,
+              "won": 0,
+              "lost": 3,
+              "open": 0,
+              "sales": 0,
+              "name": "Empresas"
+            },
+            {
+              "total": 2,
+              "won": 0,
+              "lost": 2,
+              "open": 0,
+              "sales": 0,
+              "name": "Conjunto Residencial"
+            }
+          ],
+          "lostReasons": [
+            {
+              "name": "Sin motivo registrado",
+              "count": 117
+            }
+          ],
+          "byStage": []
+        },
+        "2026-09": {
+          "total": 160,
+          "won": 0,
+          "lost": 160,
+          "open": 0,
+          "stale": 0,
+          "winRate": 0,
+          "lossRate": 100,
+          "closedWinRate": 0,
+          "sales": 0,
+          "avgDaysToWin": null,
+          "byOwner": [
+            {
+              "total": 160,
+              "won": 0,
+              "lost": 160,
+              "open": 0,
+              "sales": 0,
+              "name": "KipperSAS"
+            }
+          ],
+          "byOrigin": [
+            {
+              "total": 70,
+              "won": 0,
+              "lost": 70,
+              "open": 0,
+              "sales": 0,
+              "name": "Hogar"
+            },
+            {
+              "total": 57,
+              "won": 0,
+              "lost": 57,
+              "open": 0,
+              "sales": 0,
+              "name": "Hablar con asesor"
+            },
+            {
+              "total": 14,
+              "won": 0,
+              "lost": 14,
+              "open": 0,
+              "sales": 0,
+              "name": "Comercio u Oficina"
+            },
+            {
+              "total": 7,
+              "won": 0,
+              "lost": 7,
+              "open": 0,
+              "sales": 0,
+              "name": "Empresas"
+            },
+            {
+              "total": 7,
+              "won": 0,
+              "lost": 7,
+              "open": 0,
+              "sales": 0,
+              "name": "Otro"
+            },
+            {
+              "total": 5,
+              "won": 0,
+              "lost": 5,
+              "open": 0,
+              "sales": 0,
+              "name": "Conjunto Residencial"
+            }
+          ],
+          "lostReasons": [
+            {
+              "name": "Sin motivo registrado",
+              "count": 160
+            }
+          ],
+          "byStage": []
+        }
+      },
+      "open": {
+        "open": 0,
+        "stale": 0,
+        "byStage": [],
+        "byOwner": []
+      }
+    },
     "proviser": {
       "months": {},
       "open": {

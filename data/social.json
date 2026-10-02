@@ -1086,7 +1086,7 @@
           "cities": [
             [
               "Cali",
-              58.6
+              58.62
             ],
             [
               "Bogotá",
@@ -1108,17 +1108,19 @@
           "content": {
             "posts": {
               "count": 3,
-              "engagement": 86.96,
-              "interactions": 4,
+              "engagement": 108.7,
+              "interactions": 5,
               "avgReach": 15,
               "views": 86,
               "reactions": 2,
-              "shares": 2
+              "shares": 3
             },
             "reels": {
               "count": 3,
               "interactions": 4,
-              "videoViews": 360
+              "videoViews": 363,
+              "likes": 3,
+              "actions": 1
             },
             "stories": {
               "count": 1

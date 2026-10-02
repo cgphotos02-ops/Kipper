@@ -165,14 +165,17 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
     hay = pipelineName[lead.pipeline_id] || '';
     for (k in MARCAS) if (MARCAS[k].test(hay)) return k;
     var ctc = contactoDe(lead);
-    var tagsTxt = ((lead._embedded && lead._embedded.tags) || []).map(function (t) { return t.name; }).join(' ') + ' ' + ctc.tags;
-    hay = tagsTxt;
-    for (k in MARCAS) if (MARCAS[k].test(hay)) return k;
-    // cualquier campo personalizado del lead cuya opción diga la marca
+    var leadTags = ((lead._embedded && lead._embedded.tags) || []).map(function (t) { return t.name; }).join(' ');
+    var tagsTxt = leadTags + ' ' + ctc.tags;
+    // 1) la etiqueta del LEAD manda (es la más reciente: la pone el bot en cada conversación)
+    for (k in MARCAS) if (MARCAS[k].test(leadTags)) return k;
+    // 2) cualquier campo personalizado del lead cuya opción diga la marca
     hay = (lead.custom_fields_values || []).map(function (f) {
       return (f.values || []).map(function (v) { return String(v.value == null ? '' : v.value); }).join(' ');
     }).join(' ');
     for (k in MARCAS) if (MARCAS[k].test(hay)) return k;
+    // 3) la etiqueta del CONTACTO (puede ser vieja, por eso va después)
+    for (k in MARCAS) if (MARCAS[k].test(ctc.tags)) return k;
     // sin etiqueta: se deduce por el contenido (nombre del lead + etiquetas + notas/mensajes)
     var m = marcaPorTexto([lead.name, tagsTxt, hay, ctc.extra].concat(textoPorLead[lead.id] || []).join(' \n '));
     if (m) { clasif.porTexto++; return m; }

@@ -100,7 +100,25 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
   console.log('Conectando con ' + SUBDOMAIN + '.kommo.com …');
   var pipelines = await fetchAll('/leads/pipelines', 'pipelines');
   var users = await fetchAll('/users', 'users');
-  var leads = await fetchAll('/leads', 'leads', 'with=loss_reason,source_id');
+  var leads = await fetchAll('/leads', 'leads', 'with=loss_reason,source_id,contacts');
+  // Contactos: Kommo también etiqueta (y guarda respuestas del bot) en el CONTACTO, no solo en el lead.
+  // Solo se usa en memoria: etiquetas y el campo "Tipo de servicio". Nada de nombres ni teléfonos.
+  var contactoInfo = {}, contactosError = null, contactoTags = {};
+  try {
+    (await fetchAll('/contacts', 'contacts')).forEach(function (c) {
+      var tg = ((c._embedded && c._embedded.tags) || []).map(function (t) { return t.name; });
+      tg.forEach(function (n) { contactoTags[n] = (contactoTags[n] || 0) + 1; });
+      var extra = (c.custom_fields_values || []).filter(function (f) { return /servicio|necesita|tipo de solicitud/i.test(f.field_name || ''); })
+        .map(function (f) { return (f.values || []).map(function (v) { return String(v.value == null ? '' : v.value); }).join(' '); }).join(' ');
+      contactoInfo[c.id] = { tags: tg.join(' '), extra: extra };
+    });
+  } catch (e) { contactosError = e.message; }
+  function contactoDe(lead) {
+    var ids = ((lead._embedded && lead._embedded.contacts) || []).map(function (c) { return c.id; });
+    var tags = [], extra = [];
+    ids.forEach(function (id) { var ci = contactoInfo[id]; if (ci) { tags.push(ci.tags); extra.push(ci.extra); } });
+    return { tags: tags.join(' '), extra: extra.join(' ') };
+  }
   // Fuentes (canales conectados: número de WhatsApp, cuenta de Instagram, etc.). Si la cuenta no las expone, se sigue sin ellas.
   var fuenteNombre = {}, fuentesError = null, fuentesDetalle = [];
   try {
@@ -146,7 +164,8 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
     var k, hay;
     hay = pipelineName[lead.pipeline_id] || '';
     for (k in MARCAS) if (MARCAS[k].test(hay)) return k;
-    var tagsTxt = ((lead._embedded && lead._embedded.tags) || []).map(function (t) { return t.name; }).join(' ');
+    var ctc = contactoDe(lead);
+    var tagsTxt = ((lead._embedded && lead._embedded.tags) || []).map(function (t) { return t.name; }).join(' ') + ' ' + ctc.tags;
     hay = tagsTxt;
     for (k in MARCAS) if (MARCAS[k].test(hay)) return k;
     // cualquier campo personalizado del lead cuya opción diga la marca
@@ -155,7 +174,7 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
     }).join(' ');
     for (k in MARCAS) if (MARCAS[k].test(hay)) return k;
     // sin etiqueta: se deduce por el contenido (nombre del lead + etiquetas + notas/mensajes)
-    var m = marcaPorTexto([lead.name, tagsTxt, hay].concat(textoPorLead[lead.id] || []).join(' \n '));
+    var m = marcaPorTexto([lead.name, tagsTxt, hay, ctc.extra].concat(textoPorLead[lead.id] || []).join(' \n '));
     if (m) { clasif.porTexto++; return m; }
     return null;
   }
@@ -185,7 +204,8 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
   var excluidosInternos = 0, noCalificados = 0;
   leads = leads.filter(function (l) {
     if (EXCLUIR_EMBUDOS.test(pipelineName[l.pipeline_id] || '')) { excluidos++; return false; }
-    var tg = ((l._embedded && l._embedded.tags) || []).map(function (t) { return t.name; }).join(' ');
+    var ct = contactoDe(l);
+    var tg = ((l._embedded && l._embedded.tags) || []).map(function (t) { return t.name; }).join(' ') + ' ' + ct.tags + (ct.extra ? ' hablar con asesor' : '');   // quien contestó el bot (tiene tipo de servicio) cuenta como real
     if (EXCLUIR_ETIQUETAS.test(tg)) { excluidosInternos++; return false; }
     // solo cuenta como lead real si pasó por el bot (tiene alguna etiqueta del cuestionario o de marca)
     if (!ETIQUETAS_LEAD_REAL.test(tg)) { noCalificados++; return false; }
@@ -293,6 +313,9 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
   });
   diag.camposOpciones = camposOpciones;
   diag.notas = notasInfo;
+  diag.etiquetasContacto = Object.keys(contactoTags).map(function (k) { return [k, contactoTags[k]]; }).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 40);
+  diag.contactosError = contactosError;
+  diag.contactosLeidos = Object.keys(contactoInfo).length;
   var porFuente = {};
   leads.forEach(function (l) { var n = l.source_id ? (fuenteNombre[l.source_id] || ('fuente ' + l.source_id)) : '(sin fuente)'; porFuente[n] = (porFuente[n] || 0) + 1; });
   diag.fuentes = Object.keys(porFuente).map(function (k) { return [k, porFuente[k]]; }).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 25);

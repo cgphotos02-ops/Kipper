@@ -97,9 +97,16 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
   var users = await fetchAll('/users', 'users');
   var leads = await fetchAll('/leads', 'leads', 'with=loss_reason,source_id');
   // Fuentes (canales conectados: número de WhatsApp, cuenta de Instagram, etc.). Si la cuenta no las expone, se sigue sin ellas.
-  var fuenteNombre = {}, fuentesError = null;
+  var fuenteNombre = {}, fuentesError = null, fuentesDetalle = [];
   try {
-    (await fetchAll('/sources', 'sources')).forEach(function (s) { fuenteNombre[s.id] = String(s.name || s.external_id || s.id).replace(/\d{7,}/g, function (d) { return '…' + d.slice(-4); }); });
+    var mask = function (x) { return String(x == null ? '' : x).replace(/\d{7,}/g, function (d) { return '…' + d.slice(-4); }); };
+    var fuentesRaw = await fetchAll('/sources', 'sources');
+    fuentesDetalle = fuentesRaw.map(function (s) {
+      var pages = [];
+      (s.services || []).forEach(function (sv) { (sv.pages || []).forEach(function (pg) { pages.push(mask(pg.name || pg.id)); }); });
+      return { id: s.id, name: mask(s.name), origin: s.origin_code || null, pages: pages.slice(0, 5) };
+    });
+    fuentesRaw.forEach(function (s) { fuenteNombre[s.id] = mask(s.name || s.external_id || s.id); });
   } catch (e) { fuentesError = e.message; }
   console.log('Embudos: ' + pipelines.length + ' · usuarios: ' + users.length + ' · leads: ' + leads.length);
 
@@ -278,6 +285,18 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
     var porOrigen = {};
     talks.forEach(function (t) { var o = t.origin || '(sin origen)'; porOrigen[o] = (porOrigen[o] || 0) + 1; });
     diag.conversaciones = { total: talks.length, porOrigen: porOrigen };
+    // por canal (source_id) de cada lead, qué tipo de conversación tiene
+    var talkOrigenPorLead = {};
+    talks.forEach(function (t) { if (t.entity_type === 'lead' || t.entity_id) { (talkOrigenPorLead[t.entity_id] = talkOrigenPorLead[t.entity_id] || {})[t.origin || '?'] = true; } });
+    var porFuenteOrigen = {};
+    leads.forEach(function (l) {
+      var f = String(l.source_id || 'sin fuente');
+      var os = Object.keys(talkOrigenPorLead[l.id] || {});
+      (porFuenteOrigen[f] = porFuenteOrigen[f] || {});
+      (os.length ? os : ['sin conversación']).forEach(function (o) { porFuenteOrigen[f][o] = (porFuenteOrigen[f][o] || 0) + 1; });
+    });
+    diag.fuenteOrigen = porFuenteOrigen;
+    diag.fuentesDetalle = fuentesDetalle;
   } catch (e) { diag.conversaciones = { error: e.message }; }
   diag.leadsClasificadosPorTexto = clasif.porTexto;
   diag.leadsConNombreUtil = leads.filter(function (l) { return marcaPorTexto(l.name) !== null; }).length;

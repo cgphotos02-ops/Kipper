@@ -95,7 +95,12 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
   console.log('Conectando con ' + SUBDOMAIN + '.kommo.com …');
   var pipelines = await fetchAll('/leads/pipelines', 'pipelines');
   var users = await fetchAll('/users', 'users');
-  var leads = await fetchAll('/leads', 'leads', 'with=loss_reason');
+  var leads = await fetchAll('/leads', 'leads', 'with=loss_reason,source_id');
+  // Fuentes (canales conectados: número de WhatsApp, cuenta de Instagram, etc.). Si la cuenta no las expone, se sigue sin ellas.
+  var fuenteNombre = {}, fuentesError = null;
+  try {
+    (await fetchAll('/sources', 'sources')).forEach(function (s) { fuenteNombre[s.id] = String(s.name || s.external_id || s.id).replace(/\d{7,}/g, function (d) { return '…' + d.slice(-4); }); });
+  } catch (e) { fuentesError = e.message; }
   console.log('Embudos: ' + pipelines.length + ' · usuarios: ' + users.length + ' · leads: ' + leads.length);
 
   var userName = {};
@@ -264,6 +269,16 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
   });
   diag.camposOpciones = camposOpciones;
   diag.notas = notasInfo;
+  var porFuente = {};
+  leads.forEach(function (l) { var n = l.source_id ? (fuenteNombre[l.source_id] || ('fuente ' + l.source_id)) : '(sin fuente)'; porFuente[n] = (porFuente[n] || 0) + 1; });
+  diag.fuentes = Object.keys(porFuente).map(function (k) { return [k, porFuente[k]]; }).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 25);
+  diag.fuentesError = fuentesError;
+  try {
+    var talks = await fetchAll('/talks', 'talks');
+    var porOrigen = {};
+    talks.forEach(function (t) { var o = t.origin || '(sin origen)'; porOrigen[o] = (porOrigen[o] || 0) + 1; });
+    diag.conversaciones = { total: talks.length, porOrigen: porOrigen };
+  } catch (e) { diag.conversaciones = { error: e.message }; }
   diag.leadsClasificadosPorTexto = clasif.porTexto;
   diag.leadsConNombreUtil = leads.filter(function (l) { return marcaPorTexto(l.name) !== null; }).length;
   diag.etiquetas = Object.keys(diag.etiquetas).map(function (k) { return [k, diag.etiquetas[k]]; }).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 40);

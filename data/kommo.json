@@ -1,5 +1,65 @@
 {
-  "generatedAt": null,
-  "source": "sin-conectar",
-  "accounts": {}
+  "generatedAt": "2026-10-02T16:06:05.314Z",
+  "source": "kommo",
+  "staleDays": 7,
+  "unassigned": 1075,
+  "pipelines": [
+    "Embudo de ventas",
+    "Embudo gestión humana"
+  ],
+  "accounts": {
+    "proviser": {
+      "months": {
+        "2026-09": {
+          "total": 1,
+          "won": 1,
+          "lost": 0,
+          "open": 0,
+          "stale": 0,
+          "winRate": 100,
+          "lossRate": 0,
+          "closedWinRate": 100,
+          "sales": 0,
+          "avgDaysToWin": 22.3,
+          "byOwner": [
+            {
+              "total": 1,
+              "won": 1,
+              "lost": 0,
+              "open": 0,
+              "sales": 0,
+              "name": "KipperSAS"
+            }
+          ],
+          "byOrigin": [
+            {
+              "total": 1,
+              "won": 1,
+              "lost": 0,
+              "open": 0,
+              "sales": 0,
+              "name": "Otro"
+            }
+          ],
+          "lostReasons": [],
+          "byStage": []
+        }
+      },
+      "open": {
+        "open": 0,
+        "stale": 0,
+        "byStage": [],
+        "byOwner": []
+      }
+    },
+    "nass": {
+      "months": {},
+      "open": {
+        "open": 0,
+        "stale": 0,
+        "byStage": [],
+        "byOwner": []
+      }
+    }
+  }
 }

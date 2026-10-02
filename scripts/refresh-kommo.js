@@ -21,11 +21,11 @@ const OUT = path.join(__dirname, '..', 'data', 'kommo.json');
 // Ajusta las expresiones si en Kommo usas otros nombres.
 // En Kommo la marca se marca con la etiqueta (o la opción de un campo) "Seguridad física" (Proviser) o "Seguridad electrónica" (Nass).
 const MARCAS = {
-  proviser: /proviser|seguridads+f[ií]sica/i,
-  nass: /nass|seguridads+electr[oó]nica/i
+  proviser: /proviser|seguridad\s+f[ií]sica/i,
+  nass: /nass|seguridad\s+electr[oó]nica/i
 };
 // Embudos que no son de ventas y no se cuentan (selección de personal).
-const EXCLUIR_EMBUDOS = /gesti[oó]ns+humana/i;
+const EXCLUIR_EMBUDOS = /gesti[oó]n\s+humana/i;
 // Campos personalizados donde suele estar el origen del lead (si no hay, se usan las etiquetas).
 const ORIGEN_FIELD_NAMES = /^(origen|fuente|canal|utm_source|source)$/i;
 

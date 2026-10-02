@@ -336,7 +336,58 @@
           },
           "topPosts": [],
           "hashtags": [],
-          "competitors": []
+          "competitors": [
+            {
+              "name": "Grupo Atlas Seguridad",
+              "handle": "@grupoatlasseguridad",
+              "followers": 10520,
+              "posts": 7,
+              "reels": 2,
+              "avgLikes": 29.33,
+              "avgComments": 0,
+              "engagement": 0.28
+            },
+            {
+              "name": "Alarmas Telesentinel",
+              "handle": "@telesentinel_colombia",
+              "followers": 10200,
+              "posts": 13,
+              "reels": 5,
+              "avgLikes": 15.89,
+              "avgComments": 0.3,
+              "engagement": 0.16
+            },
+            {
+              "name": "Oszford Seguridad Privada Cali",
+              "handle": "@seguridadprivadaoszford",
+              "followers": 5920,
+              "posts": null,
+              "reels": 6,
+              "avgLikes": 116.83,
+              "avgComments": 1.5,
+              "engagement": 2
+            },
+            {
+              "name": "Seguridad Omega",
+              "handle": "@seguridadomegaco",
+              "followers": 2900,
+              "posts": 1,
+              "reels": null,
+              "avgLikes": 37,
+              "avgComments": 1,
+              "engagement": 1.31
+            },
+            {
+              "name": "Sotech Seguridad y Tecnología",
+              "handle": "@sotechdecolombia",
+              "followers": 344,
+              "posts": null,
+              "reels": null,
+              "avgLikes": null,
+              "avgComments": null,
+              "engagement": null
+            }
+          ]
         }
       },
       "facebook": {

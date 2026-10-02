@@ -1,7 +1,7 @@
 {
   "diagnostico": {
     "porEmbudo": {
-      "Embudo de ventas": 279
+      "Embudo de ventas": 280
     },
     "etiquetas": [
       [
@@ -47,6 +47,10 @@
       [
         "5 minutos",
         1
+      ],
+      [
+        "PROVISER",
+        1
       ]
     ],
     "campos": {
@@ -73,10 +77,30 @@
       "leadsConTexto": 1,
       "error": null
     },
+    "etiquetasContacto": [
+      [
+        "VACANTES",
+        3
+      ],
+      [
+        "POTENCIAL",
+        3
+      ],
+      [
+        "REVISAR",
+        1
+      ],
+      [
+        "PROVISER",
+        1
+      ]
+    ],
+    "contactosError": null,
+    "contactosLeidos": 1142,
     "fuentes": [
       [
         "fuente 75089",
-        279
+        280
       ]
     ],
     "fuentesError": null,
@@ -91,22 +115,22 @@
     },
     "fuenteOrigen": {
       "75089": {
-        "waba": 279,
+        "waba": 280,
         "com.amocrm.amocrmwa": 6
       }
     },
     "fuentesDetalle": [],
-    "leadsClasificadosPorTexto": 0,
+    "leadsClasificadosPorTexto": 33,
     "leadsConNombreUtil": 0
   },
-  "generatedAt": "2026-10-02T19:16:18.119Z",
+  "generatedAt": "2026-10-02T19:19:15.842Z",
   "source": "kommo",
   "staleDays": 7,
-  "unassigned": 279,
+  "unassigned": 246,
   "descartados": {
     "gestionHumana": 414,
     "internos": 0,
-    "sinPasarPorElBot": 384
+    "sinPasarPorElBot": 383
   },
   "pipelines": [
     "Embudo de ventas",
@@ -319,26 +343,305 @@
             }
           ],
           "byStage": []
+        },
+        "2026-10": {
+          "total": 1,
+          "won": 0,
+          "lost": 0,
+          "open": 1,
+          "stale": 0,
+          "winRate": 0,
+          "lossRate": 0,
+          "closedWinRate": null,
+          "sales": 0,
+          "avgDaysToWin": null,
+          "byOwner": [
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 0,
+              "open": 1,
+              "sales": 0,
+              "name": "KipperSAS"
+            }
+          ],
+          "byOrigin": [
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 0,
+              "open": 1,
+              "sales": 0,
+              "name": "Sin origen"
+            }
+          ],
+          "lostReasons": [],
+          "byStage": [
+            {
+              "name": "Contacto inicial",
+              "pipeline": "Embudo de ventas",
+              "sort": 20,
+              "count": 1,
+              "stale": 0
+            }
+          ]
         }
       },
       "open": {
-        "open": 0,
+        "open": 1,
         "stale": 0,
-        "byStage": [],
-        "byOwner": []
+        "byStage": [
+          {
+            "name": "Contacto inicial",
+            "pipeline": "Embudo de ventas",
+            "sort": 20,
+            "count": 1,
+            "stale": 0
+          }
+        ],
+        "byOwner": [
+          {
+            "name": "KipperSAS",
+            "open": 1,
+            "stale": 0
+          }
+        ]
       }
     },
     "proviser": {
-      "months": {},
+      "months": {
+        "2026-09": {
+          "total": 2,
+          "won": 0,
+          "lost": 2,
+          "open": 0,
+          "stale": 0,
+          "winRate": 0,
+          "lossRate": 100,
+          "closedWinRate": 0,
+          "sales": 0,
+          "avgDaysToWin": null,
+          "byOwner": [
+            {
+              "total": 2,
+              "won": 0,
+              "lost": 2,
+              "open": 0,
+              "sales": 0,
+              "name": "KipperSAS"
+            }
+          ],
+          "byOrigin": [
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 1,
+              "open": 0,
+              "sales": 0,
+              "name": "Hogar"
+            },
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 1,
+              "open": 0,
+              "sales": 0,
+              "name": "Comercio u Oficina"
+            }
+          ],
+          "lostReasons": [
+            {
+              "name": "Sin motivo registrado",
+              "count": 2
+            }
+          ],
+          "byStage": []
+        },
+        "2026-10": {
+          "total": 1,
+          "won": 0,
+          "lost": 0,
+          "open": 1,
+          "stale": 0,
+          "winRate": 0,
+          "lossRate": 0,
+          "closedWinRate": null,
+          "sales": 0,
+          "avgDaysToWin": null,
+          "byOwner": [
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 0,
+              "open": 1,
+              "sales": 0,
+              "name": "KipperSAS"
+            }
+          ],
+          "byOrigin": [
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 0,
+              "open": 1,
+              "sales": 0,
+              "name": "Sin origen"
+            }
+          ],
+          "lostReasons": [],
+          "byStage": [
+            {
+              "name": "Contacto inicial",
+              "pipeline": "Embudo de ventas",
+              "sort": 20,
+              "count": 1,
+              "stale": 0
+            }
+          ]
+        }
+      },
       "open": {
-        "open": 0,
+        "open": 1,
         "stale": 0,
-        "byStage": [],
-        "byOwner": []
+        "byStage": [
+          {
+            "name": "Contacto inicial",
+            "pipeline": "Embudo de ventas",
+            "sort": 20,
+            "count": 1,
+            "stale": 0
+          }
+        ],
+        "byOwner": [
+          {
+            "name": "KipperSAS",
+            "open": 1,
+            "stale": 0
+          }
+        ]
       }
     },
     "nass": {
-      "months": {},
+      "months": {
+        "2026-08": {
+          "total": 11,
+          "won": 0,
+          "lost": 11,
+          "open": 0,
+          "stale": 0,
+          "winRate": 0,
+          "lossRate": 100,
+          "closedWinRate": 0,
+          "sales": 0,
+          "avgDaysToWin": null,
+          "byOwner": [
+            {
+              "total": 11,
+              "won": 0,
+              "lost": 11,
+              "open": 0,
+              "sales": 0,
+              "name": "KipperSAS"
+            }
+          ],
+          "byOrigin": [
+            {
+              "total": 10,
+              "won": 0,
+              "lost": 10,
+              "open": 0,
+              "sales": 0,
+              "name": "Hogar"
+            },
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 1,
+              "open": 0,
+              "sales": 0,
+              "name": "Comercio u Oficina"
+            }
+          ],
+          "lostReasons": [
+            {
+              "name": "Sin motivo registrado",
+              "count": 11
+            }
+          ],
+          "byStage": []
+        },
+        "2026-09": {
+          "total": 20,
+          "won": 0,
+          "lost": 20,
+          "open": 0,
+          "stale": 0,
+          "winRate": 0,
+          "lossRate": 100,
+          "closedWinRate": 0,
+          "sales": 0,
+          "avgDaysToWin": null,
+          "byOwner": [
+            {
+              "total": 20,
+              "won": 0,
+              "lost": 20,
+              "open": 0,
+              "sales": 0,
+              "name": "KipperSAS"
+            }
+          ],
+          "byOrigin": [
+            {
+              "total": 14,
+              "won": 0,
+              "lost": 14,
+              "open": 0,
+              "sales": 0,
+              "name": "Hogar"
+            },
+            {
+              "total": 2,
+              "won": 0,
+              "lost": 2,
+              "open": 0,
+              "sales": 0,
+              "name": "Empresas"
+            },
+            {
+              "total": 2,
+              "won": 0,
+              "lost": 2,
+              "open": 0,
+              "sales": 0,
+              "name": "Otro"
+            },
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 1,
+              "open": 0,
+              "sales": 0,
+              "name": "Conjunto Residencial"
+            },
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 1,
+              "open": 0,
+              "sales": 0,
+              "name": "Comercio u Oficina"
+            }
+          ],
+          "lostReasons": [
+            {
+              "name": "Sin motivo registrado",
+              "count": 20
+            }
+          ],
+          "byStage": []
+        }
+      },
       "open": {
         "open": 0,
         "stale": 0,

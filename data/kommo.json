@@ -129,10 +129,44 @@
         "com.amocrm.amocrmwa": 217
       }
     },
+    "fuenteOrigen": {
+      "26938": {
+        "com.amocrm.amocrmwa": 104
+      },
+      "73685": {
+        "facebook": 47
+      },
+      "73689": {
+        "facebook": 5
+      },
+      "73693": {
+        "instagram_business": 7
+      },
+      "73695": {
+        "instagram_business": 2
+      },
+      "73697": {
+        "instagram_business": 19
+      },
+      "73699": {
+        "instagram_business": 4
+      },
+      "75089": {
+        "waba": 456,
+        "com.amocrm.amocrmwa": 13
+      },
+      "75091": {
+        "waba": 17
+      },
+      "80001": {
+        "com.amocrm.amocrmwa": 1
+      }
+    },
+    "fuentesDetalle": [],
     "leadsClasificadosPorTexto": 0,
     "leadsConNombreUtil": 0
   },
-  "generatedAt": "2026-10-02T16:49:13.348Z",
+  "generatedAt": "2026-10-02T16:58:03.655Z",
   "source": "kommo",
   "staleDays": 7,
   "unassigned": 662,

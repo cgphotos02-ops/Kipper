@@ -1018,6 +1018,7 @@
     <h1 class="greeting">Leads</h1>
     <div class="date-sub">Cómo se están gestionando tus leads en Kommo, y los leads pagados + orgánicos por marca</div>
 
+    <div id="gestion-wrap"></div>
     <div id="kommo-wrap"></div>
 
     <div class="card">
@@ -1302,6 +1303,7 @@
     var set = {};
     set[DATA_MONTH] = true;
     if (typeof SEG !== 'undefined' && SEG && SEG.rows) SEG.rows.forEach(function (r) { if (r.mes) set[r.mes] = true; });
+    if (typeof GESTION !== 'undefined' && GESTION && GESTION.months) Object.keys(GESTION.months).forEach(function (m) { set[m] = true; });
     if (typeof KOMMO !== 'undefined' && KOMMO && KOMMO.accounts) {
       Object.keys(KOMMO.accounts).forEach(function (k) { kommoMonths(KOMMO.accounts[k]).forEach(function (m) { set[m] = true; }); });
     }
@@ -1373,6 +1375,7 @@
     setText('profile-updated', 'Métricas: ' + monthLabel(hasThisMonth ? selectedMonth : latest));
     renderSocial(currentAccount());
     renderSeguimiento(currentAccount());
+    renderGestion();
     renderKommo();
   }
   if (cuentaSel) cuentaSel.addEventListener('change', refreshAccount);
@@ -2816,6 +2819,68 @@
       b.addEventListener('click', function () { kommoScope = this.getAttribute('data-scope'); renderKommo(); });
     });
   }
+
+  // ---------- Gestión comercial del equipo (data/gestion.json, resumen del Excel de contactos) ----------
+  var GESTION = null;
+  function gTitle(s) { s = String(s || '').toLowerCase(); return s.charAt(0).toUpperCase() + s.slice(1); }
+  function renderGestion() {
+    var box = el('gestion-wrap');
+    if (!box) return;
+    if (!GESTION || !GESTION.months) { box.innerHTML = ''; return; }
+    var months = Object.keys(GESTION.months).sort();
+    var b = GESTION.months[selectedMonth];
+    if (!b) {
+      box.innerHTML = '<div class="card"><h2>📞 Gestión comercial del equipo</h2><div class="leads-empty-state">' + monthJumpHtml('gestión comercial', months) + '</div></div>';
+      wireMonthJumpBtn(box);
+      return;
+    }
+    function est(re) { return Object.keys(b.estados).reduce(function (s, k) { return re.test(k) ? s + b.estados[k] : s; }, 0); }
+    var vac = est(/vacante/i), noLead = est(/no es un lead/i), noCont = est(/no contesta/i), noInt = est(/no interesado/i);
+    var prosp = b.prospectos, avance = prosp - noCont - noInt;
+    var html = '<div class="card"><h2>📞 Gestión comercial del equipo — ' + kEsc(monthLabel(selectedMonth)) + '</h2>' +
+      '<p class="kommo-hint">Resumen del Excel que lleva el equipo comercial (ambas marcas). Cada contacto que escribió tiene un estado. ' +
+      'Se separan los que <b>no son clientes</b> (vacantes y mensajes ajenos) de los <b>prospectos reales</b>, que son los que el equipo debía gestionar.</p>' +
+      '<div class="kpi-row">' +
+      kTile('Contactos que escribieron', kmt(b.total), 'todos los chats del mes', 'Todas las personas que escribieron y quedaron como contacto en Kommo ese mes.') +
+      kTile('No son clientes', kmt(vac + noLead), kmt(vac) + ' vacantes · ' + kmt(noLead) + ' otros motivos', 'Vacantes: personas pidiendo empleo. "No es un lead": escribieron por otro motivo ajeno a la empresa. No se cuentan como prospectos.') +
+      kTile('Prospectos reales', kmt(prosp), 'lo que había que gestionar', 'Contactos que sí podían ser clientes: todo lo que no es vacante ni "no es un lead".') +
+      kTile('Sin respuesta', kmt(noCont), (prosp ? kPct((noCont / prosp) * 100) : '—') + ' de los prospectos', 'Prospectos a los que se intentó contactar y no contestaron.') +
+      '</div>';
+    if (prosp > 0 && avance <= 0) {
+      html += '<p class="vc-note" style="margin-top:12px">⚠️ En el Excel <b>ningún prospecto aparece como interesado, cotizado o vendido</b>: todos están como "no contesta" o "no interesado". ' +
+        'Si hubo conversaciones comerciales o ventas, no se están registrando, y no se puede medir cuántos prospectos avanzan.</p>';
+    }
+    // estados
+    var ests = Object.keys(b.estados).map(function (k) { return { name: gTitle(k), count: b.estados[k] }; }).sort(function (a, c) { return c.count - a.count; });
+    html += '<h3 style="margin:16px 0 4px;font-size:13px">Cómo quedó cada contacto</h3>' +
+      kBars(ests, 'name', 'count', function (r) { return r.count + ' · ' + kPct((r.count / b.total) * 100); });
+    if (b.observaciones && b.observaciones.length) {
+      html += '<h3 style="margin:16px 0 4px;font-size:13px">Motivos que anotó el equipo</h3>' +
+        kBars(b.observaciones.map(function (o) { return { name: gTitle(o.texto), count: o.count }; }), 'name', 'count', function (r) { return String(r.count); });
+    }
+    if (b.servicio && b.servicio.length) {
+      var conServ = b.servicio.reduce(function (s, x) { return s + x.count; }, 0);
+      html += '<h3 style="margin:16px 0 4px;font-size:13px">Qué servicio pidieron</h3>' +
+        '<p class="kommo-hint">Solo ' + kmt(conServ) + ' de ' + kmt(b.total) + ' contactos contestaron esta pregunta del bot, así que es una muestra pequeña.</p>' +
+        kBars(b.servicio, 'name', 'count', function (r) { return String(r.count); });
+    }
+    if (b.urgencia && b.urgencia.length) {
+      html += '<h3 style="margin:16px 0 4px;font-size:13px">Qué tan pronto lo necesitan</h3>' +
+        kBars(b.urgencia, 'name', 'count', function (r) { return String(r.count); });
+    }
+    // evolución mes a mes
+    html += '<h3 style="margin:16px 0 4px;font-size:13px">Mes a mes</h3><div class="simple-table-wrap"><table class="simple-table"><thead><tr><th>Mes</th><th>Contactos</th><th>Prospectos</th><th>Sin respuesta</th><th>% sin respuesta</th></tr></thead><tbody>' +
+      months.map(function (mk) {
+        var x = GESTION.months[mk], nc = Object.keys(x.estados).reduce(function (s, k) { return /no contesta/i.test(k) ? s + x.estados[k] : s; }, 0);
+        return '<tr' + (mk === selectedMonth ? ' style="font-weight:700"' : '') + '><td>' + kEsc(monthLabel(mk)) + '</td><td>' + x.total + '</td><td>' + x.prospectos + '</td><td>' + nc + '</td><td>' + (x.prospectos ? kPct((nc / x.prospectos) * 100) : '—') + '</td></tr>';
+      }).join('') + '</tbody></table></div>' +
+      '<p class="kommo-hint" style="margin-top:8px">Fuente: ' + kEsc(GESTION.file || 'Excel del equipo') + '. Contiene solo conteos, sin nombres ni teléfonos.</p></div>';
+    box.innerHTML = html;
+  }
+  fetch('data/gestion.json', { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) { GESTION = d; buildMonthOptions(); renderGestion(); })
+    .catch(function () {});
 
   fetch('data/kommo.json', { cache: 'no-store' })
     .then(function (r) { return r.ok ? r.json() : null; })

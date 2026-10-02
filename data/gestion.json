@@ -1,0 +1,207 @@
+{
+  "source": "Excel del equipo comercial (export de contactos de Kommo + ESTADO/OBSERVACIONES/MES)",
+  "file": "kommo_export_contacts_and_companies_2026-09-23.xlsx",
+  "updatedAt": "2026-10-02T17:10:22.031Z",
+  "months": {
+    "2026-06": {
+      "total": 157,
+      "estados": {
+        "NO CONTESTA": 98,
+        "VACANTE": 58,
+        "NO ES UN LEAD": 1
+      },
+      "observaciones": [],
+      "servicio": [
+        {
+          "name": "CCTV / Cámaras",
+          "count": 4
+        },
+        {
+          "name": "Seguridad integral",
+          "count": 2
+        },
+        {
+          "name": "Alarmas y monitoreo",
+          "count": 2
+        },
+        {
+          "name": "Guardas de seguridad",
+          "count": 2
+        },
+        {
+          "name": "Seguridad híbrida",
+          "count": 1
+        }
+      ],
+      "urgencia": [
+        {
+          "name": "Lo antes posible",
+          "count": 6
+        },
+        {
+          "name": "Este mes",
+          "count": 3
+        },
+        {
+          "name": "Explorando opciones",
+          "count": 1
+        },
+        {
+          "name": "En los próximos meses",
+          "count": 1
+        }
+      ],
+      "prospectos": 98
+    },
+    "2026-07": {
+      "total": 84,
+      "estados": {
+        "NO CONTESTA": 45,
+        "VACANTE": 36,
+        "NO ES UN LEAD": 3
+      },
+      "observaciones": [],
+      "servicio": [
+        {
+          "name": "CCTV / Cámaras",
+          "count": 2
+        }
+      ],
+      "urgencia": [
+        {
+          "name": "Explorando opciones",
+          "count": 1
+        },
+        {
+          "name": "Lo antes posible",
+          "count": 1
+        }
+      ],
+      "prospectos": 45
+    },
+    "2026-08": {
+      "total": 316,
+      "estados": {
+        "VACANTE": 181,
+        "NO ES UN LEAD": 2,
+        "NO INTERESADO": 6,
+        "NO CONTESTA": 127
+      },
+      "observaciones": [
+        {
+          "estado": "NO INTERESADO",
+          "texto": "SE LLAMA AL CLIENTE, INFORMA QUE YA COMPRO EQUIPOS CON OTRO PROVEEDOR",
+          "count": 2
+        }
+      ],
+      "servicio": [
+        {
+          "name": "CCTV / Cámaras",
+          "count": 12
+        },
+        {
+          "name": "Seguridad integral",
+          "count": 5
+        },
+        {
+          "name": "Alarmas y monitoreo",
+          "count": 4
+        },
+        {
+          "name": "Seguridad híbrida",
+          "count": 2
+        },
+        {
+          "name": "Guardas de seguridad",
+          "count": 1
+        }
+      ],
+      "urgencia": [
+        {
+          "name": "Explorando opciones",
+          "count": 8
+        },
+        {
+          "name": "Lo antes posible",
+          "count": 7
+        },
+        {
+          "name": "Este mes",
+          "count": 6
+        },
+        {
+          "name": "En los próximos meses",
+          "count": 3
+        }
+      ],
+      "prospectos": 133
+    },
+    "2026-09": {
+      "total": 408,
+      "estados": {
+        "NO ES UN LEAD": 62,
+        "VACANTE": 136,
+        "NO CONTESTA": 198,
+        "NO INTERESADO": 12
+      },
+      "observaciones": [
+        {
+          "estado": "NO ES UN LEAD",
+          "texto": "CLIENTE SE CONTACTA POR OTRO MOTIVO AGENO A LA EMPRESA",
+          "count": 13
+        },
+        {
+          "estado": "NO INTERESADO",
+          "texto": "SE LLAMA AL CLIENTE, INFORMA QUE YA COMPRO EQUIPOS CON OTRO PROVEEDOR",
+          "count": 6
+        },
+        {
+          "estado": "NO CONTESTA",
+          "texto": "NO CONTESTA, SE CIERRA INTERACCION",
+          "count": 2
+        }
+      ],
+      "servicio": [
+        {
+          "name": "CCTV / Cámaras",
+          "count": 14
+        },
+        {
+          "name": "Alarmas y monitoreo",
+          "count": 8
+        },
+        {
+          "name": "Guardas de seguridad",
+          "count": 3
+        },
+        {
+          "name": "Seguridad híbrida",
+          "count": 2
+        },
+        {
+          "name": "Seguridad integral",
+          "count": 2
+        }
+      ],
+      "urgencia": [
+        {
+          "name": "Lo antes posible",
+          "count": 11
+        },
+        {
+          "name": "Explorando opciones",
+          "count": 8
+        },
+        {
+          "name": "Este mes",
+          "count": 7
+        },
+        {
+          "name": "En los próximos meses",
+          "count": 3
+        }
+      ],
+      "prospectos": 210
+    }
+  }
+}

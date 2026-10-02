@@ -387,6 +387,37 @@
               "avgComments": null,
               "engagement": null
             }
+          ],
+          "cities": [
+            [
+              "Santiago de Cali",
+              28.29
+            ],
+            [
+              "Bogotá",
+              15.88
+            ],
+            [
+              "Medellín",
+              4.34
+            ],
+            [
+              "Jamundí",
+              2.87
+            ],
+            [
+              "Palmira",
+              2.75
+            ]
+          ],
+          "countries": [
+            "Colombia",
+            "España",
+            "Venezuela",
+            "Estados Unidos",
+            "Argentina",
+            "México",
+            "Chile"
           ]
         }
       },

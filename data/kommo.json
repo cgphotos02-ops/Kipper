@@ -1,5 +1,88 @@
 {
-  "generatedAt": "2026-10-02T16:06:05.314Z",
+  "diagnostico": {
+    "porEmbudo": {
+      "Embudo de ventas": 663,
+      "Embudo gestión humana": 413
+    },
+    "etiquetas": [
+      [
+        "Hogar",
+        165
+      ],
+      [
+        "Hablar con asesor",
+        151
+      ],
+      [
+        "Otro",
+        29
+      ],
+      [
+        "Comercio u Oficina",
+        28
+      ],
+      [
+        "Llamada",
+        27
+      ],
+      [
+        "Externo",
+        20
+      ],
+      [
+        "Empresas",
+        15
+      ],
+      [
+        "Conjunto Residencial",
+        15
+      ],
+      [
+        "Inmediatamente",
+        9
+      ],
+      [
+        "1 hora",
+        8
+      ],
+      [
+        "Visita Técnica",
+        7
+      ],
+      [
+        "Colaborador",
+        3
+      ],
+      [
+        "5 minutos",
+        3
+      ]
+    ],
+    "campos": {
+      "Empresa": 20
+    },
+    "estados": {},
+    "camposOpciones": {
+      "Empresa": {
+        "Edificio Parque San Felipe": 1,
+        "Vive vital": 1,
+        "Proviser": 1,
+        "Instalador Independiente": 1,
+        "Eagle equipos sas": 1,
+        "en presas": 1,
+        "Veterinaria tu angel guardian": 1,
+        "Casa": 5,
+        "Aceros y Aluminios del Café SAS": 1,
+        "Hogar": 2,
+        "Cardexol": 1,
+        "Minimarket": 1,
+        "Alta gama": 1,
+        "Comercio": 1,
+        "Trapiche procecaña": 1
+      }
+    }
+  },
+  "generatedAt": "2026-10-02T16:09:43.737Z",
   "source": "kommo",
   "staleDays": 7,
   "unassigned": 1075,

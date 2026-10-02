@@ -38,6 +38,8 @@ function marcaPorTexto(texto) {
   if (p > n) return 'proviser';
   return null;   // sin señales, o empate: queda "sin marca"
 }
+// Etiquetas de conversaciones que NO son clientes (compañeros de trabajo que escriben al mismo WhatsApp). No se cuentan.
+const EXCLUIR_ETIQUETAS = /colaborador|interno|compa[nñ]ero|empleado/i;
 // Embudos que no son de ventas y no se cuentan (selección de personal).
 const EXCLUIR_EMBUDOS = /gesti[oó]n\s+humana/i;
 // Campos personalizados donde suele estar el origen del lead (si no hay, se usan las etiquetas).
@@ -177,8 +179,14 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
   Object.keys(MARCAS).forEach(function (k) { openByBrand[k] = newBucket(); });
 
   var excluidos = 0;
-  leads = leads.filter(function (l) { var ex = EXCLUIR_EMBUDOS.test(pipelineName[l.pipeline_id] || ''); if (ex) excluidos++; return !ex; });
-  console.log('Leads de ventas: ' + leads.length + ' (excluidos por embudo: ' + excluidos + ')');
+  var excluidosInternos = 0;
+  leads = leads.filter(function (l) {
+    if (EXCLUIR_EMBUDOS.test(pipelineName[l.pipeline_id] || '')) { excluidos++; return false; }
+    var tg = ((l._embedded && l._embedded.tags) || []).map(function (t) { return t.name; }).join(' ');
+    if (EXCLUIR_ETIQUETAS.test(tg)) { excluidosInternos++; return false; }
+    return true;
+  });
+  console.log('Leads de ventas: ' + leads.length + ' (excluidos por embudo: ' + excluidos + ' · internos/colaboradores: ' + excluidosInternos + ')');
   leads.forEach(function (lead) {
     var marca = marcaDe(lead);
     if (!marca) { sinMarca++; return; }

@@ -24,6 +24,20 @@ const MARCAS = {
   proviser: /proviser|seguridad\s+f[ií]sica/i,
   nass: /nass|seguridad\s+electr[oó]nica/i
 };
+// Si el lead no trae la etiqueta de marca, se deduce leyendo su nombre, etiquetas y notas/mensajes guardados en Kommo.
+// El texto solo se usa en memoria para decidir la marca: NUNCA se imprime ni se guarda en el repo (que es público).
+// Se normaliza sin tildes y en minúsculas. Ajusta las palabras según lo que escriben tus clientes.
+const PALABRAS_NASS = /\b(camaras?|cctv|alarmas?|sensor(es)?|control de acceso|biometric\w*|huella|citofon\w*|videoportero|cerc[ao]s? electric\w*|domotic\w*|automatizacion|monitoreo|dvr|nvr|wifi|cerradur\w*|boton de panico|sirena|videovigilancia|seguridad electronica|kit basico|instalacion de camaras)\b/g;
+const PALABRAS_PROVISER = /\b(vigilantes?|vigilancia|guardas?|guardia|escolta\w*|porteria|portero|seguridad privada|seguridad fisica|supervisor\w*|puesto de vigilancia|rondas?|ronderos?|canin\w*|servicio de seguridad|empresa de seguridad)\b/g;
+function sinTildes(s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+function marcaPorTexto(texto) {
+  var t = sinTildes(texto);
+  var n = new Set(t.match(PALABRAS_NASS) || []).size;
+  var p = new Set(t.match(PALABRAS_PROVISER) || []).size;
+  if (n > p) return 'nass';
+  if (p > n) return 'proviser';
+  return null;   // sin señales, o empate: queda "sin marca"
+}
 // Embudos que no son de ventas y no se cuentan (selección de personal).
 const EXCLUIR_EMBUDOS = /gesti[oó]n\s+humana/i;
 // Campos personalizados donde suele estar el origen del lead (si no hay, se usan las etiquetas).
@@ -94,17 +108,38 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
     });
   });
 
+  // Notas y mensajes guardados por lead (solo en memoria). Si la cuenta no deja leerlos, se sigue sin ellos.
+  var textoPorLead = {}, clasif = { porTexto: 0 };
+  var notasInfo = { tipos: {}, leadsConNotas: 0, leadsConTexto: 0, error: null };
+  try {
+    var notas = await fetchAll('/leads/notes', 'notes');
+    notas.forEach(function (n) {
+      notasInfo.tipos[n.note_type] = (notasInfo.tipos[n.note_type] || 0) + 1;
+      var p = n.params || {};
+      var txt = [p.text, p.html, p.service, p.message && p.message.text].filter(function (x) { return typeof x === 'string' && x; }).join(' ');
+      if (!textoPorLead[n.entity_id]) textoPorLead[n.entity_id] = [];
+      textoPorLead[n.entity_id].push(txt.slice(0, 1500));
+    });
+    notasInfo.leadsConNotas = Object.keys(textoPorLead).length;
+    notasInfo.leadsConTexto = Object.keys(textoPorLead).filter(function (id) { return textoPorLead[id].join('').trim().length > 0; }).length;
+  } catch (e) { notasInfo.error = e.message; }
+  console.log('Notas leídas: ' + Object.keys(notasInfo.tipos).reduce(function (s, k) { return s + notasInfo.tipos[k]; }, 0) + ' · leads con notas: ' + notasInfo.leadsConNotas + (notasInfo.error ? ' · aviso: ' + notasInfo.error : ''));
+
   function marcaDe(lead) {
     var k, hay;
     hay = pipelineName[lead.pipeline_id] || '';
     for (k in MARCAS) if (MARCAS[k].test(hay)) return k;
-    hay = ((lead._embedded && lead._embedded.tags) || []).map(function (t) { return t.name; }).join(' ');
+    var tagsTxt = ((lead._embedded && lead._embedded.tags) || []).map(function (t) { return t.name; }).join(' ');
+    hay = tagsTxt;
     for (k in MARCAS) if (MARCAS[k].test(hay)) return k;
     // cualquier campo personalizado del lead cuya opción diga la marca
     hay = (lead.custom_fields_values || []).map(function (f) {
       return (f.values || []).map(function (v) { return String(v.value == null ? '' : v.value); }).join(' ');
     }).join(' ');
     for (k in MARCAS) if (MARCAS[k].test(hay)) return k;
+    // sin etiqueta: se deduce por el contenido (nombre del lead + etiquetas + notas/mensajes)
+    var m = marcaPorTexto([lead.name, tagsTxt, hay].concat(textoPorLead[lead.id] || []).join(' \n '));
+    if (m) { clasif.porTexto++; return m; }
     return null;
   }
   function origenDe(lead) {
@@ -228,6 +263,9 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
     if (vals.length <= 15 && !/tel|cel|mail|correo|nombre|name|phone|c[eé]dula|nit|direcci/i.test(n)) camposOpciones[n] = camposValores[n];
   });
   diag.camposOpciones = camposOpciones;
+  diag.notas = notasInfo;
+  diag.leadsClasificadosPorTexto = clasif.porTexto;
+  diag.leadsConNombreUtil = leads.filter(function (l) { return marcaPorTexto(l.name) !== null; }).length;
   diag.etiquetas = Object.keys(diag.etiquetas).map(function (k) { return [k, diag.etiquetas[k]]; }).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 40);
 
   writeOut({

@@ -19,11 +19,13 @@ const OUT = path.join(__dirname, '..', 'data', 'kommo.json');
 // ---- Cómo saber de qué marca es cada lead ----
 // Se evalúa en este orden: nombre del embudo, etiquetas del lead, campo personalizado "Marca".
 // Ajusta las expresiones si en Kommo usas otros nombres.
+// En Kommo la marca se marca con la etiqueta (o la opción de un campo) "Seguridad física" (Proviser) o "Seguridad electrónica" (Nass).
 const MARCAS = {
-  proviser: /proviser/i,
-  nass: /nass/i
+  proviser: /proviser|seguridads+f[ií]sica/i,
+  nass: /nass|seguridads+electr[oó]nica/i
 };
-const MARCA_FIELD_NAMES = /^(marca|empresa|unidad de negocio)$/i;
+// Embudos que no son de ventas y no se cuentan (selección de personal).
+const EXCLUIR_EMBUDOS = /gesti[oó]ns+humana/i;
 // Campos personalizados donde suele estar el origen del lead (si no hay, se usan las etiquetas).
 const ORIGEN_FIELD_NAMES = /^(origen|fuente|canal|utm_source|source)$/i;
 
@@ -98,11 +100,11 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
     for (k in MARCAS) if (MARCAS[k].test(hay)) return k;
     hay = ((lead._embedded && lead._embedded.tags) || []).map(function (t) { return t.name; }).join(' ');
     for (k in MARCAS) if (MARCAS[k].test(hay)) return k;
-    var cf = (lead.custom_fields_values || []).filter(function (f) { return MARCA_FIELD_NAMES.test(f.field_name || ''); })[0];
-    if (cf && cf.values && cf.values[0]) {
-      hay = String(cf.values[0].value || '');
-      for (k in MARCAS) if (MARCAS[k].test(hay)) return k;
-    }
+    // cualquier campo personalizado del lead cuya opción diga la marca
+    hay = (lead.custom_fields_values || []).map(function (f) {
+      return (f.values || []).map(function (v) { return String(v.value == null ? '' : v.value); }).join(' ');
+    }).join(' ');
+    for (k in MARCAS) if (MARCAS[k].test(hay)) return k;
     return null;
   }
   function origenDe(lead) {
@@ -127,6 +129,9 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
   var openByBrand = {};
   Object.keys(MARCAS).forEach(function (k) { openByBrand[k] = newBucket(); });
 
+  var excluidos = 0;
+  leads = leads.filter(function (l) { var ex = EXCLUIR_EMBUDOS.test(pipelineName[l.pipeline_id] || ''); if (ex) excluidos++; return !ex; });
+  console.log('Leads de ventas: ' + leads.length + ' (excluidos por embudo: ' + excluidos + ')');
   leads.forEach(function (lead) {
     var marca = marcaDe(lead);
     if (!marca) { sinMarca++; return; }

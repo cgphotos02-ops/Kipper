@@ -77,10 +77,62 @@
       "leadsConTexto": 1,
       "error": null
     },
+    "fuentes": [
+      [
+        "fuente 75089",
+        456
+      ],
+      [
+        "fuente 26938",
+        104
+      ],
+      [
+        "fuente 73685",
+        47
+      ],
+      [
+        "fuente 73697",
+        19
+      ],
+      [
+        "fuente 75091",
+        17
+      ],
+      [
+        "fuente 73693",
+        7
+      ],
+      [
+        "fuente 73689",
+        5
+      ],
+      [
+        "fuente 73699",
+        4
+      ],
+      [
+        "fuente 73695",
+        2
+      ],
+      [
+        "fuente 80001",
+        1
+      ]
+    ],
+    "fuentesError": null,
+    "conversaciones": {
+      "total": 1334,
+      "porOrigen": {
+        "facebook": 150,
+        "instagram_business": 102,
+        "waba": 865,
+        "com.amocrm.amocrmwa": 217
+      }
+    },
     "leadsClasificadosPorTexto": 0,
     "leadsConNombreUtil": 0
   },
-  "generatedAt": "2026-10-02T16:45:21.486Z",
+  "generatedAt": "2026-10-02T16:49:13.348Z",
   "source": "kommo",
   "staleDays": 7,
   "unassigned": 662,

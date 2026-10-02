@@ -344,7 +344,7 @@
       "facebook": {
         "2026-08": {
           "followers": 15510,
-          "followersDelta": 25,
+          "followersDelta": -19,
           "acquired": 55,
           "lost": 30,
           "views": 67700,
@@ -353,7 +353,7 @@
           "cities": [
             [
               "Cali",
-              33.06
+              33.05
             ],
             [
               "Bogotá",
@@ -375,20 +375,20 @@
           "content": {
             "posts": {
               "count": 1,
-              "engagement": 56.52,
+              "engagement": 52,
               "interactions": 39,
-              "avgReach": 690,
-              "views": 1125,
+              "avgReach": 750,
+              "views": 1293,
               "reactions": 16,
               "shares": 1,
               "clicks": 22
             },
             "reels": {
               "count": 3,
-              "interactions": 205,
-              "videoViews": 5571,
-              "likes": 176,
-              "actions": 29
+              "interactions": 235,
+              "videoViews": 6883,
+              "likes": 204,
+              "actions": 31
             },
             "stories": {
               "count": 1

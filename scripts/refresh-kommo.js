@@ -1,0 +1,214 @@
+// Jala los leads de Kommo (CRM) y deja un resumen por marca y mes en data/kommo.json.
+// Se ejecuta desde GitHub Actions (.github/workflows/refresh-kommo.yml).
+// Secretos del repo necesarios:
+//   KOMMO_SUBDOMAIN  -> lo que va antes de ".kommo.com" (ej: "kipperholding")
+//   KOMMO_TOKEN      -> token de larga duración (Kommo → Ajustes → Integraciones → tu integración privada → Claves y alcances)
+//
+// IMPORTANTE: el archivo de salida es público (GitHub Pages), así que SOLO guarda conteos y totales.
+// Nunca se escriben nombres, teléfonos ni correos de clientes.
+//
+// Sin secretos configurados, el script no falla: deja data/kommo.json como "sin-conectar".
+
+const fs = require('fs');
+const path = require('path');
+
+const SUBDOMAIN = (process.env.KOMMO_SUBDOMAIN || '').trim().replace(/^https?:\/\//, '').replace(/\.kommo\.com.*$/, '');
+const TOKEN = (process.env.KOMMO_TOKEN || '').trim();
+const OUT = path.join(__dirname, '..', 'data', 'kommo.json');
+
+// ---- Cómo saber de qué marca es cada lead ----
+// Se evalúa en este orden: nombre del embudo, etiquetas del lead, campo personalizado "Marca".
+// Ajusta las expresiones si en Kommo usas otros nombres.
+const MARCAS = {
+  proviser: /proviser/i,
+  nass: /nass/i
+};
+const MARCA_FIELD_NAMES = /^(marca|empresa|unidad de negocio)$/i;
+// Campos personalizados donde suele estar el origen del lead (si no hay, se usan las etiquetas).
+const ORIGEN_FIELD_NAMES = /^(origen|fuente|canal|utm_source|source)$/i;
+
+const STALE_DAYS = 7;               // un lead abierto sin movimiento hace más de esto cuenta como "sin gestión reciente"
+const TZ_OFFSET_HOURS = -5;         // Colombia (UTC-5, sin horario de verano)
+const STATUS_WON = 142, STATUS_LOST = 143;   // ids fijos de Kommo: "Éxito" y "Cerrado, no realizado"
+
+function writeOut(obj) { fs.writeFileSync(OUT, JSON.stringify(obj, null, 2) + '\n'); }
+
+if (!SUBDOMAIN || !TOKEN) {
+  console.log('Kommo sin conectar: faltan los secretos KOMMO_SUBDOMAIN y/o KOMMO_TOKEN. No se cambia nada.');
+  if (!fs.existsSync(OUT)) writeOut({ generatedAt: null, source: 'sin-conectar', accounts: {} });
+  process.exit(0);
+}
+
+const BASE = process.env.KOMMO_BASE_URL || ('https://' + SUBDOMAIN + '.kommo.com/api/v4');   // KOMMO_BASE_URL solo para pruebas locales
+const sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+
+async function api(pathAndQuery) {
+  for (var attempt = 0; attempt < 4; attempt++) {
+    var res = await fetch(BASE + pathAndQuery, { headers: { Authorization: 'Bearer ' + TOKEN, Accept: 'application/json' } });
+    if (res.status === 204) return null;
+    if (res.status === 429 || res.status >= 500) { await sleep(1500 * (attempt + 1)); continue; }
+    if (res.status === 401) throw new Error('Kommo respondió 401: el token venció o es incorrecto.');
+    if (!res.ok) throw new Error('Kommo respondió ' + res.status + ' en ' + pathAndQuery.split('?')[0]);
+    return res.json();
+  }
+  throw new Error('Kommo no respondió tras varios intentos: ' + pathAndQuery.split('?')[0]);
+}
+
+async function fetchAll(endpoint, embeddedKey, extraQuery) {
+  var items = [], page = 1;
+  for (;;) {
+    var data = await api(endpoint + '?limit=250&page=' + page + (extraQuery ? '&' + extraQuery : ''));
+    var chunk = data && data._embedded && data._embedded[embeddedKey];
+    if (!chunk || !chunk.length) break;
+    items = items.concat(chunk);
+    if (chunk.length < 250) break;
+    page++;
+    await sleep(160);   // Kommo permite ~7 pedidos por segundo
+  }
+  return items;
+}
+
+function monthKey(unixSeconds) {
+  var d = new Date((unixSeconds + TZ_OFFSET_HOURS * 3600) * 1000);
+  return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0');
+}
+
+function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
+
+(async function main() {
+  console.log('Conectando con ' + SUBDOMAIN + '.kommo.com …');
+  var pipelines = await fetchAll('/leads/pipelines', 'pipelines');
+  var users = await fetchAll('/users', 'users');
+  var leads = await fetchAll('/leads', 'leads', 'with=loss_reason');
+  console.log('Embudos: ' + pipelines.length + ' · usuarios: ' + users.length + ' · leads: ' + leads.length);
+
+  var userName = {};
+  users.forEach(function (u) { userName[u.id] = u.name; });
+  var pipelineName = {}, statusInfo = {};   // statusInfo[status_id] = { name, pipeline, sort }
+  pipelines.forEach(function (p) {
+    pipelineName[p.id] = p.name;
+    ((p._embedded && p._embedded.statuses) || []).forEach(function (s) {
+      statusInfo[s.id] = { name: s.name, pipeline: p.name, sort: s.sort, type: s.type };
+    });
+  });
+
+  function marcaDe(lead) {
+    var k, hay;
+    hay = pipelineName[lead.pipeline_id] || '';
+    for (k in MARCAS) if (MARCAS[k].test(hay)) return k;
+    hay = ((lead._embedded && lead._embedded.tags) || []).map(function (t) { return t.name; }).join(' ');
+    for (k in MARCAS) if (MARCAS[k].test(hay)) return k;
+    var cf = (lead.custom_fields_values || []).filter(function (f) { return MARCA_FIELD_NAMES.test(f.field_name || ''); })[0];
+    if (cf && cf.values && cf.values[0]) {
+      hay = String(cf.values[0].value || '');
+      for (k in MARCAS) if (MARCAS[k].test(hay)) return k;
+    }
+    return null;
+  }
+  function origenDe(lead) {
+    var cf = (lead.custom_fields_values || []).filter(function (f) { return ORIGEN_FIELD_NAMES.test(f.field_name || ''); })[0];
+    if (cf && cf.values && cf.values[0] && cf.values[0].value) return String(cf.values[0].value).trim();
+    var tags = ((lead._embedded && lead._embedded.tags) || []).map(function (t) { return t.name; })
+      .filter(function (n) { return !Object.keys(MARCAS).some(function (k) { return MARCAS[k].test(n); }); });
+    return tags.length ? tags[0] : 'Sin origen';
+  }
+
+  var nowSec = Math.floor(Date.now() / 1000);
+  var accounts = {};
+  var sinMarca = 0;
+  Object.keys(MARCAS).forEach(function (k) { accounts[k] = { months: {}, open: null }; });
+
+  function newBucket() {
+    return { total: 0, won: 0, lost: 0, open: 0, sales: 0, daysToWinSum: 0, daysToWinN: 0, stale: 0,
+      byOwner: {}, byOrigin: {}, lostReasons: {}, byStage: {} };
+  }
+  function bump(obj, key, field) { var o = obj[key] || (obj[key] = { total: 0, won: 0, lost: 0, open: 0, sales: 0 }); o.total++; o[field]++; return o; }
+
+  var openByBrand = {};
+  Object.keys(MARCAS).forEach(function (k) { openByBrand[k] = newBucket(); });
+
+  leads.forEach(function (lead) {
+    var marca = marcaDe(lead);
+    if (!marca) { sinMarca++; return; }
+    var acc = accounts[marca];
+    var mk = monthKey(lead.created_at);
+    var b = acc.months[mk] || (acc.months[mk] = newBucket());
+    var estado = lead.status_id === STATUS_WON ? 'won' : (lead.status_id === STATUS_LOST ? 'lost' : 'open');
+    var owner = userName[lead.responsible_user_id] || 'Sin asignar';
+    var origen = origenDe(lead);
+
+    b.total++; b[estado]++;
+    bump(b.byOwner, owner, estado);
+    bump(b.byOrigin, origen, estado);
+    if (estado === 'won') {
+      var price = +lead.price || 0;
+      b.sales += price; b.byOwner[owner].sales += price; b.byOrigin[origen].sales += price;
+      if (lead.closed_at) { b.daysToWinSum += Math.max(0, (lead.closed_at - lead.created_at) / 86400); b.daysToWinN++; }
+    }
+    if (estado === 'lost') {
+      var lr = (lead._embedded && lead._embedded.loss_reason && lead._embedded.loss_reason[0]) ? lead._embedded.loss_reason[0].name : 'Sin motivo registrado';
+      b.lostReasons[lr] = (b.lostReasons[lr] || 0) + 1;
+    }
+    if (estado === 'open') {
+      var st = statusInfo[lead.status_id] || { name: 'Etapa ' + lead.status_id, pipeline: '', sort: 0 };
+      var stale = (nowSec - (lead.updated_at || lead.created_at)) / 86400 > STALE_DAYS;
+      b.byStage[st.name] = b.byStage[st.name] || { count: 0, stale: 0, pipeline: st.pipeline, sort: st.sort };
+      b.byStage[st.name].count++;
+      if (stale) { b.stale++; b.byStage[st.name].stale++; }
+      // foto del embudo HOY (todos los leads abiertos, sin importar en qué mes se crearon)
+      var o = openByBrand[marca];
+      o.open++; if (stale) o.stale++;
+      o.byStage[st.name] = o.byStage[st.name] || { count: 0, stale: 0, pipeline: st.pipeline, sort: st.sort };
+      o.byStage[st.name].count++; if (stale) o.byStage[st.name].stale++;
+      o.byOwner[owner] = o.byOwner[owner] || { open: 0, stale: 0 };
+      o.byOwner[owner].open++; if (stale) o.byOwner[owner].stale++;
+    }
+  });
+
+  function finish(b) {
+    var out = {
+      total: b.total, won: b.won, lost: b.lost, open: b.open, stale: b.stale,
+      winRate: pct(b.won, b.total), lossRate: pct(b.lost, b.total),
+      closedWinRate: pct(b.won, b.won + b.lost),
+      sales: Math.round(b.sales),
+      avgDaysToWin: b.daysToWinN ? Math.round((b.daysToWinSum / b.daysToWinN) * 10) / 10 : null
+    };
+    function rank(map) {
+      return Object.keys(map).map(function (k) { var v = map[k]; v.name = k; return v; })
+        .sort(function (a, c) { return c.total - a.total; });
+    }
+    out.byOwner = rank(b.byOwner);
+    out.byOrigin = rank(b.byOrigin);
+    out.lostReasons = Object.keys(b.lostReasons).map(function (k) { return { name: k, count: b.lostReasons[k] }; })
+      .sort(function (a, c) { return c.count - a.count; });
+    out.byStage = Object.keys(b.byStage).map(function (k) { var v = b.byStage[k]; return { name: k, pipeline: v.pipeline, sort: v.sort, count: v.count, stale: v.stale }; })
+      .sort(function (a, c) { return (a.pipeline || '').localeCompare(c.pipeline || '') || a.sort - c.sort; });
+    return out;
+  }
+
+  Object.keys(accounts).forEach(function (marca) {
+    var acc = accounts[marca], months = {};
+    Object.keys(acc.months).sort().forEach(function (mk) { months[mk] = finish(acc.months[mk]); });
+    var o = openByBrand[marca];
+    acc.months = months;
+    acc.open = {
+      open: o.open, stale: o.stale,
+      byStage: Object.keys(o.byStage).map(function (k) { var v = o.byStage[k]; return { name: k, pipeline: v.pipeline, sort: v.sort, count: v.count, stale: v.stale }; })
+        .sort(function (a, c) { return (a.pipeline || '').localeCompare(c.pipeline || '') || a.sort - c.sort; }),
+      byOwner: Object.keys(o.byOwner).map(function (k) { return { name: k, open: o.byOwner[k].open, stale: o.byOwner[k].stale }; })
+        .sort(function (a, c) { return c.open - a.open; })
+    };
+    console.log(marca + ': ' + Object.keys(months).map(function (m) { return m + '=' + months[m].total; }).join(' · '));
+  });
+  if (sinMarca) console.log('⚠ ' + sinMarca + ' leads no se pudieron asignar a Proviser ni a Nass (revisa MARCAS en scripts/refresh-kommo.js).');
+
+  writeOut({
+    generatedAt: new Date().toISOString(),
+    source: 'kommo',
+    staleDays: STALE_DAYS,
+    unassigned: sinMarca,
+    pipelines: pipelines.map(function (p) { return p.name; }),
+    accounts: accounts
+  });
+  console.log('OK → data/kommo.json');
+})().catch(function (e) { console.error('Error:', e.message); process.exit(1); });

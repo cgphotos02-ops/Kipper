@@ -667,6 +667,12 @@
   .par-check label:hover { border-color: var(--accent); }
   .par-check input { width: 15px; height: 15px; accent-color: var(--good); flex: 0 0 15px; margin: 0; cursor: pointer; }
   .par-check label.on { background: var(--good-soft); color: var(--good-ink); border-color: transparent; }
+  .kommo-row .sede-name { width: 180px; flex: 0 0 180px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .kommo-row .sede-counts { width: 150px; flex: 0 0 150px; }
+  .kommo-stale { color: var(--warn); font-weight: 700; }
+  .kommo-steps { margin: 8px 0 0 18px; padding: 0; font-size: 13px; line-height: 1.7; color: var(--ink-muted); }
+  .kommo-hint { font-size: 12px; color: var(--ink-faint); margin: -2px 0 10px; line-height: 1.5; }
+  @media (max-width: 640px) { .kommo-row .sede-name { width: 110px; flex-basis: 110px; } .kommo-row .sede-counts { width: 100px; flex-basis: 100px; } }
   .seg-jump-btn { font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent-soft-ink); }
   .seg-jump-btn:hover { background: var(--accent); color: #fff; }
 
@@ -1010,7 +1016,9 @@
   <!-- LEADS -->
   <section class="view" id="view-leads">
     <h1 class="greeting">Leads</h1>
-    <div class="date-sub">Todos tus leads — pagados de Meta Ads + orgánicos de Instagram, por marca</div>
+    <div class="date-sub">Cómo se están gestionando tus leads en Kommo, y los leads pagados + orgánicos por marca</div>
+
+    <div id="kommo-wrap"></div>
 
     <div class="card">
       <h2>🎯 Todos tus leads — pagados + orgánicos, por marca</h2>
@@ -1294,6 +1302,9 @@
     var set = {};
     set[DATA_MONTH] = true;
     if (typeof SEG !== 'undefined' && SEG && SEG.rows) SEG.rows.forEach(function (r) { if (r.mes) set[r.mes] = true; });
+    if (typeof KOMMO !== 'undefined' && KOMMO && KOMMO.accounts) {
+      Object.keys(KOMMO.accounts).forEach(function (k) { kommoMonths(KOMMO.accounts[k]).forEach(function (m) { set[m] = true; }); });
+    }
     if (typeof SOCIAL !== 'undefined' && SOCIAL && SOCIAL.accounts) {
       Object.keys(SOCIAL.accounts).forEach(function (k) {
         var acc = SOCIAL.accounts[k];
@@ -1362,6 +1373,7 @@
     setText('profile-updated', 'Métricas: ' + monthLabel(hasThisMonth ? selectedMonth : latest));
     renderSocial(currentAccount());
     renderSeguimiento(currentAccount());
+    renderKommo();
   }
   if (cuentaSel) cuentaSel.addEventListener('change', refreshAccount);
 
@@ -1825,6 +1837,7 @@
 
   // ---------- Social: datos de Metricool (data/social.json, generado desde los informes exportados) ----------
   var SOCIAL = null;
+  var KOMMO = null; // leads de Kommo (data/kommo.json, lo escribe el robot de GitHub Actions)
   var SEG = null; // seguimiento de contenidos (data/seguimiento.json, generado del Excel)
 
   // Muestra/oculta la tarjeta (.card) que contiene un contenedor; se usa para no mostrar cuadros sin datos.
@@ -2687,6 +2700,101 @@
 
     out.innerHTML = html;
   }
+
+  // ---------- Kommo: gestión de leads (data/kommo.json) ----------
+  function kEsc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function kMoney(n) { return (n == null || !isFinite(n)) ? '—' : '$' + Math.round(n).toLocaleString('es-CO'); }
+  function kPct(n) { return (n == null || !isFinite(n)) ? '—' : (Math.round(n * 10) / 10).toString().replace('.', ',') + '%'; }
+  function kmt(n) { return (n == null ? 0 : n).toLocaleString('es-CO'); }
+  function kTile(label, value, sub, tip) {
+    return '<div class="kpi-tile" title="' + kEsc(tip || '') + '"><div class="kpi-label">' + label + '</div><div class="kpi-value">' + value + '</div><div class="kpi-sub">' + sub + '</div></div>';
+  }
+  function kBars(rows, nameKey, valKey, fmtRight) {
+    var max = rows.reduce(function (m, r) { return Math.max(m, r[valKey]); }, 0) || 1;
+    return rows.map(function (r) {
+      return '<div class="sede-row kommo-row"><div class="sede-name" title="' + kEsc(r[nameKey]) + '">' + kEsc(r[nameKey]) + '</div>' +
+        '<div class="sede-bar-track"><div class="sede-bar-fill bar-fill-accent" style="width:' + Math.round((r[valKey] / max) * 100) + '%"></div></div>' +
+        '<div class="sede-counts">' + fmtRight(r) + '</div></div>';
+    }).join('');
+  }
+  function kommoMonths(acc) { return acc && acc.months ? Object.keys(acc.months).sort() : []; }
+
+  function renderKommo() {
+    var box = el('kommo-wrap');
+    if (!box) return;
+    var connected = KOMMO && KOMMO.source === 'kommo' && KOMMO.accounts;
+    if (!connected) {
+      box.innerHTML = '<div class="card"><h2>🔌 Conecta Kommo para ver la gestión de tus leads</h2>' +
+        '<p class="vc-note">Aquí vas a ver cuántos leads llegan, en qué etapa del embudo están, quién los atiende, cuáles llevan días sin movimiento y por qué se pierden. Se actualiza solo, tres veces al día.</p>' +
+        '<ol class="kommo-steps">' +
+        '<li>En Kommo: <b>Ajustes → Integraciones → Crear integración privada</b>, y genera un <b>token de larga duración</b> (con permiso de lectura).</li>' +
+        '<li>En GitHub (repo Kipper): <b>Settings → Secrets and variables → Actions</b> y crea <code>KOMMO_SUBDOMAIN</code> (lo que va antes de <code>.kommo.com</code>) y <code>KOMMO_TOKEN</code>.</li>' +
+        '<li>En la pestaña <b>Actions</b> ejecuta a mano <b>Actualizar leads de Kommo</b>. Cuando termine, esta sección se llena sola.</li>' +
+        '</ol></div>';
+      return;
+    }
+    var acc = KOMMO.accounts[currentAccount()];
+    var months = kommoMonths(acc);
+    var m = acc && acc.months ? acc.months[selectedMonth] : null;
+    var updated = KOMMO.generatedAt ? new Date(KOMMO.generatedAt).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' }) : '';
+    var html = '';
+    if (!m) {
+      html += '<div class="card"><h2>📥 Gestión de leads · Kommo</h2><div class="leads-empty-state">' +
+        monthJumpHtml('Kommo', months) + '</div></div>';
+    } else {
+      var staleNow = acc.open ? acc.open.stale : 0;
+      html += '<div class="card"><h2>📥 Gestión de leads · Kommo — ' + kEsc(monthLabel(selectedMonth)) + '</h2>' +
+        '<p class="kommo-hint">Leads <b>creados</b> en ' + kEsc(monthLabel(selectedMonth)) + ' en el CRM de ' + kEsc(accountLabels[currentAccount()]) +
+        (updated ? ' · actualizado ' + kEsc(updated) : '') + ' — pasa el mouse sobre cada cifra para ver qué significa.</p>' +
+        '<div class="kpi-row">' +
+        kTile('Leads recibidos', kmt(m.total), 'creados en el mes', 'Todos los contactos que entraron a Kommo este mes como lead.') +
+        kTile('Ganados', kmt(m.won), kPct(m.winRate) + ' de los recibidos', 'Leads que llegaron a la etapa final de éxito (venta cerrada).') +
+        kTile('Perdidos', kmt(m.lost), kPct(m.lossRate) + ' de los recibidos', 'Leads marcados como cerrados sin venta.') +
+        kTile('En proceso', kmt(m.open), (m.stale ? '<span class="kommo-stale">' + m.stale + ' sin movimiento &gt; ' + KOMMO.staleDays + ' días</span>' : 'todos con movimiento reciente'), 'Leads del mes que siguen abiertos. "Sin movimiento" = nadie los ha tocado en más de ' + KOMMO.staleDays + ' días.') +
+        '</div><div class="kpi-row" style="margin-bottom:0">' +
+        kTile('Ventas ganadas', kMoney(m.sales), 'suma del valor de los ganados', 'Suma del campo "Presupuesto" de los leads ganados. Si en Kommo no se llena, saldrá en $0.') +
+        kTile('Tasa de cierre', kPct(m.closedWinRate), 'ganados ÷ (ganados + perdidos)', 'De los leads que ya tuvieron un resultado, cuántos terminaron en venta. No cuenta los que siguen abiertos.') +
+        kTile('Días para cerrar', m.avgDaysToWin == null ? '—' : String(m.avgDaysToWin).replace('.', ','), 'promedio de los ganados', 'Cuántos días pasan, en promedio, desde que entra el lead hasta que se gana.') +
+        kTile('Sin gestión hoy', '<span class="' + (staleNow ? 'kommo-stale' : '') + '">' + kmt(staleNow) + '</span>', 'abiertos sin movimiento (todos los meses)', 'Leads abiertos hoy, de cualquier mes, que no se han tocado en más de ' + KOMMO.staleDays + ' días. Son los que hay que retomar primero.') +
+        '</div></div>';
+
+      if (acc.open && acc.open.byStage && acc.open.byStage.length) {
+        html += '<div class="card"><h2>🧭 Dónde están hoy los leads abiertos</h2>' +
+          '<p class="kommo-hint">Foto del embudo en este momento (no depende del mes elegido): cuántos leads hay en cada etapa y cuántos llevan más de ' + KOMMO.staleDays + ' días sin tocarse.</p>' +
+          kBars(acc.open.byStage, 'name', 'count', function (r) {
+            return r.count + ' lead' + (r.count === 1 ? '' : 's') + (r.stale ? ' · <span class="kommo-stale">' + r.stale + ' sin mover</span>' : '');
+          }) + '</div>';
+      }
+      if (m.byOwner && m.byOwner.length) {
+        html += '<div class="card"><h2>🧑‍💼 Quién atiende los leads</h2>' +
+          '<p class="kommo-hint">Leads del mes por responsable, y cuántos de ellos terminaron en venta o se perdieron.</p>' +
+          '<div class="simple-table-wrap"><table class="simple-table"><thead><tr><th>Responsable</th><th>Leads</th><th>Ganados</th><th>Perdidos</th><th>Abiertos</th><th>Ventas</th></tr></thead><tbody>' +
+          m.byOwner.map(function (o) {
+            return '<tr><td>' + kEsc(o.name) + '</td><td>' + o.total + '</td><td>' + o.won + '</td><td>' + o.lost + '</td><td>' + o.open + '</td><td>' + kMoney(o.sales) + '</td></tr>';
+          }).join('') + '</tbody></table></div></div>';
+      }
+      if (m.byOrigin && m.byOrigin.length) {
+        html += '<div class="card"><h2>🧲 De dónde vienen los leads</h2>' +
+          '<p class="kommo-hint">Origen según el campo "Origen/Fuente" o la primera etiqueta del lead en Kommo. Si ves "Sin origen", falta etiquetarlos.</p>' +
+          kBars(m.byOrigin, 'name', 'total', function (r) { return r.total + ' · ' + r.won + ' ganado' + (r.won === 1 ? '' : 's'); }) + '</div>';
+      }
+      if (m.lostReasons && m.lostReasons.length) {
+        html += '<div class="card"><h2>🚫 Por qué se pierden</h2>' +
+          '<p class="kommo-hint">Motivo de pérdida registrado en Kommo. Si casi todo dice "Sin motivo registrado", conviene exigir el motivo al cerrar un lead como perdido.</p>' +
+          kBars(m.lostReasons, 'name', 'count', function (r) { return r.count + ' · ' + kPct((r.count / m.lost) * 100); }) + '</div>';
+      }
+    }
+    if (KOMMO.unassigned) {
+      html += '<p class="kommo-hint">⚠ ' + KOMMO.unassigned + ' leads de Kommo no se pudieron asignar a Proviser ni a Nass y no están contados aquí.</p>';
+    }
+    box.innerHTML = html;
+    wireMonthJumpBtn(box);
+  }
+
+  fetch('data/kommo.json', { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) { KOMMO = d; buildMonthOptions(); renderKommo(); })
+    .catch(function () { renderKommo(); });
 
   // ---------- Pautas: carga los datos guardados en data/pautas.json ----------
   fetch('data/pautas.json', { cache: 'no-store' })

@@ -1,7 +1,7 @@
 {
   "diagnostico": {
     "porEmbudo": {
-      "Embudo de ventas": 663
+      "Embudo de ventas": 662
     },
     "etiquetas": [
       [
@@ -68,12 +68,22 @@
         "Alta gama": 1,
         "Comercio": 1
       }
-    }
+    },
+    "notas": {
+      "tipos": {
+        "ai_result": 1
+      },
+      "leadsConNotas": 1,
+      "leadsConTexto": 1,
+      "error": null
+    },
+    "leadsClasificadosPorTexto": 0,
+    "leadsConNombreUtil": 0
   },
-  "generatedAt": "2026-10-02T16:32:49.484Z",
+  "generatedAt": "2026-10-02T16:45:21.486Z",
   "source": "kommo",
   "staleDays": 7,
-  "unassigned": 663,
+  "unassigned": 662,
   "pipelines": [
     "Embudo de ventas",
     "Embudo gestión humana"

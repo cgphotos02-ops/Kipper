@@ -1020,11 +1020,6 @@
 
     <div id="gestion-wrap"></div>
     <div id="kommo-wrap"></div>
-
-    <div class="card">
-      <h2>🎯 Todos tus leads — pagados + orgánicos, por marca</h2>
-      <div class="leads-empty-state" id="referentes-leads-table">Aún no conectado. Cuando cargues datos reales de Meta Ads y de Instagram, aquí verás Proviser Seguridad y Nass Tecnología lado a lado.</div>
-    </div>
   </section>
 
   <!-- CAMPAÑAS -->
@@ -2754,7 +2749,12 @@
             (s === 'marca' ? '🏷️ Solo ' + kEsc(accountLabels[currentAccount()]) : '🌐 Todos los leads reales') + '</button>';
         }).join(' ') + '</div>';
     }
-    if (!m) {
+    if (!m && scope === 'marca' && !months.length && allAcc) {
+      html += '<div class="card"><h2>📥 Gestión de leads · Kommo — ' + kEsc(accountLabels[currentAccount()]) + '</h2><div class="leads-empty-state">' +
+        'Todavía ningún lead de Kommo está identificado como de ' + kEsc(accountLabels[currentAccount()]) + '.<br>' +
+        'Para que aparezcan aquí, el lead debe llevar la etiqueta <b>Seguridad física</b> (Proviser) o <b>Seguridad electrónica</b> (Nass).<br><br>' +
+        '<button class="seg-jump-btn kommo-scope-btn" type="button" data-scope="todas">🌐 Ver todos los leads reales</button></div></div>';
+    } else if (!m) {
       html += '<div class="card"><h2>📥 Gestión de leads · Kommo</h2><div class="leads-empty-state">' +
         monthJumpHtml('Kommo', months) + '</div></div>';
     } else {

@@ -39,10 +39,10 @@ function marcaPorTexto(texto) {
   return null;   // sin señales, o empate: queda "sin marca"
 }
 // Etiquetas de conversaciones que NO son clientes (compañeros de trabajo que escriben al mismo WhatsApp). No se cuentan.
-const EXCLUIR_ETIQUETAS = /colaborador|interno|compa[nñ]ero|empleado/i;
+const EXCLUIR_ETIQUETAS = /colaborador|interno|compa[nñ]ero|empleado|vacante/i;
 // Un lead solo cuenta como "real" si el bot lo etiquetó con alguna de estas respuestas del cuestionario
 // (así los chats de compañeros u otros contactos que nunca respondieron al bot no inflan las cifras).
-const ETIQUETAS_LEAD_REAL = /hogar|comercio|oficina|empresas|conjunto residencial|visita t[eé]cnica|hablar con asesor|otro|seguridad\s+f[ií]sica|seguridad\s+electr[oó]nica|proviser|nass/i;
+const ETIQUETAS_LEAD_REAL = /hogar|comercio|oficina|empresas|conjunto residencial|visita t[eé]cnica|hablar con asesor|otro|potencial|seguridad\s+f[ií]sica|seguridad\s+electr[oó]nica|proviser|nass/i;
 // Embudos que no son de ventas y no se cuentan (selección de personal).
 const EXCLUIR_EMBUDOS = /gesti[oó]n\s+humana/i;
 // Campos personalizados donde suele estar el origen del lead (si no hay, se usan las etiquetas).

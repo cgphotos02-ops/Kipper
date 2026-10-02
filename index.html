@@ -2771,6 +2771,11 @@
         kTile('Sin gestión hoy', '<span class="' + (staleNow ? 'kommo-stale' : '') + '">' + kmt(staleNow) + '</span>', 'abiertos sin movimiento (todos los meses)', 'Leads abiertos hoy, de cualquier mes, que no se han tocado en más de ' + KOMMO.staleDays + ' días. Son los que hay que retomar primero.') +
         '</div></div>';
 
+      if (m.total > 0 && m.lost === m.total) {
+        html += '<div class="card"><h2>⚠️ Ojo con estas cifras</h2><p class="vc-note">En ' + kEsc(monthLabel(selectedMonth)) + ' <b>todos los leads aparecen cerrados como "perdidos"</b>, ninguno como ganado ni abierto. ' +
+          'Lo más probable es que el bot los cierre solo, o que la venta se gestione fuera de Kommo sin marcarla. Mientras eso pase, <b>ganados, ventas y tasa de cierre no reflejan la realidad</b>. ' +
+          'Lo que sí es confiable: cuántos leads llegan al mes y de qué tipo de cliente son.</p></div>';
+      }
       if (acc.open && acc.open.byStage && acc.open.byStage.length) {
         html += '<div class="card"><h2>🧭 Dónde están hoy los leads abiertos</h2>' +
           '<p class="kommo-hint">Foto del embudo en este momento (no depende del mes elegido): cuántos leads hay en cada etapa y cuántos llevan más de ' + KOMMO.staleDays + ' días sin tocarse.</p>' +
@@ -2778,7 +2783,7 @@
             return r.count + ' lead' + (r.count === 1 ? '' : 's') + (r.stale ? ' · <span class="kommo-stale">' + r.stale + ' sin mover</span>' : '');
           }) + '</div>';
       }
-      if (m.byOwner && m.byOwner.length) {
+      if (m.byOwner && m.byOwner.length > 1) {   // con un solo responsable la tabla no aporta
         html += '<div class="card"><h2>🧑‍💼 Quién atiende los leads</h2>' +
           '<p class="kommo-hint">Leads del mes por responsable, y cuántos de ellos terminaron en venta o se perdieron.</p>' +
           '<div class="simple-table-wrap"><table class="simple-table"><thead><tr><th>Responsable</th><th>Leads</th><th>Ganados</th><th>Perdidos</th><th>Abiertos</th><th>Ventas</th></tr></thead><tbody>' +
@@ -2787,8 +2792,8 @@
           }).join('') + '</tbody></table></div></div>';
       }
       if (m.byOrigin && m.byOrigin.length) {
-        html += '<div class="card"><h2>🧲 De dónde vienen los leads</h2>' +
-          '<p class="kommo-hint">Origen según el campo "Origen/Fuente" o la primera etiqueta del lead en Kommo. Si ves "Sin origen", falta etiquetarlos.</p>' +
+        html += '<div class="card"><h2>🧲 Qué tipo de leads llegan</h2>' +
+          '<p class="kommo-hint">Según la primera etiqueta del lead en Kommo (lo que el cliente respondió al bot: Hogar, Comercio u Oficina, Empresas…) o el campo Origen/Fuente si existe. "Sin origen" = el lead no tiene etiquetas.</p>' +
           kBars(m.byOrigin, 'name', 'total', function (r) { return r.total + ' · ' + r.won + ' ganado' + (r.won === 1 ? '' : 's'); }) + '</div>';
       }
       if (m.lostReasons && m.lostReasons.length) {

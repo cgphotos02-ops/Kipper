@@ -1837,6 +1837,7 @@
 
   // ---------- Social: datos de Metricool (data/social.json, generado desde los informes exportados) ----------
   var SOCIAL = null;
+  var kommoScope = null; // null = automático; 'marca' | 'todas' si el usuario elige
   var KOMMO = null; // leads de Kommo (data/kommo.json, lo escribe el robot de GitHub Actions)
   var SEG = null; // seguimiento de contenidos (data/seguimiento.json, generado del Excel)
 
@@ -2733,18 +2734,30 @@
         '</ol></div>';
       return;
     }
-    var acc = KOMMO.accounts[currentAccount()];
+    var brandAcc = KOMMO.accounts[currentAccount()];
+    var allAcc = KOMMO.accounts.todas;
+    // Vista: "marca" = solo los leads ya identificados como de esta marca; "todas" = todos los leads reales (con o sin marca).
+    var scope = kommoScope || ((brandAcc && kommoMonths(brandAcc).length) || !allAcc ? 'marca' : 'todas');
+    var acc = scope === 'todas' && allAcc ? allAcc : brandAcc;
     var months = kommoMonths(acc);
     var m = acc && acc.months ? acc.months[selectedMonth] : null;
     var updated = KOMMO.generatedAt ? new Date(KOMMO.generatedAt).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' }) : '';
+    var scopeLabel = scope === 'todas' ? 'todas las marcas (incluye leads aún sin marca)' : accountLabels[currentAccount()];
     var html = '';
+    if (allAcc) {
+      html += '<div class="action-row" style="margin-bottom:12px">' +
+        ['marca', 'todas'].map(function (s) {
+          return '<button type="button" class="seg-jump-btn kommo-scope-btn" data-scope="' + s + '" style="' + (s === scope ? '' : 'opacity:.55;background:transparent') + '">' +
+            (s === 'marca' ? '🏷️ Solo ' + kEsc(accountLabels[currentAccount()]) : '🌐 Todos los leads reales') + '</button>';
+        }).join(' ') + '</div>';
+    }
     if (!m) {
       html += '<div class="card"><h2>📥 Gestión de leads · Kommo</h2><div class="leads-empty-state">' +
         monthJumpHtml('Kommo', months) + '</div></div>';
     } else {
       var staleNow = acc.open ? acc.open.stale : 0;
       html += '<div class="card"><h2>📥 Gestión de leads · Kommo — ' + kEsc(monthLabel(selectedMonth)) + '</h2>' +
-        '<p class="kommo-hint">Leads <b>creados</b> en ' + kEsc(monthLabel(selectedMonth)) + ' en el CRM de ' + kEsc(accountLabels[currentAccount()]) +
+        '<p class="kommo-hint">Leads <b>creados</b> en ' + kEsc(monthLabel(selectedMonth)) + ' · ' + kEsc(scopeLabel) +
         (updated ? ' · actualizado ' + kEsc(updated) : '') + ' — pasa el mouse sobre cada cifra para ver qué significa.</p>' +
         '<div class="kpi-row">' +
         kTile('Leads recibidos', kmt(m.total), 'creados en el mes', 'Todos los contactos que entraron a Kommo este mes como lead.') +
@@ -2784,11 +2797,19 @@
           kBars(m.lostReasons, 'name', 'count', function (r) { return r.count + ' · ' + kPct((r.count / m.lost) * 100); }) + '</div>';
       }
     }
-    if (KOMMO.unassigned) {
-      html += '<p class="kommo-hint">⚠ ' + KOMMO.unassigned + ' leads de Kommo no se pudieron asignar a Proviser ni a Nass y no están contados aquí.</p>';
+    if (scope === 'marca' && KOMMO.unassigned) {
+      html += '<p class="kommo-hint">⚠ ' + KOMMO.unassigned + ' leads reales todavía no tienen marca (seguridad física o electrónica) y no están contados en esta vista. Míralos en "Todos los leads reales".</p>';
+    }
+    if (KOMMO.descartados) {
+      var dd = KOMMO.descartados;
+      html += '<p class="kommo-hint">No se cuentan como leads: ' + kmt(dd.sinPasarPorElBot) + ' contactos que no respondieron al bot (por ejemplo, chats de compañeros u otros), ' +
+        kmt(dd.internos) + ' marcados como colaborador/interno y ' + kmt(dd.gestionHumana) + ' del embudo de gestión humana.</p>';
     }
     box.innerHTML = html;
     wireMonthJumpBtn(box);
+    Array.prototype.forEach.call(box.querySelectorAll('.kommo-scope-btn'), function (b) {
+      b.addEventListener('click', function () { kommoScope = this.getAttribute('data-scope'); renderKommo(); });
+    });
   }
 
   fetch('data/kommo.json', { cache: 'no-store' })

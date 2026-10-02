@@ -40,6 +40,9 @@ function marcaPorTexto(texto) {
 }
 // Etiquetas de conversaciones que NO son clientes (compañeros de trabajo que escriben al mismo WhatsApp). No se cuentan.
 const EXCLUIR_ETIQUETAS = /colaborador|interno|compa[nñ]ero|empleado/i;
+// Un lead solo cuenta como "real" si el bot lo etiquetó con alguna de estas respuestas del cuestionario
+// (así los chats de compañeros u otros contactos que nunca respondieron al bot no inflan las cifras).
+const ETIQUETAS_LEAD_REAL = /hogar|comercio|oficina|empresas|conjunto residencial|visita t[eé]cnica|hablar con asesor|otro|seguridad\s+f[ií]sica|seguridad\s+electr[oó]nica|proviser|nass/i;
 // Embudos que no son de ventas y no se cuentan (selección de personal).
 const EXCLUIR_EMBUDOS = /gesti[oó]n\s+humana/i;
 // Campos personalizados donde suele estar el origen del lead (si no hay, se usan las etiquetas).
@@ -167,7 +170,7 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
   var nowSec = Math.floor(Date.now() / 1000);
   var accounts = {};
   var sinMarca = 0;
-  Object.keys(MARCAS).forEach(function (k) { accounts[k] = { months: {}, open: null }; });
+  ['todas'].concat(Object.keys(MARCAS)).forEach(function (k) { accounts[k] = { months: {}, open: null }; });
 
   function newBucket() {
     return { total: 0, won: 0, lost: 0, open: 0, sales: 0, daysToWinSum: 0, daysToWinN: 0, stale: 0,
@@ -176,21 +179,21 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
   function bump(obj, key, field) { var o = obj[key] || (obj[key] = { total: 0, won: 0, lost: 0, open: 0, sales: 0 }); o.total++; o[field]++; return o; }
 
   var openByBrand = {};
-  Object.keys(MARCAS).forEach(function (k) { openByBrand[k] = newBucket(); });
+  ['todas'].concat(Object.keys(MARCAS)).forEach(function (k) { openByBrand[k] = newBucket(); });
 
   var excluidos = 0;
-  var excluidosInternos = 0;
+  var excluidosInternos = 0, noCalificados = 0;
   leads = leads.filter(function (l) {
     if (EXCLUIR_EMBUDOS.test(pipelineName[l.pipeline_id] || '')) { excluidos++; return false; }
     var tg = ((l._embedded && l._embedded.tags) || []).map(function (t) { return t.name; }).join(' ');
     if (EXCLUIR_ETIQUETAS.test(tg)) { excluidosInternos++; return false; }
+    // solo cuenta como lead real si pasó por el bot (tiene alguna etiqueta del cuestionario o de marca)
+    if (!ETIQUETAS_LEAD_REAL.test(tg)) { noCalificados++; return false; }
     return true;
   });
-  console.log('Leads de ventas: ' + leads.length + ' (excluidos por embudo: ' + excluidos + ' · internos/colaboradores: ' + excluidosInternos + ')');
-  leads.forEach(function (lead) {
-    var marca = marcaDe(lead);
-    if (!marca) { sinMarca++; return; }
-    var acc = accounts[marca];
+  console.log('Leads reales: ' + leads.length + ' (excluidos por embudo: ' + excluidos + ' · internos/colaboradores: ' + excluidosInternos + ' · sin pasar por el bot: ' + noCalificados + ')');
+  function contar(dest, lead) {
+    var acc = accounts[dest];
     var mk = monthKey(lead.created_at);
     var b = acc.months[mk] || (acc.months[mk] = newBucket());
     var estado = lead.status_id === STATUS_WON ? 'won' : (lead.status_id === STATUS_LOST ? 'lost' : 'open');
@@ -216,13 +219,19 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
       b.byStage[st.name].count++;
       if (stale) { b.stale++; b.byStage[st.name].stale++; }
       // foto del embudo HOY (todos los leads abiertos, sin importar en qué mes se crearon)
-      var o = openByBrand[marca];
+      var o = openByBrand[dest];
       o.open++; if (stale) o.stale++;
       o.byStage[st.name] = o.byStage[st.name] || { count: 0, stale: 0, pipeline: st.pipeline, sort: st.sort };
       o.byStage[st.name].count++; if (stale) o.byStage[st.name].stale++;
       o.byOwner[owner] = o.byOwner[owner] || { open: 0, stale: 0 };
       o.byOwner[owner].open++; if (stale) o.byOwner[owner].stale++;
     }
+  }
+  leads.forEach(function (lead) {
+    contar('todas', lead);               // vista "todos los leads reales", con o sin marca
+    var marca = marcaDe(lead);
+    if (!marca) { sinMarca++; return; }
+    contar(marca, lead);
   });
 
   function finish(b) {
@@ -316,6 +325,7 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
     source: 'kommo',
     staleDays: STALE_DAYS,
     unassigned: sinMarca,
+    descartados: { gestionHumana: excluidos, internos: excluidosInternos, sinPasarPorElBot: noCalificados },
     pipelines: pipelines.map(function (p) { return p.name; }),
     accounts: accounts
   });

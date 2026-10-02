@@ -898,8 +898,8 @@
           "followersDelta": 8,
           "acquired": 17,
           "lost": 9,
-          "engagement": 0.89,
-          "engagementNote": "estimado con los posts del período (interacciones de posts+reels del período ÷ seguidores, misma fórmula que la tabla de competidores)",
+          "engagement": 0.91,
+          "engagementNote": "estimado con los posts y reels del período (78 interacciones ÷ 5 piezas ÷ seguidores, misma fórmula que la tabla de competidores)",
           "views": 10200,
           "avgDailyReach": 198,
           "engagedAccounts": 111,
@@ -940,47 +940,45 @@
             "gender": [
               [
                 "Hombres",
-                52
+                50.77
               ],
               [
                 "Mujeres",
-                28
+                30.11
               ],
               [
                 "Sin especificar",
-                20
+                19.13
               ]
             ],
-            "genderApprox": true,
-            "genderNote": "Aproximado, leído del gráfico de género (Metricool no mostró los % exactos en esta captura).",
             "age": [
               [
                 "13-17",
-                1
+                0.3
               ],
               [
                 "18-24",
-                4
+                3.8
               ],
               [
                 "25-34",
-                25
+                24.7
               ],
               [
                 "35-44",
-                33
+                33.8
               ],
               [
                 "45-54",
-                22
+                22.6
               ],
               [
                 "55-64",
-                6
+                9.7
               ],
               [
                 "65+",
-                5
+                4.8
               ]
             ],
             "ageApprox": true
@@ -988,21 +986,22 @@
           "content": {
             "posts": {
               "count": 3,
-              "engagement": 229.17,
+              "engagement": 226.8,
               "interactions": 44,
-              "avgReach": 64,
-              "views": 380,
+              "avgReach": 65,
+              "views": 385,
               "likes": 40,
-              "comments": 0,
               "saves": 2,
               "shares": 2
             },
             "reels": {
               "count": 2,
-              "engagement": 142.24,
-              "interactions": 33,
-              "avgReach": 116,
-              "views": 340
+              "engagement": 145.3,
+              "interactions": 34,
+              "avgReach": 117,
+              "views": 342,
+              "likes": 32,
+              "saves": 2
             },
             "stories": {
               "count": 2

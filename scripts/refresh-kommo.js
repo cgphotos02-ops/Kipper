@@ -202,7 +202,31 @@ function pct(a, b) { return b ? Math.round((a / b) * 1000) / 10 : null; }
   });
   if (sinMarca) console.log('⚠ ' + sinMarca + ' leads no se pudieron asignar a Proviser ni a Nass (revisa MARCAS en scripts/refresh-kommo.js).');
 
+  // ---- Diagnóstico temporal: ayuda a decidir cómo separar las marcas (solo conteos, sin datos personales) ----
+  var diag = { porEmbudo: {}, etiquetas: {}, campos: {}, estados: {} };
+  var camposValores = {};
+  leads.forEach(function (lead) {
+    var pn = pipelineName[lead.pipeline_id] || String(lead.pipeline_id);
+    diag.porEmbudo[pn] = (diag.porEmbudo[pn] || 0) + 1;
+    ((lead._embedded && lead._embedded.tags) || []).forEach(function (t) { diag.etiquetas[t.name] = (diag.etiquetas[t.name] || 0) + 1; });
+    (lead.custom_fields_values || []).forEach(function (f) {
+      var n = f.field_name || String(f.field_id);
+      diag.campos[n] = (diag.campos[n] || 0) + 1;
+      camposValores[n] = camposValores[n] || {};
+      (f.values || []).forEach(function (v) { var x = String(v.value == null ? '' : v.value).slice(0, 40); camposValores[n][x] = (camposValores[n][x] || 0) + 1; });
+    });
+  });
+  // solo se muestran valores de campos con pocas opciones distintas y que no parezcan teléfono/correo/nombre
+  var camposOpciones = {};
+  Object.keys(camposValores).forEach(function (n) {
+    var vals = Object.keys(camposValores[n]);
+    if (vals.length <= 15 && !/tel|cel|mail|correo|nombre|name|phone|c[eé]dula|nit|direcci/i.test(n)) camposOpciones[n] = camposValores[n];
+  });
+  diag.camposOpciones = camposOpciones;
+  diag.etiquetas = Object.keys(diag.etiquetas).map(function (k) { return [k, diag.etiquetas[k]]; }).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 40);
+
   writeOut({
+    diagnostico: diag,
     generatedAt: new Date().toISOString(),
     source: 'kommo',
     staleDays: STALE_DAYS,

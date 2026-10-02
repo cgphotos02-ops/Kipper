@@ -1827,6 +1827,8 @@
   var SOCIAL = null;
   var SEG = null; // seguimiento de contenidos (data/seguimiento.json, generado del Excel)
 
+  // Muestra/oculta la tarjeta (.card) que contiene un contenedor; se usa para no mostrar cuadros sin datos.
+  function cardShow(id, show) { var e = el(id); var c = e && e.closest ? e.closest('.card') : null; if (c) c.style.display = show ? '' : 'none'; }
   function socEmpty(id, msg) { var e = el(id); if (e) e.innerHTML = '<div class="leads-empty-state">' + (msg || 'Aún no hay datos cargados.') + '</div>'; }
   function socBars(rows, unit) {
     var max = Math.max.apply(null, rows.map(function (r) { return r[1] || 0; }).concat([1]));
@@ -2088,6 +2090,7 @@
     var fb = fbMatch ? fbByMonth[selectedMonth] : (fbByMonth[fbMonths[fbMonths.length - 1]] || {});
     var igEff = igMatch ? ig : {};
     var fbEff = fbMatch ? fb : {};
+    ['home-besttime'].concat(POSTS_AUD_COMP_IDS).forEach(function (id) { cardShow(id, true); });
 
     // ---- INICIO (según la pestaña Todo / Instagram / Facebook) ----
     var num = function (x) { return (x == null || isNaN(x)) ? null : x; };
@@ -2155,6 +2158,8 @@
           ? '<div class="hero-stat"><div class="hero-number">' + ig.bestTime + '</div><div class="hero-sub">Franja de más actividad de tus seguidores en Instagram (Metricool)</div></div>'
           : '<div class="leads-empty-state">Sin dato de mejor hora.</div>';
       }
+      // Sin dato de mejor hora (y el mes sí coincide) => se quita el cuadro
+      cardShow('home-besttime', (net !== 'fb' && !igMatch) || !!igEff.bestTime);
     }
 
     if (!igMatch) {
@@ -2184,6 +2189,7 @@
     if (el('posts-hashtags')) el('posts-hashtags').innerHTML = (ig.hashtags && ig.hashtags.length)
       ? socBars(ig.hashtags, ' pub.')
       : '<div class="leads-empty-state">Sin hashtags detectados en el período.</div>';
+    cardShow('posts-hashtags', !!(ig.hashtags && ig.hashtags.length));
 
     if (el('posts-series')) {
       var blocks = [];
@@ -2200,7 +2206,7 @@
       var bestFmt = fmtSegs.slice().sort(function (x, y) { return y.value - x.value; })[0];
       el('posts-pattern').innerHTML = '<div class="pattern-row">' +
         '<div class="pattern-item"><div class="k">Formato más usado</div><div class="v">' + (bestFmt ? bestFmt.label : '—') + '</div></div>' +
-        '<div class="pattern-item"><div class="k">Mejor hora</div><div class="v">' + (ig.bestTime || '—') + '</div></div>' +
+        (ig.bestTime ? '<div class="pattern-item"><div class="k">Mejor hora</div><div class="v">' + ig.bestTime + '</div></div>' : '') +
         '<div class="pattern-item"><div class="k">Alcance medio/día</div><div class="v">' + fmtNumCO(ig.avgDailyReach || 0) + '</div></div>' +
         '</div>';
     }
@@ -2216,6 +2222,7 @@
           : '<div class="leads-empty-state">Sin ' + (fmt === 'todos' ? 'publicaciones' : fmt.toLowerCase()) + ' en el período.</div>';
       }
     }
+    cardShow('posts-organic-ideas', !!(ig.topPosts && ig.topPosts.length));
 
     // ---- MI AUDIENCIA ----
     setText('audiencia-period', 'Metricool · ' + (SOCIAL.period || '') + ' · IG @' + (ig.username || ''));
@@ -2233,6 +2240,8 @@
     if (el('audiencia-age')) el('audiencia-age').innerHTML = (aud.age && aud.age.length)
       ? socBars(aud.age.map(function (r) { return [r[0] + ' años', r[1]]; }), '%') + (aud.ageApprox ? '<p class="vc-note" style="margin-top:8px">Valores aproximados leídos del gráfico de Metricool. Para exactos, pásame el CSV de edad.</p>' : '')
       : '<div class="leads-empty-state">El desglose por edad viene en el CSV de audiencia de Metricool. Pásamelo y lo lleno.</div>';
+    cardShow('audiencia-gender', !!(aud.gender && aud.gender.length));
+    cardShow('audiencia-age', !!(aud.age && aud.age.length));
     if (el('audiencia-places')) el('audiencia-places').innerHTML = (ig.cities && ig.cities.length)
       ? '<p class="vc-note" style="margin-top:-4px">Principales ciudades (Instagram):</p>' + socBars(ig.cities.map(function (r) { return [r[0], r[1]]; }), '%') +
         (ig.countries && ig.countries.length ? '<p class="vc-note" style="margin-top:10px">Países: ' + ig.countries.join(' · ') + '</p>' : '')
@@ -2240,6 +2249,8 @@
     if (el('audiencia-besttime')) el('audiencia-besttime').innerHTML = ig.bestTime
       ? '<div class="hero-stat"><div class="hero-number">' + ig.bestTime + '</div><div class="hero-sub">Instagram · Metricool</div></div>'
       : '<div class="leads-empty-state">Sin dato.</div>';
+    cardShow('audiencia-places', !!(ig.cities && ig.cities.length));
+    cardShow('audiencia-besttime', !!ig.bestTime);
 
     // ---- COMPETENCIA (vista para dirección) ----
     var comps = (ig.competitors || []).filter(function (x) { return x.followers != null; });
@@ -2250,6 +2261,7 @@
         '<div class="leads-empty-state">Aún no hay comparativa de competencia para ' + a.label + '.' +
         ((ig.competitors || []).length ? ' Están agregados <b>' + ig.competitors.map(function (x) { return x.name; }).join(', ') + '</b> en Metricool, pero sin métricas todavía — actívales el seguimiento.' : '') + '</div>';
       if (el('referentes-share')) el('referentes-share').innerHTML = '<div class="leads-empty-state">Se calcula cuando haya competidores con datos.</div>';
+      cardShow('referentes-share', false);
       return;
     }
 

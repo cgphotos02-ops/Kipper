@@ -248,6 +248,97 @@
               "engagement": null
             }
           ]
+        },
+        "2026-09": {
+          "username": "proviserseguridad",
+          "followers": 4380,
+          "following": 585,
+          "followersDelta": 68,
+          "acquired": 89,
+          "lost": 24,
+          "engagement": 0.98,
+          "engagementNote": "estimado con los posts y reels del período (342 interacciones ÷ 8 piezas ÷ seguidores, misma fórmula que la tabla de competidores)",
+          "views": 14190,
+          "avgDailyReach": 151,
+          "engagedAccounts": 364,
+          "postsInPeriod": 16,
+          "bestTime": null,
+          "audience": {
+            "gender": [
+              [
+                "Hombres",
+                54.13
+              ],
+              [
+                "Mujeres",
+                32.35
+              ],
+              [
+                "Sin especificar",
+                13.53
+              ]
+            ],
+            "age": [
+              [
+                "13-17",
+                0.1
+              ],
+              [
+                "18-24",
+                5.5
+              ],
+              [
+                "25-34",
+                36.7
+              ],
+              [
+                "35-44",
+                34.3
+              ],
+              [
+                "45-54",
+                16.8
+              ],
+              [
+                "55-64",
+                5.1
+              ],
+              [
+                "65+",
+                1.4
+              ]
+            ],
+            "ageApprox": true
+          },
+          "content": {
+            "posts": {
+              "count": 1,
+              "engagement": 132.74,
+              "interactions": 30,
+              "avgReach": 226,
+              "views": 513,
+              "likes": 27,
+              "saves": 2,
+              "shares": 1
+            },
+            "reels": {
+              "count": 7,
+              "engagement": 88.61,
+              "interactions": 312,
+              "avgReach": 503,
+              "views": 6362,
+              "likes": 277,
+              "comments": 9,
+              "saves": 19,
+              "shares": 7
+            },
+            "stories": {
+              "count": 8
+            }
+          },
+          "topPosts": [],
+          "hashtags": [],
+          "competitors": []
         }
       },
       "facebook": {

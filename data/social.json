@@ -394,6 +394,59 @@
               "count": 1
             }
           }
+        },
+        "2026-09": {
+          "followers": 15530,
+          "followersDelta": 17,
+          "acquired": 85,
+          "lost": 23,
+          "views": 111200,
+          "pageVisits": 1924,
+          "postsInPeriod": 13,
+          "cities": [
+            [
+              "Cali",
+              33.25
+            ],
+            [
+              "Bogotá",
+              10.92
+            ],
+            [
+              "Medellín",
+              2.19
+            ],
+            [
+              "Jamundí",
+              1.85
+            ],
+            [
+              "Cartagena",
+              1.85
+            ]
+          ],
+          "content": {
+            "posts": {
+              "count": 1,
+              "engagement": 64.26,
+              "interactions": 41,
+              "avgReach": 638,
+              "views": 964,
+              "reactions": 12,
+              "shares": 1,
+              "clicks": 28
+            },
+            "reels": {
+              "count": 7,
+              "interactions": 313,
+              "videoViews": 20720,
+              "likes": 273,
+              "actions": 40
+            },
+            "stories": {
+              "count": 5
+            }
+          }
         }
       },
       "tiktok": {
@@ -1167,7 +1220,7 @@
         },
         "2026-09": {
           "followers": 3597,
-          "followersDelta": 3,
+          "followersDelta": -2,
           "acquired": 6,
           "lost": 3,
           "views": 60400,

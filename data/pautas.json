@@ -123,7 +123,7 @@
       ]
     },
     "2026-09": {
-      "updatedAt": "2026-10-03T13:31:15.610Z",
+      "updatedAt": "2026-10-03T13:48:01.982Z",
       "source": "PROVISER-_-NASS-Campañas-1-sep-2026---30-sep-2026.xlsx",
       "period": {
         "start": "2026-09-01",
@@ -184,7 +184,8 @@
           "ctrLink": 4.830783,
           "igVisits": 9,
           "igFollows": 0,
-          "interactions": 152
+          "interactions": 152,
+          "conversations": 119
         }
       ],
       "activeUntil": "2026-09-15",

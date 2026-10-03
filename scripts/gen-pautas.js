@@ -148,6 +148,15 @@ for (let r = 1; r < grid.length; r++) {
 if (!period || !/^\d{4}-\d{2}/.test(period.start || '')) { console.error('No pude saber el mes del informe (falta "Inicio del informe").'); process.exit(1); }
 const monthKey = period.start.slice(0, 7);
 const monthObj = { updatedAt: new Date().toISOString(), source: path.basename(SRC), period: period, rows: rows };
+// --conversaciones="proviser:119,nass:167": conversaciones de mensajes iniciadas (dato que Meta muestra aparte, en el detalle de "Conversiones")
+// para las pautas cuyo resultado principal es otro (por ejemplo clics en el enlace). Se busca por texto dentro del nombre de la campaña.
+if (FLAGS.conversaciones) {
+  FLAGS.conversaciones.split(',').forEach(function (pair) {
+    const p = pair.split(':'); const key = (p[0] || '').trim().toLowerCase(); const n = parseFloat(p[1]);
+    if (!key || !isFinite(n)) return;
+    rows.forEach(function (r) { if (r.name.toLowerCase().indexOf(key) > -1) r.conversations = n; });
+  });
+}
 if (FLAGS.hasta) monthObj.activeUntil = FLAGS.hasta;
 if (FLAGS.nota) monthObj.note = FLAGS.nota;
 // Se conserva lo que ya hubiera: el formato viejo (un solo mes) se migra; los demás meses no se tocan.

@@ -1690,24 +1690,27 @@
 
   function renderPautaBigCard(p) {
     var isConv = (p.resInd || '').indexOf('messaging') > -1;
-    var convRate = (isConv && p.linkClicks) ? (p.results / p.linkClicks) * 100 : null;
-    var pctBudget = (p.budget && p.spend) ? Math.min(100, (p.spend / p.budget) * 100) : null;
+    var hasConv = !isConv && p.conversations != null;   // pautas de clics con el dato de conversaciones iniciadas que da Meta aparte
+    var convRate = (isConv && p.linkClicks) ? (p.results / p.linkClicks) * 100 : (hasConv && p.linkClicks ? (p.conversations / p.linkClicks) * 100 : null);
     var meters = pautaMeter('CTR enlace', fmtPct2(p.ctrLink), (p.ctrLink / 6) * 100, pautaCtrColor(p.ctrLink)) +
-      pautaMeter('Frecuencia', fmtFreq(p.freq), (p.freq / 3.5) * 100, pautaFreqColor(p.freq)) +
-      (pctBudget != null ? pautaMeter('Presupuesto', Math.round(pctBudget) + '%', pctBudget, pctBudget >= 90 ? 'var(--warn)' : 'var(--accent)') : '');
+      pautaMeter('Frecuencia', fmtFreq(p.freq), (p.freq / 3.5) * 100, pautaFreqColor(p.freq));
     var chips = '<div class="pauta-chip">CPC enlace<b>' + fmtCOP(p.cpcLink) + '</b></div>' +
       '<div class="pauta-chip">CPM<b>' + fmtCOP(p.cpm) + '</b></div>' +
       '<div class="pauta-chip">Alcance<b>' + fmtNumCO(p.reach) + '</b></div>' +
-      '<div class="pauta-chip">Gasto<b>' + fmtCOP(p.spend) + '</b></div>' +
+      '<div class="pauta-chip">Impresiones<b>' + fmtNumCO(p.impr) + '</b></div>' +
+      (p.budget ? '<div class="pauta-chip" title="Presupuesto de toda la duración de la pauta, no solo de este mes">Presupuesto ' + (/total/i.test(p.budgetType) ? 'total' : 'diario') + '<b>' + fmtCOP(p.budget) + '</b></div>' : '') +
       (convRate != null ? '<div class="pauta-chip">Conv. ÷ clics<b>' + fmtPct2(convRate) + '</b></div>' : '');
     return '<div class="pauta-bigcard">' +
       '<div class="p-brand">' + (p.brand === '—' ? 'Sin marca' : p.brand) + ' <span class="status-pill ' + p.status.cls + '" style="margin-left:4px">' + p.status.label + '</span></div>' +
       '<div class="p-name">' + p.name + '</div>' +
       '<div class="p-dates">' + (p.start ? p.start + (p.end ? ' → ' + p.end : '') : 'sin fechas') + '</div>' +
       '<div class="pauta-pillrow" style="justify-content:flex-start;margin-bottom:16px">' +
+      pautaStatPill('Importe gastado', fmtCOP(p.spend), 'accent') +
       pautaStatPill(pautaResLabel(p.resInd), fmtNumCO(p.results), 'blue') +
-      pautaStatPill('Costo por resultado', fmtCOP(p.cpr), 'accent') +
+      (hasConv ? pautaStatPill('Conversaciones iniciadas', fmtNumCO(p.conversations), 'good') : '') +
+      pautaStatPill(hasConv ? 'Costo por conversación' : 'Costo por resultado', fmtCOP(hasConv && p.conversations ? p.spend / p.conversations : p.cpr), 'accent') +
       '</div>' +
+      (hasConv ? '<p class="vc-note" style="margin:-6px 0 12px">Meta mide esta pauta por <b>clics en el enlace</b>; las <b>conversaciones iniciadas</b> son las personas que de verdad escribieron por WhatsApp (dato de Meta, estimado con modelos estadísticos).</p>' : '') +
       '<div class="pauta-meterrow">' + meters + '</div>' +
       '<div class="pauta-chips">' + chips + '</div>' +
       '</div>';
@@ -1761,22 +1764,13 @@
       '<div class="pauta-section-title">Resumen del período' + (periodTxt ? ' · ' + periodTxt : '') + '</div>' +
       (parsed.updatedAt ? '<p class="vc-note" style="margin-top:-8px;text-align:center">Datos actualizados: ' + new Date(parsed.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }) + (parsed.source ? ' · ' + parsed.source : '') + '</p>' : '') +
       '<div class="pauta-pillrow">' +
-      pautaStatPill('Inversión total', fmtCOP(totalSpend), 'accent') +
-      (untilTxt ? pautaStatPill('Activas hasta', untilTxt, 'good') : pautaStatPill('Pautas activas', activeCount + ' / ' + rows.length, 'good')) +
-      realBrands.map(function (b, i) {
-        var bd = byBrand[b];
-        return pautaStatPill(b, fmtCOPshort(bd.spend) + ' · ' + Math.round(bd.spend / (totalSpend || 1) * 100) + '%', i === 0 ? 'accent' : 'blue');
+      // Importe gastado de CADA pauta (lo invertido en esa pauta). No se suma un total entre marcas.
+      rows.filter(function (p) { return p.spend > 0; }).sort(function (a, b) { return b.spend - a.spend; }).map(function (p, i) {
+        return pautaStatPill('Importe gastado · ' + (p.brand === '—' ? p.name : p.brand), fmtCOP(p.spend), i === 0 ? 'accent' : 'blue');
       }).join('') +
-      '</div>';
-    if (realBrands.length > 1) {
-      html += '<div class="pauta-split" style="margin-top:18px">' + realBrands.map(function (b, i) {
-        var w = byBrand[b].spend / (totalSpend || 1) * 100;
-        return '<div class="pauta-split-seg" style="width:' + w.toFixed(2) + '%;background:' + palette[i % palette.length] + '">' + (w > 12 ? Math.round(w) + '%' : '') + '</div>';
-      }).join('') + '</div>' +
-      '<div class="pauta-splitleg">' + realBrands.map(function (b, i) {
-        return '<span><span class="pauta-dot" style="background:' + palette[i % palette.length] + '"></span>' + b + ' · ' + fmtCOP(byBrand[b].spend) + '</span>';
-      }).join('') + '</div>';
-    }
+      (untilTxt ? pautaStatPill('Activas hasta', untilTxt, 'good') : pautaStatPill('Pautas activas', activeCount + ' / ' + rows.length, 'good')) +
+      '</div>' +
+      '<p class="vc-note" style="margin-top:10px;text-align:center">Importe gastado = lo que Meta cobró por cada pauta dentro del período.</p>';
     html += '</div>';
 
     // ---- Pautas activas ahora ----
@@ -1830,7 +1824,7 @@
     });
     var maxCtr = Math.max.apply(null, rows.map(function (p) { return p.ctrLink; }).concat([1]));
     html += '<div class="pauta-softcard"><div class="pauta-section-title">Todas las pautas</div><div class="simple-table-wrap"><table class="simple-table">' +
-      '<thead><tr><th>Marca</th><th>Campaña</th><th>Estado</th><th>Objetivo</th><th>Resultado</th><th>Costo/result.</th><th>Gasto</th><th>CTR</th><th>Frec.</th></tr></thead><tbody>' +
+      '<thead><tr><th>Marca</th><th>Campaña</th><th>Estado</th><th>Objetivo</th><th>Resultado</th><th>Costo/result.</th><th>Importe gastado</th><th>CTR</th><th>Frec.</th></tr></thead><tbody>' +
       sorted.map(function (p) {
         var objLabel = pautaResLabel(p.resInd);
         return '<tr>' +
@@ -2634,14 +2628,19 @@
 
       var reachNow = pr ? pr.reach : c.base.alcance;
       var freqNow = pr ? pr.freq : c.base.frecuencia;
-      var leadsNow, costNow, clicsNow = null, spendNow = pr ? pr.spend : null;
+      var leadsNow, costNow, clicsNow = null, spendNow = pr ? pr.spend : null, leadsReal = false;
       if (c.mideConversaciones) {
         leadsNow = pr ? pr.results : c.base.resultados;
         costNow = pr ? pr.cpr : c.base.costoPorResultado;
       } else {
         clicsNow = pr ? pr.linkClicks : (c.base.clics || 0);
-        leadsNow = Math.round(clicsNow * rate);
-        costNow = (pr && leadsNow) ? (pr.spend / leadsNow) : c.base.costoPorResultado;
+        if (pr && pr.conversations != null) {     // dato real de Meta: conversaciones iniciadas
+          leadsNow = pr.conversations; leadsReal = true;
+          costNow = leadsNow ? (pr.spend / leadsNow) : c.base.costoPorResultado;
+        } else {
+          leadsNow = Math.round(clicsNow * rate);
+          costNow = (pr && leadsNow) ? (pr.spend / leadsNow) : c.base.costoPorResultado;
+        }
       }
       var fresh = !!pr && (!PAUTAS.period || PAUTAS.period.start !== '2026-08-01');
       var freq = metaSemZone(freqNow);
@@ -2658,7 +2657,7 @@
         metaBar(reachNow, c.meta.alcance, c.base.alcance, 'var(--accent)') + '</div>' +
 
         '<div class="meta-metric"><div class="mm-head"><span class="mm-name">🎯 Resultados (leads)</span><span class="mm-val">' + fmtNumCO(leadsNow) + ' de ' + fmtNumCO(c.meta.resultados) + ' &nbsp;(' + Math.round((leadsNow / c.meta.resultados) * 100) + '%)</span></div>' +
-        '<div class="mm-what">Personas interesadas que realmente escribieron' + (c.mideConversaciones ? '.' : ' — estimado: ' + fmtNumCO(clicsNow) + ' clics × ' + fmtPct2(rate * 100) + '.') + '</div>' +
+        '<div class="mm-what">Personas interesadas que realmente escribieron' + (c.mideConversaciones ? '.' : (leadsReal ? ' — dato de Meta: conversaciones iniciadas (de ' + fmtNumCO(clicsNow) + ' clics).' : ' — estimado: ' + fmtNumCO(clicsNow) + ' clics × ' + fmtPct2(rate * 100) + '.')) + '</div>' +
         metaBar(leadsNow, c.meta.resultados, c.base.resultados, 'var(--good)') + '</div>' +
 
         '<div class="meta-metric"><div class="mm-head"><span class="mm-name">🔁 Frecuencia</span><span class="mm-val">' + fmtFreq(freqNow) + '</span></div>' +

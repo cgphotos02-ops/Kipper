@@ -1730,7 +1730,19 @@
       wireMonthJumpBtn(out);
       return;
     }
-    var rows = parsed.rows;
+    // Solo las pautas de la marca elegida en el selector de arriba
+    var brandLabel = accountLabels[currentAccount()];
+    var rows = parsed.rows.filter(function (p) { return p.brand === brandLabel; });
+    if (!rows.length) {
+      var otherMonths = pautasMonths().filter(function (mk) {
+        return mk !== selectedMonth && PAUTAS_ALL.months[mk].rows.some(function (p) { return p.brand === brandLabel && p.spend > 0; });
+      });
+      out.innerHTML = '<div class="card"><div class="leads-empty-state">No hay pautas de ' + kEsc(brandLabel) + ' en ' + kEsc(monthLabel(selectedMonth)) + '.' +
+        (otherMonths.length ? '<br><br><button class="seg-jump-btn mo-jump-btn" type="button" data-mes="' + otherMonths[otherMonths.length - 1] + '">📅 Ver ' + kEsc(monthLabel(otherMonths[otherMonths.length - 1])) + '</button>' : '') +
+        '</div></div>';
+      wireMonthJumpBtn(out);
+      return;
+    }
     var totalSpend = 0, activeCount = 0;
     var byBrand = {};
     rows.forEach(function (p) {
@@ -1751,6 +1763,8 @@
     var palette = ['#29abc7', '#1f7fc4', '#9bc93c', '#f8be22'];
     var html = '';
     var untilTxt = parsed.activeUntil ? pautaDateLong(parsed.activeUntil) : '';
+
+    html += '<p class="vc-note" style="text-align:center;margin:0 0 10px">Mostrando solo las pautas de <b>' + kEsc(brandLabel) + '</b>. Cambia de marca en el selector de arriba.</p>';
 
     // ---- Aclaración del mes (por ejemplo: pautas activas solo hasta cierta fecha) ----
     if (parsed.note || untilTxt) {
@@ -2596,7 +2610,8 @@
     if (!out) return;
     if (!METAS || !METAS.campanas) { out.innerHTML = '<div class="card"><div class="leads-empty-state">Aún no hay guía de metas cargada.</div></div>'; return; }
     var M = METAS;
-    var liveRows = (PAUTAS && PAUTAS.rows) ? PAUTAS.rows : [];
+    var brandLabelM = accountLabels[currentAccount()];
+    var liveRows = (PAUTAS && PAUTAS.rows) ? PAUTAS.rows.filter(function (p) { return p.brand === brandLabelM; }) : [];
     var rate = M.conversionClicLead || 0.041;
     var html = '';
 
@@ -2620,7 +2635,7 @@
       html += '<p class="vc-note" style="text-align:center">⏱️ ' + (PAUTAS.note || ('Las pautas estuvieron activas hasta el ' + pautaDateLong(PAUTAS.activeUntil) + '.')) +
         ' Se comparan con la meta del mes completo, así que quedar por debajo es esperable.</p>';
     }
-    (M.campanas || []).forEach(function (c) {
+    (M.campanas || []).filter(function (c) { return c.marca === brandLabelM; }).forEach(function (c) {
       // ¿hay dato en vivo para esta campaña? (misma marca + activa)
       var pr = liveRows.filter(function (r) {
         return pautaBrand(r.name) === c.marca && (r.status.k === 'active' || (PAUTAS && PAUTAS.activeUntil && r.spend > 0));
@@ -2676,7 +2691,7 @@
     html += '</div>';
 
     // ===== C. El caso de PROVISER: clics ≠ leads =====
-    if (M.conversion) {
+    if (M.conversion && brandLabelM === 'Proviser Seguridad') {   // el caso "clic ≠ lead" es solo de Proviser
       var cv = M.conversion;
       html += '<div class="pauta-softcard"><div class="pauta-section-title">Ojo con PROVISER: un clic no es un lead</div>' +
         '<div class="pauta-twocol" style="align-items:center">' +

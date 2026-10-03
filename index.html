@@ -1298,6 +1298,7 @@
     var set = {};
     set[DATA_MONTH] = true;
     if (typeof SEG !== 'undefined' && SEG && SEG.rows) SEG.rows.forEach(function (r) { if (r.mes) set[r.mes] = true; });
+    if (typeof PAUTAS_ALL !== 'undefined' && PAUTAS_ALL && PAUTAS_ALL.months) Object.keys(PAUTAS_ALL.months).forEach(function (m) { set[m] = true; });
     if (typeof GESTION !== 'undefined' && GESTION && GESTION.months) Object.keys(GESTION.months).forEach(function (m) { set[m] = true; });
     if (typeof KOMMO !== 'undefined' && KOMMO && KOMMO.accounts) {
       Object.keys(KOMMO.accounts).forEach(function (k) { kommoMonths(KOMMO.accounts[k]).forEach(function (m) { set[m] = true; }); });
@@ -1372,6 +1373,7 @@
     renderSeguimiento(currentAccount());
     renderGestion();
     renderKommo();
+    if (PAUTAS_ALL) syncPautas();
   }
   if (cuentaSel) cuentaSel.addEventListener('change', refreshAccount);
 
@@ -1711,11 +1713,18 @@
       '</div>';
   }
 
+  function pautaDateLong(iso) {
+    var p = String(iso || '').split('-');
+    if (p.length < 3) return iso || '';
+    return (+p[2]) + ' de ' + (MESES_ES[+p[1] - 1] || '');
+  }
   function renderPautas(parsed) {
     var out = el('pautas-output');
     if (!out) return;
     if (!parsed || !parsed.rows || !parsed.rows.length) {
-      out.innerHTML = '<div class="card"><div class="leads-empty-state">Aún no hay datos cargados.</div></div>';
+      out.innerHTML = '<div class="card"><div class="leads-empty-state">' +
+        (pautasMonths().length ? monthJumpHtml('pautas', pautasMonths()) : 'Aún no hay datos cargados.') + '</div></div>';
+      wireMonthJumpBtn(out);
       return;
     }
     var rows = parsed.rows;
@@ -1738,6 +1747,14 @@
 
     var palette = ['#29abc7', '#1f7fc4', '#9bc93c', '#f8be22'];
     var html = '';
+    var untilTxt = parsed.activeUntil ? pautaDateLong(parsed.activeUntil) : '';
+
+    // ---- Aclaración del mes (por ejemplo: pautas activas solo hasta cierta fecha) ----
+    if (parsed.note || untilTxt) {
+      html += '<div class="pauta-softcard" style="border-left:4px solid var(--warn)">' +
+        '<div class="pauta-section-title">⏱️ Ojo con este mes' + (untilTxt ? ': pautas activas hasta el ' + untilTxt : '') + '</div>' +
+        '<p class="vc-note" style="margin-top:-8px;text-align:center">' + (parsed.note || ('Las pautas estuvieron activas hasta el ' + untilTxt + '.')) + '</p></div>';
+    }
 
     // ---- Resumen ----
     html += '<div class="pauta-softcard">' +
@@ -1745,7 +1762,7 @@
       (parsed.updatedAt ? '<p class="vc-note" style="margin-top:-8px;text-align:center">Datos actualizados: ' + new Date(parsed.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }) + (parsed.source ? ' · ' + parsed.source : '') + '</p>' : '') +
       '<div class="pauta-pillrow">' +
       pautaStatPill('Inversión total', fmtCOP(totalSpend), 'accent') +
-      pautaStatPill('Pautas activas', activeCount + ' / ' + rows.length, 'good') +
+      (untilTxt ? pautaStatPill('Activas hasta', untilTxt, 'good') : pautaStatPill('Pautas activas', activeCount + ' / ' + rows.length, 'good')) +
       realBrands.map(function (b, i) {
         var bd = byBrand[b];
         return pautaStatPill(b, fmtCOPshort(bd.spend) + ' · ' + Math.round(bd.spend / (totalSpend || 1) * 100) + '%', i === 0 ? 'accent' : 'blue');
@@ -1763,9 +1780,10 @@
     html += '</div>';
 
     // ---- Pautas activas ahora ----
-    var actives = rows.filter(function (p) { return p.status.k === 'active'; })
+    // En un mes cerrado con fecha de fin ("activas hasta el 15"), se muestran las que tuvieron entrega en el mes.
+    var actives = rows.filter(function (p) { return untilTxt ? p.spend > 0 : p.status.k === 'active'; })
       .sort(function (a, b) { return b.spend - a.spend; });
-    html += '<div class="pauta-softcard"><div class="pauta-section-title">Pautas activas ahora</div>';
+    html += '<div class="pauta-softcard"><div class="pauta-section-title">' + (untilTxt ? 'Pautas del mes (activas hasta el ' + untilTxt + ')' : 'Pautas activas ahora') + '</div>';
     if (actives.length) {
       html += '<div class="pauta-active-grid">' + actives.map(renderPautaBigCard).join('') + '</div>';
       if (actives.length >= 2) {
@@ -2527,7 +2545,13 @@
     .catch(function () { /* sin archivo: estado vacío */ });
 
   // ---------- Pautas → Metas: guía para leer los números (data/metas.json + lo que ya viene de pautas.json) ----------
-  var PAUTAS = null, METAS = null;
+  var PAUTAS = null, METAS = null, PAUTAS_ALL = null;   // PAUTAS = las pautas del mes elegido; PAUTAS_ALL = todos los meses (data/pautas.json)
+  function pautasMonths() { return PAUTAS_ALL && PAUTAS_ALL.months ? Object.keys(PAUTAS_ALL.months).sort() : []; }
+  function syncPautas() {
+    PAUTAS = (PAUTAS_ALL && PAUTAS_ALL.months && PAUTAS_ALL.months[selectedMonth]) || null;
+    renderPautas(PAUTAS);
+    renderMetas();
+  }
 
   function metaSemZone(f) {
     if (f == null || !isFinite(f)) return { k: 'bien', t: '—' };
@@ -2598,10 +2622,14 @@
     html += '<div class="pauta-softcard"><div class="pauta-section-title">Cómo vamos frente a la meta del mes</div>' +
       '<p class="vc-note" style="margin-top:-8px;text-align:center">Meta calculada con el presupuesto completo de ' + fmtCOP(M.presupuestoMesPorCampana) + ' por campaña al mes. Es la meta «piso»: lo mínimo a igualar o mejorar. La marca gris │ es el dato real de ' + (M.periodoBase || 'la línea base') + '.</p>';
 
+    if (PAUTAS && PAUTAS.activeUntil) {
+      html += '<p class="vc-note" style="text-align:center">⏱️ ' + (PAUTAS.note || ('Las pautas estuvieron activas hasta el ' + pautaDateLong(PAUTAS.activeUntil) + '.')) +
+        ' Se comparan con la meta del mes completo, así que quedar por debajo es esperable.</p>';
+    }
     (M.campanas || []).forEach(function (c) {
       // ¿hay dato en vivo para esta campaña? (misma marca + activa)
       var pr = liveRows.filter(function (r) {
-        return pautaBrand(r.name) === c.marca && r.status.k === 'active';
+        return pautaBrand(r.name) === c.marca && (r.status.k === 'active' || (PAUTAS && PAUTAS.activeUntil && r.spend > 0));
       }).sort(function (a, b) { return b.spend - a.spend; })[0];
 
       var reachNow = pr ? pr.reach : c.base.alcance;
@@ -2890,7 +2918,13 @@
   // ---------- Pautas: carga los datos guardados en data/pautas.json ----------
   fetch('data/pautas.json', { cache: 'no-store' })
     .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (data) { if (data && data.rows && data.rows.length) { PAUTAS = data; renderPautas(data); renderMetas(); } })
+    .then(function (data) {
+      if (!data) return;
+      // formato viejo (un solo mes) → se envuelve por mes
+      if (!data.months && data.rows && data.period && data.period.start) { var mk = data.period.start.slice(0, 7), w = {}; w[mk] = data; data = { months: w }; }
+      if (!data.months) return;
+      PAUTAS_ALL = data; buildMonthOptions(); syncPautas();
+    })
     .catch(function () { /* sin archivo de datos: se queda el estado vacío */ });
 
   fetch('data/metas.json', { cache: 'no-store' })

@@ -1,12 +1,18 @@
 // Convierte un informe de campañas de Meta (.xlsx o .csv/.tsv) a data/pautas.json
-// Uso: node gen-pautas.js <archivo-informe> [ruta-salida]
+// Uso: node scripts/gen-pautas.js <archivo-informe> [ruta-salida] [--hasta=AAAA-MM-DD] [--nota="texto"]
+//   --hasta  fecha hasta la que las pautas estuvieron activas dentro del mes (el informe puede cubrir el mes completo)
+//   --nota   aclaración que se muestra en el panel para ese mes
+// El archivo es POR MES: cada informe se guarda en months["AAAA-MM"] y NO borra los demás meses.
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { execSync } = require('child_process');
 
-const SRC = process.argv[2];
-const OUT = process.argv[3] || path.join(process.cwd(), 'data', 'pautas.json');
+const FLAGS = {};
+const POS = [];
+process.argv.slice(2).forEach(function (a) { const m = a.match(/^--([a-z]+)=([\s\S]*)$/); if (m) FLAGS[m[1]] = m[2]; else POS.push(a); });
+const SRC = POS[0];
+const OUT = POS[1] || path.join(process.cwd(), 'data', 'pautas.json');
 if (!SRC || !fs.existsSync(SRC)) { console.error('Falta el archivo de entrada o no existe:', SRC); process.exit(1); }
 
 function num(v) {
@@ -139,7 +145,24 @@ for (let r = 1; r < grid.length; r++) {
     igVisits: num(g(C.igVisits)), igFollows: num(g(C.igFollows)), interactions: num(g(C.interactions))
   });
 }
-const outObj = { updatedAt: new Date().toISOString(), source: path.basename(SRC), period: period, rows: rows };
+if (!period || !/^\d{4}-\d{2}/.test(period.start || '')) { console.error('No pude saber el mes del informe (falta "Inicio del informe").'); process.exit(1); }
+const monthKey = period.start.slice(0, 7);
+const monthObj = { updatedAt: new Date().toISOString(), source: path.basename(SRC), period: period, rows: rows };
+if (FLAGS.hasta) monthObj.activeUntil = FLAGS.hasta;
+if (FLAGS.nota) monthObj.note = FLAGS.nota;
+// Se conserva lo que ya hubiera: el formato viejo (un solo mes) se migra; los demás meses no se tocan.
+let all = { months: {} };
+if (fs.existsSync(OUT)) {
+  try {
+    const prev = JSON.parse(fs.readFileSync(OUT, 'utf8'));
+    if (prev.months) all = prev;
+    else if (prev.rows && prev.period && prev.period.start) all.months[prev.period.start.slice(0, 7)] = prev;
+  } catch (e) {}
+}
+all.months[monthKey] = monthObj;
+const sortedMonths = {};
+Object.keys(all.months).sort().forEach(function (k) { sortedMonths[k] = all.months[k]; });
+all.months = sortedMonths;
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
-fs.writeFileSync(OUT, JSON.stringify(outObj, null, 2) + '\n');
-console.log('OK - ' + rows.length + ' campanas - periodo ' + (period ? period.start + ' a ' + period.end : '?') + ' -> ' + OUT);
+fs.writeFileSync(OUT, JSON.stringify(all, null, 2) + '\n');
+console.log('OK - ' + rows.length + ' campanas - mes ' + monthKey + ' (' + period.start + ' a ' + period.end + ') -> ' + OUT + ' | meses guardados: ' + Object.keys(all.months).join(', '));

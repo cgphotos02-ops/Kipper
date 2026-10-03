@@ -70,7 +70,7 @@ a una estructura por mes; hoy guarda solo el último cargado.)
 ## Actualizar la pestaña Pautas
 
 1. Descarga el informe de campañas de Meta (`.xlsx`).
-2. `node scripts/gen-pautas.js "ruta/al/informe.xlsx"` → reescribe `data/pautas.json`.
+2. `node scripts/gen-pautas.js "ruta/al/informe.xlsx" [--hasta=AAAA-MM-DD] [--nota="texto"]` → agrega ese mes a `data/pautas.json` (queda guardado por mes: **no borra los demás**). `--hasta` indica hasta qué fecha estuvieron activas las pautas dentro del mes y `--nota` deja una aclaración visible en el panel.
 3. `git add data/pautas.json && git commit -m "Actualiza pautas" && git push` → Pages se reconstruye y el panel muestra los nuevos datos.
 
 ## Conectar datos reales de Meta Ads

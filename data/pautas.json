@@ -1,122 +1,194 @@
 {
-  "updatedAt": "2026-09-09T13:18:01.729Z",
-  "source": "PROVISER-_-NASS-Campañas-1-ago-2026---31-ago-2026.xlsx",
-  "period": {
-    "start": "2026-08-01",
-    "end": "2026-08-31"
-  },
-  "rows": [
-    {
-      "name": "Leads NASS",
-      "brand": "Nass Tecnología",
-      "status": {
-        "k": "done",
-        "label": "Finalizada",
-        "cls": "off"
+  "months": {
+    "2026-08": {
+      "updatedAt": "2026-09-09T13:18:01.729Z",
+      "source": "PROVISER-_-NASS-Campañas-1-ago-2026---31-ago-2026.xlsx",
+      "period": {
+        "start": "2026-08-01",
+        "end": "2026-08-31"
       },
-      "statusRaw": "completed",
-      "start": "2026-06-16",
-      "end": "2026-07-03",
-      "reach": 0,
-      "freq": 0,
-      "impr": 0,
-      "results": 0,
-      "resInd": "",
-      "cpr": 0,
-      "budget": 400000,
-      "budgetType": "Total",
-      "spend": 0,
-      "cpm": 0,
-      "linkClicks": 0,
-      "cpcLink": 0,
-      "ctrLink": 0,
-      "igVisits": 0,
-      "igFollows": 0,
-      "interactions": 0
+      "rows": [
+        {
+          "name": "Leads NASS",
+          "brand": "Nass Tecnología",
+          "status": {
+            "k": "done",
+            "label": "Finalizada",
+            "cls": "off"
+          },
+          "statusRaw": "completed",
+          "start": "2026-06-16",
+          "end": "2026-07-03",
+          "reach": 0,
+          "freq": 0,
+          "impr": 0,
+          "results": 0,
+          "resInd": "",
+          "cpr": 0,
+          "budget": 400000,
+          "budgetType": "Total",
+          "spend": 0,
+          "cpm": 0,
+          "linkClicks": 0,
+          "cpcLink": 0,
+          "ctrLink": 0,
+          "igVisits": 0,
+          "igFollows": 0,
+          "interactions": 0
+        },
+        {
+          "name": "NASS KIT DE SEGURIDAD",
+          "brand": "Nass Tecnología",
+          "status": {
+            "k": "nodeliv",
+            "label": "No entrega",
+            "cls": "warn"
+          },
+          "statusRaw": "not_delivering",
+          "start": "2026-07-03",
+          "end": "2026-07-12",
+          "reach": 0,
+          "freq": 0,
+          "impr": 0,
+          "results": 0,
+          "resInd": "",
+          "cpr": 0,
+          "budget": 200000,
+          "budgetType": "Total",
+          "spend": 0,
+          "cpm": 0,
+          "linkClicks": 0,
+          "cpcLink": 0,
+          "ctrLink": 0,
+          "igVisits": 0,
+          "igFollows": 0,
+          "interactions": 0
+        },
+        {
+          "name": "Nass Pautas Publicitarias",
+          "brand": "Nass Tecnología",
+          "status": {
+            "k": "active",
+            "label": "Activa",
+            "cls": "good"
+          },
+          "statusRaw": "active",
+          "start": "2026-08-21",
+          "end": "2026-09-15",
+          "reach": 27758,
+          "freq": 1.814036,
+          "impr": 50354,
+          "results": 153,
+          "resInd": "actions:onsite_conversion.messaging_conversation_started_7d",
+          "cpr": 1535.19607843,
+          "budget": 500000,
+          "budgetType": "Total",
+          "spend": 234885,
+          "cpm": 4664.674107,
+          "linkClicks": 514,
+          "cpcLink": 456.974708,
+          "ctrLink": 1.020773,
+          "igVisits": 24,
+          "igFollows": 2,
+          "interactions": 112
+        },
+        {
+          "name": "PROVISER | WhatsApp | Seguridad | Prospecting",
+          "brand": "Proviser Seguridad",
+          "status": {
+            "k": "active",
+            "label": "Activa",
+            "cls": "good"
+          },
+          "statusRaw": "active",
+          "start": "2026-08-21",
+          "end": "2026-09-15",
+          "reach": 36024,
+          "freq": 1.526649,
+          "impr": 54996,
+          "results": 2821,
+          "resInd": "actions:link_click",
+          "cpr": 79.3842609,
+          "budget": 500000,
+          "budgetType": "Total",
+          "spend": 223943,
+          "cpm": 4071.987054,
+          "linkClicks": 2821,
+          "cpcLink": 79.384261,
+          "ctrLink": 5.129464,
+          "igVisits": 6,
+          "igFollows": 2,
+          "interactions": 154
+        }
+      ]
     },
-    {
-      "name": "NASS KIT DE SEGURIDAD",
-      "brand": "Nass Tecnología",
-      "status": {
-        "k": "nodeliv",
-        "label": "No entrega",
-        "cls": "warn"
+    "2026-09": {
+      "updatedAt": "2026-10-03T13:31:15.610Z",
+      "source": "PROVISER-_-NASS-Campañas-1-sep-2026---30-sep-2026.xlsx",
+      "period": {
+        "start": "2026-09-01",
+        "end": "2026-09-30"
       },
-      "statusRaw": "not_delivering",
-      "start": "2026-07-03",
-      "end": "2026-07-12",
-      "reach": 0,
-      "freq": 0,
-      "impr": 0,
-      "results": 0,
-      "resInd": "",
-      "cpr": 0,
-      "budget": 200000,
-      "budgetType": "Total",
-      "spend": 0,
-      "cpm": 0,
-      "linkClicks": 0,
-      "cpcLink": 0,
-      "ctrLink": 0,
-      "igVisits": 0,
-      "igFollows": 0,
-      "interactions": 0
-    },
-    {
-      "name": "Nass Pautas Publicitarias",
-      "brand": "Nass Tecnología",
-      "status": {
-        "k": "active",
-        "label": "Activa",
-        "cls": "good"
-      },
-      "statusRaw": "active",
-      "start": "2026-08-21",
-      "end": "2026-09-15",
-      "reach": 27758,
-      "freq": 1.814036,
-      "impr": 50354,
-      "results": 153,
-      "resInd": "actions:onsite_conversion.messaging_conversation_started_7d",
-      "cpr": 1535.19607843,
-      "budget": 500000,
-      "budgetType": "Total",
-      "spend": 234885,
-      "cpm": 4664.674107,
-      "linkClicks": 514,
-      "cpcLink": 456.974708,
-      "ctrLink": 1.020773,
-      "igVisits": 24,
-      "igFollows": 2,
-      "interactions": 112
-    },
-    {
-      "name": "PROVISER | WhatsApp | Seguridad | Prospecting",
-      "brand": "Proviser Seguridad",
-      "status": {
-        "k": "active",
-        "label": "Activa",
-        "cls": "good"
-      },
-      "statusRaw": "active",
-      "start": "2026-08-21",
-      "end": "2026-09-15",
-      "reach": 36024,
-      "freq": 1.526649,
-      "impr": 54996,
-      "results": 2821,
-      "resInd": "actions:link_click",
-      "cpr": 79.3842609,
-      "budget": 500000,
-      "budgetType": "Total",
-      "spend": 223943,
-      "cpm": 4071.987054,
-      "linkClicks": 2821,
-      "cpcLink": 79.384261,
-      "ctrLink": 5.129464,
-      "igVisits": 6,
-      "igFollows": 2,
-      "interactions": 154
+      "rows": [
+        {
+          "name": "Nass Pautas Publicitarias",
+          "brand": "Nass Tecnología",
+          "status": {
+            "k": "done",
+            "label": "Finalizada",
+            "cls": "off"
+          },
+          "statusRaw": "completed",
+          "start": "2026-08-21",
+          "end": "2026-09-15",
+          "reach": 35093,
+          "freq": 1.841934,
+          "impr": 64639,
+          "results": 167,
+          "resInd": "actions:onsite_conversion.messaging_conversation_started_7d",
+          "cpr": 1587.02994012,
+          "budget": 500000,
+          "budgetType": "Total",
+          "spend": 265034,
+          "cpm": 4100.218135,
+          "linkClicks": 642,
+          "cpcLink": 412.825545,
+          "ctrLink": 0.993208,
+          "igVisits": 26,
+          "igFollows": 3,
+          "interactions": 99
+        },
+        {
+          "name": "PROVISER | WhatsApp | Seguridad | Prospecting",
+          "brand": "Proviser Seguridad",
+          "status": {
+            "k": "done",
+            "label": "Finalizada",
+            "cls": "off"
+          },
+          "statusRaw": "completed",
+          "start": "2026-08-21",
+          "end": "2026-09-15",
+          "reach": 47775,
+          "freq": 1.503527,
+          "impr": 71831,
+          "results": 3470,
+          "resInd": "actions:link_click",
+          "cpr": 79.47665706,
+          "budget": 500000,
+          "budgetType": "Total",
+          "spend": 275784,
+          "cpm": 3839.34513,
+          "linkClicks": 3470,
+          "cpcLink": 79.476657,
+          "ctrLink": 4.830783,
+          "igVisits": 9,
+          "igFollows": 0,
+          "interactions": 152
+        }
+      ],
+      "activeUntil": "2026-09-15",
+      "note": "Las pautas estuvieron activas hasta el 15 de septiembre. Las cifras de este mes corresponden solo a esos 15 días de entrega (el informe cubre del 1 al 30 de septiembre)."
     }
-  ]
+  }
 }

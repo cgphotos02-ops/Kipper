@@ -2150,7 +2150,8 @@
             pautaStatPill('Crecimiento', delta(ig.followersDelta), (ig.followersDelta || 0) >= 0 ? 'good' : 'crit') +
             pill('Visualizaciones', num(ig.views), 'blue') +
             pill('Alcance medio/día', num(ig.avgDailyReach), 'blue') +
-            pill('Cuentas con interacción', num(ig.engagedAccounts), 'accent');
+            pill('Cuentas con interacción', num(ig.engagedAccounts), 'accent') +
+            (ig.engagement != null ? pill('Interacción por seguidor', fmtPct2(ig.engagement), 'blue') : '');
         } else if (net === 'fb') {
           pills = pill('Seguidores FB', num(fb.followers), 'accent') +
             pautaStatPill('Crecimiento', delta(fb.followersDelta), (fb.followersDelta || 0) >= 0 ? 'good' : 'crit') +

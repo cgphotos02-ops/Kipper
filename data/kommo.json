@@ -92,7 +92,7 @@
       ]
     ],
     "contactosError": null,
-    "contactosLeidos": 1152,
+    "contactosLeidos": 1156,
     "fuentes": [
       [
         "fuente 75089",
@@ -101,10 +101,10 @@
     ],
     "fuentesError": null,
     "conversaciones": {
-      "total": 1355,
+      "total": 1360,
       "porOrigen": {
-        "waba": 876,
-        "facebook": 152,
+        "waba": 880,
+        "facebook": 153,
         "instagram_business": 110,
         "com.amocrm.amocrmwa": 217
       }
@@ -119,12 +119,12 @@
     "leadsClasificadosPorTexto": 33,
     "leadsConNombreUtil": 0
   },
-  "generatedAt": "2026-10-07T18:20:44.208Z",
+  "generatedAt": "2026-10-07T23:59:43.883Z",
   "source": "kommo",
   "staleDays": 7,
   "unassigned": 246,
   "descartados": {
-    "gestionHumana": 419,
+    "gestionHumana": 421,
     "internos": 0,
     "sinPasarPorElBot": 387
   },

@@ -53,11 +53,11 @@
         1
       ],
       [
-        "NASS",
+        "NO CONTESTA",
         1
       ],
       [
-        "NO CONTESTA",
+        "NASS",
         1
       ]
     ],
@@ -104,7 +104,7 @@
       ]
     ],
     "contactosError": null,
-    "contactosLeidos": 1216,
+    "contactosLeidos": 1219,
     "fuentes": [
       [
         "fuente 75089",
@@ -113,11 +113,11 @@
     ],
     "fuentesError": null,
     "conversaciones": {
-      "total": 1432,
+      "total": 1436,
       "porOrigen": {
-        "waba": 941,
-        "facebook": 161,
-        "instagram_business": 113,
+        "waba": 942,
+        "instagram_business": 115,
+        "facebook": 162,
         "com.amocrm.amocrmwa": 217
       }
     },
@@ -131,14 +131,14 @@
     "leadsClasificadosPorTexto": 33,
     "leadsConNombreUtil": 0
   },
-  "generatedAt": "2026-10-13T18:48:11.530Z",
+  "generatedAt": "2026-10-13T23:34:38.747Z",
   "source": "kommo",
   "staleDays": 7,
   "unassigned": 248,
   "descartados": {
-    "gestionHumana": 463,
+    "gestionHumana": 465,
     "internos": 0,
-    "sinPasarPorElBot": 400
+    "sinPasarPorElBot": 403
   },
   "pipelines": [
     "Embudo de ventas",
@@ -363,11 +363,11 @@
         "2026-10": {
           "total": 3,
           "won": 0,
-          "lost": 1,
-          "open": 2,
+          "lost": 3,
+          "open": 0,
           "stale": 0,
           "winRate": 0,
-          "lossRate": 33.3,
+          "lossRate": 100,
           "closedWinRate": 0,
           "sales": 0,
           "avgDaysToWin": null,
@@ -375,8 +375,8 @@
             {
               "total": 3,
               "won": 0,
-              "lost": 1,
-              "open": 2,
+              "lost": 3,
+              "open": 0,
               "sales": 0,
               "name": "KipperSAS"
             }
@@ -385,8 +385,8 @@
             {
               "total": 3,
               "won": 0,
-              "lost": 1,
-              "open": 2,
+              "lost": 3,
+              "open": 0,
               "sales": 0,
               "name": "POTENCIAL"
             }
@@ -394,36 +394,28 @@
           "lostReasons": [
             {
               "name": "Sin motivo registrado",
-              "count": 1
+              "count": 3
             }
           ],
-          "byStage": [
-            {
-              "name": "Contacto inicial",
-              "pipeline": "Embudo de ventas",
-              "sort": 20,
-              "count": 2,
-              "stale": 0
-            }
-          ]
+          "byStage": []
         }
       },
       "open": {
-        "open": 3,
+        "open": 1,
         "stale": 0,
         "byStage": [
           {
             "name": "Contacto inicial",
             "pipeline": "Embudo de ventas",
             "sort": 20,
-            "count": 3,
+            "count": 1,
             "stale": 0
           }
         ],
         "byOwner": [
           {
             "name": "KipperSAS",
-            "open": 3,
+            "open": 1,
             "stale": 0
           }
         ]
@@ -609,20 +601,20 @@
         "2026-10": {
           "total": 1,
           "won": 0,
-          "lost": 0,
-          "open": 1,
+          "lost": 1,
+          "open": 0,
           "stale": 0,
           "winRate": 0,
-          "lossRate": 0,
-          "closedWinRate": null,
+          "lossRate": 100,
+          "closedWinRate": 0,
           "sales": 0,
           "avgDaysToWin": null,
           "byOwner": [
             {
               "total": 1,
               "won": 0,
-              "lost": 0,
-              "open": 1,
+              "lost": 1,
+              "open": 0,
               "sales": 0,
               "name": "KipperSAS"
             }
@@ -631,43 +623,26 @@
             {
               "total": 1,
               "won": 0,
-              "lost": 0,
-              "open": 1,
+              "lost": 1,
+              "open": 0,
               "sales": 0,
               "name": "POTENCIAL"
             }
           ],
-          "lostReasons": [],
-          "byStage": [
+          "lostReasons": [
             {
-              "name": "Contacto inicial",
-              "pipeline": "Embudo de ventas",
-              "sort": 20,
-              "count": 1,
-              "stale": 0
+              "name": "Sin motivo registrado",
+              "count": 1
             }
-          ]
+          ],
+          "byStage": []
         }
       },
       "open": {
-        "open": 1,
+        "open": 0,
         "stale": 0,
-        "byStage": [
-          {
-            "name": "Contacto inicial",
-            "pipeline": "Embudo de ventas",
-            "sort": 20,
-            "count": 1,
-            "stale": 0
-          }
-        ],
-        "byOwner": [
-          {
-            "name": "KipperSAS",
-            "open": 1,
-            "stale": 0
-          }
-        ]
+        "byStage": [],
+        "byOwner": []
       }
     }
   }

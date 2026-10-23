@@ -108,7 +108,7 @@
       ]
     ],
     "contactosError": null,
-    "contactosLeidos": 1290,
+    "contactosLeidos": 1292,
     "fuentes": [
       [
         "fuente 75089",
@@ -117,11 +117,11 @@
     ],
     "fuentesError": null,
     "conversaciones": {
-      "total": 1514,
+      "total": 1516,
       "porOrigen": {
-        "waba": 1006,
+        "facebook": 169,
+        "waba": 1007,
         "instagram_business": 123,
-        "facebook": 168,
         "com.amocrm.amocrmwa": 217
       }
     },
@@ -135,12 +135,12 @@
     "leadsClasificadosPorTexto": 34,
     "leadsConNombreUtil": 0
   },
-  "generatedAt": "2026-10-23T16:21:22.629Z",
+  "generatedAt": "2026-10-23T22:51:24.096Z",
   "source": "kommo",
   "staleDays": 7,
   "unassigned": 250,
   "descartados": {
-    "gestionHumana": 481,
+    "gestionHumana": 482,
     "internos": 0,
     "sinPasarPorElBot": 418
   },
@@ -282,7 +282,7 @@
           "won": 0,
           "lost": 159,
           "open": 1,
-          "stale": 0,
+          "stale": 1,
           "winRate": 0,
           "lossRate": 99.4,
           "closedWinRate": 0,
@@ -360,7 +360,7 @@
               "pipeline": "Embudo de ventas",
               "sort": 20,
               "count": 1,
-              "stale": 0
+              "stale": 1
             }
           ]
         },
@@ -422,21 +422,21 @@
       },
       "open": {
         "open": 9,
-        "stale": 0,
+        "stale": 1,
         "byStage": [
           {
             "name": "Contacto inicial",
             "pipeline": "Embudo de ventas",
             "sort": 20,
             "count": 9,
-            "stale": 0
+            "stale": 1
           }
         ],
         "byOwner": [
           {
             "name": "KipperSAS",
             "open": 9,
-            "stale": 0
+            "stale": 1
           }
         ]
       }

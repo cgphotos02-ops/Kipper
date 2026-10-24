@@ -108,7 +108,7 @@
       ]
     ],
     "contactosError": null,
-    "contactosLeidos": 1292,
+    "contactosLeidos": 1297,
     "fuentes": [
       [
         "fuente 75089",
@@ -117,10 +117,10 @@
     ],
     "fuentesError": null,
     "conversaciones": {
-      "total": 1516,
+      "total": 1522,
       "porOrigen": {
-        "facebook": 169,
-        "waba": 1007,
+        "facebook": 170,
+        "waba": 1012,
         "instagram_business": 123,
         "com.amocrm.amocrmwa": 217
       }
@@ -135,12 +135,12 @@
     "leadsClasificadosPorTexto": 34,
     "leadsConNombreUtil": 0
   },
-  "generatedAt": "2026-10-23T22:51:24.096Z",
+  "generatedAt": "2026-10-24T15:17:30.130Z",
   "source": "kommo",
   "staleDays": 7,
   "unassigned": 250,
   "descartados": {
-    "gestionHumana": 482,
+    "gestionHumana": 485,
     "internos": 0,
     "sinPasarPorElBot": 418
   },
@@ -369,7 +369,7 @@
           "won": 0,
           "lost": 3,
           "open": 8,
-          "stale": 0,
+          "stale": 1,
           "winRate": 0,
           "lossRate": 27.3,
           "closedWinRate": 0,
@@ -415,28 +415,28 @@
               "pipeline": "Embudo de ventas",
               "sort": 20,
               "count": 8,
-              "stale": 0
+              "stale": 1
             }
           ]
         }
       },
       "open": {
         "open": 9,
-        "stale": 1,
+        "stale": 2,
         "byStage": [
           {
             "name": "Contacto inicial",
             "pipeline": "Embudo de ventas",
             "sort": 20,
             "count": 9,
-            "stale": 1
+            "stale": 2
           }
         ],
         "byOwner": [
           {
             "name": "KipperSAS",
             "open": 9,
-            "stale": 1
+            "stale": 2
           }
         ]
       }
@@ -679,7 +679,7 @@
           "won": 0,
           "lost": 1,
           "open": 5,
-          "stale": 0,
+          "stale": 1,
           "winRate": 0,
           "lossRate": 16.7,
           "closedWinRate": 0,
@@ -717,28 +717,28 @@
               "pipeline": "Embudo de ventas",
               "sort": 20,
               "count": 5,
-              "stale": 0
+              "stale": 1
             }
           ]
         }
       },
       "open": {
         "open": 5,
-        "stale": 0,
+        "stale": 1,
         "byStage": [
           {
             "name": "Contacto inicial",
             "pipeline": "Embudo de ventas",
             "sort": 20,
             "count": 5,
-            "stale": 0
+            "stale": 1
           }
         ],
         "byOwner": [
           {
             "name": "KipperSAS",
             "open": 5,
-            "stale": 0
+            "stale": 1
           }
         ]
       }

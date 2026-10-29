@@ -108,7 +108,7 @@
       ]
     ],
     "contactosError": null,
-    "contactosLeidos": 1320,
+    "contactosLeidos": 1322,
     "fuentes": [
       [
         "fuente 75089",
@@ -117,10 +117,10 @@
     ],
     "fuentesError": null,
     "conversaciones": {
-      "total": 1546,
+      "total": 1549,
       "porOrigen": {
-        "waba": 1033,
-        "instagram_business": 124,
+        "waba": 1035,
+        "instagram_business": 125,
         "facebook": 172,
         "com.amocrm.amocrmwa": 217
       }
@@ -135,7 +135,7 @@
     "leadsClasificadosPorTexto": 34,
     "leadsConNombreUtil": 0
   },
-  "generatedAt": "2026-10-28T23:50:29.655Z",
+  "generatedAt": "2026-10-29T17:56:40.553Z",
   "source": "kommo",
   "staleDays": 7,
   "unassigned": 252,
@@ -146,7 +146,8 @@
   },
   "pipelines": [
     "Embudo de ventas",
-    "Embudo gestión humana"
+    "Embudo gestión humana",
+    "Agente Dapta"
   ],
   "accounts": {
     "todas": {

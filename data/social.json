@@ -1419,6 +1419,134 @@
               "engagement": null
             }
           ]
+        },
+        "2026-10": {
+          "username": "nasstecnologia",
+          "followers": 1742,
+          "following": 2857,
+          "followersDelta": 19,
+          "acquired": 27,
+          "lost": 8,
+          "engagement": 0.73,
+          "engagementNote": "estimado con los posts y reels del período (89 interacciones ÷ 7 piezas ÷ seguidores, misma fórmula que la tabla de competidores)",
+          "views": 3626,
+          "avgDailyReach": 69,
+          "engagedAccounts": 94,
+          "postsInPeriod": 7,
+          "bestTime": null,
+          "cities": [
+            [
+              "Santiago de Cali, Valle del Cauca",
+              33.43
+            ],
+            [
+              "Bogotá, Distrito Especial",
+              8.52
+            ],
+            [
+              "Medellín, Antioquia",
+              3.42
+            ],
+            [
+              "Jamundí, Valle del Cauca",
+              2.84
+            ]
+          ],
+          "countries": [
+            "Colombia",
+            "Argentina",
+            "Brasil",
+            "Venezuela",
+            "España",
+            "Estados Unidos",
+            "México"
+          ],
+          "audience": {
+            "gender": [
+              [
+                "Hombres",
+                50.77
+              ],
+              [
+                "Mujeres",
+                30.11
+              ],
+              [
+                "Sin especificar",
+                19.13
+              ]
+            ],
+            "age": [
+              [
+                "13-17",
+                0.2
+              ],
+              [
+                "18-24",
+                3.5
+              ],
+              [
+                "25-34",
+                25
+              ],
+              [
+                "35-44",
+                33.7
+              ],
+              [
+                "45-54",
+                22.5
+              ],
+              [
+                "55-64",
+                9.5
+              ],
+              [
+                "65+",
+                4.7
+              ]
+            ],
+            "ageApprox": true,
+            "genderApprox": true,
+            "genderNote": "Sin la tabla de octubre: se mantienen los porcentajes de septiembre (la audiencia casi no cambia de un mes a otro)."
+          },
+          "content": {
+            "posts": {
+              "count": 4,
+              "engagement": 175.93,
+              "interactions": 38,
+              "avgReach": 54,
+              "views": 487,
+              "likes": 38
+            },
+            "reels": {
+              "count": 3,
+              "engagement": 105.59,
+              "interactions": 51,
+              "avgReach": 161,
+              "views": 736,
+              "likes": 47,
+              "comments": 3,
+              "saves": 1
+            },
+            "stories": {
+              "count": 0
+            }
+          },
+          "topPosts": [],
+          "hashtags": [],
+          "competitors": [
+            {
+              "name": "TANGO Colombia",
+              "followers": null,
+              "engagement": null
+            },
+            {
+              "name": "SYTEC",
+              "followers": null,
+              "engagement": null
+            }
+          ]
         }
       },
       "facebook": {

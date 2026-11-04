@@ -1523,6 +1523,54 @@
               "count": 1
             }
           }
+        },
+        "2026-10": {
+          "followers": 3592,
+          "followersDelta": -2,
+          "acquired": 5,
+          "lost": 3,
+          "views": 18200,
+          "pageVisits": 83,
+          "postsInPeriod": 7,
+          "cities": [
+            [
+              "Cali",
+              58.77
+            ],
+            [
+              "Bogotá",
+              3.09
+            ],
+            [
+              "Jamundí",
+              1.98
+            ],
+            [
+              "Candelaria",
+              1.39
+            ],
+            [
+              "Yumbo",
+              1.2
+            ]
+          ],
+          "content": {
+            "posts": {
+              "count": 4,
+              "engagement": 105.26,
+              "interactions": 8,
+              "avgReach": 19,
+              "views": 99,
+              "reactions": 4,
+              "shares": 4
+            },
+            "reels": {
+              "count": 3,
+              "interactions": 1,
+              "videoViews": 448,
+              "likes": 1
+            }
+          }
         }
       },
       "tiktok": {

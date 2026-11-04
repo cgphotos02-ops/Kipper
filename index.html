@@ -1997,7 +1997,7 @@
       var cards = TT_STAT_LABELS.map(function (s) {
         var d = cont.stats[s.k] || {};
         return '<div class="tt-stat-card"><div class="net-followers">' + fmtNumCO(d.total) + '</div><div class="net-label">' + s.label + '</div>' +
-          (d.delta != null ? '<span class="net-delta">+' + fmtNumCO(d.delta) + (d.deltaPct != null ? ' (' + fmtPctSigned(d.deltaPct).replace('+', '') + ')' : '') + '</span>' : '') + '</div>';
+          (d.delta != null ? '<span class="net-delta">' + (d.delta < 0 ? '' : '+') + fmtNumCO(d.delta) + (d.deltaPct != null ? ' (' + fmtPctSigned(d.deltaPct).replace('+', '') + ')' : '') + '</span>' : '') + '</div>';
       }).join('');
       contentEl.innerHTML = (cont.periodo ? '<p class="vc-note" style="margin:-4px 0 12px;text-align:center"><b style="color:var(--accent-soft-ink)">' + cont.periodo + '</b></p>' : '') +
         '<div class="tt-stat-grid">' + cards + '</div>' +

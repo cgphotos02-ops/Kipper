@@ -1789,6 +1789,162 @@
                 "fechaRelativa": "hace 1 sem"
               }
             ]
+          },
+          "2026-10": {
+            "updatedAt": "2026-11-04",
+            "ventana": "Visualizaciones de los últimos 60 días (al 3 de noviembre)",
+            "porVisualizaciones": [
+              {
+                "titulo": "En NASS integramos tecnología, monitoreo y respaldo para que tu...",
+                "valor": 3700,
+                "totalViews": 3700,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Solicita tu cotización #SeguridadElectrónica #Monitoreo...",
+                "valor": 2200,
+                "totalViews": 2200,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Irte de viaje no debería significar desconectarte de la seguridad de t...",
+                "valor": 1200,
+                "totalViews": 1200,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Tener seguridad en casa puede ser más accesible de lo que imaginas....",
+                "valor": 1100,
+                "totalViews": 1100,
+                "fechaRelativa": "hace 3 sem"
+              },
+              {
+                "titulo": "En NASS analizamos tu espacio para diseñar una solución que realmente...",
+                "valor": 685,
+                "totalViews": 685,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Tener más cámaras no siempre equivale a estar mejor protegido. A...",
+                "valor": 637,
+                "totalViews": 637,
+                "fechaRelativa": "hace 1 mes"
+              }
+            ],
+            "porNuevosEspectadores": [
+              {
+                "titulo": "En NASS integramos tecnología, monitoreo y respaldo para que tu...",
+                "valor": 2600,
+                "totalViews": 3700,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Solicita tu cotización #SeguridadElectrónica #Monitoreo...",
+                "valor": 1500,
+                "totalViews": 2200,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Tener seguridad en casa puede ser más accesible de lo que imaginas....",
+                "valor": 955,
+                "totalViews": 1100,
+                "fechaRelativa": "hace 3 sem"
+              },
+              {
+                "titulo": "Irte de viaje no debería significar desconectarte de la seguridad de t...",
+                "valor": 925,
+                "totalViews": 1200,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Tener más cámaras no siempre equivale a estar mejor protegido. A...",
+                "valor": 502,
+                "totalViews": 637,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Comprar una cámara es fácil. Tener una respuesta cuando algo sucede...",
+                "valor": 490,
+                "totalViews": 569,
+                "fechaRelativa": "hace 2 sem"
+              }
+            ],
+            "porMeGusta": [
+              {
+                "titulo": "Irte de viaje no debería significar desconectarte de la seguridad de t...",
+                "valor": 363,
+                "totalViews": 1200,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Tener más cámaras no siempre equivale a estar mejor protegido. A...",
+                "valor": 99,
+                "totalViews": 637,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "En NASS integramos tecnología, monitoreo y respaldo para que tu...",
+                "valor": 85,
+                "totalViews": 3700,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Solicita tu cotización #SeguridadElectrónica #Monitoreo...",
+                "valor": 56,
+                "totalViews": 2200,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "En NASS analizamos tu espacio para diseñar una solución que realmente...",
+                "valor": 12,
+                "totalViews": 685,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Tener seguridad en casa puede ser más accesible de lo que imaginas....",
+                "valor": 10,
+                "totalViews": 1100,
+                "fechaRelativa": "hace 3 sem"
+              }
+            ],
+            "porNuevosSeguidores": [
+              {
+                "titulo": "En NASS integramos tecnología, monitoreo y respaldo para que tu...",
+                "valor": 91,
+                "totalViews": 3700,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Solicita tu cotización #SeguridadElectrónica #Monitoreo...",
+                "valor": 38,
+                "totalViews": 2200,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Irte de viaje no debería significar desconectarte de la seguridad de t...",
+                "valor": 14,
+                "totalViews": 1200,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Tener más cámaras no siempre equivale a estar mejor protegido. A...",
+                "valor": 9,
+                "totalViews": 637,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "En NASS analizamos tu espacio para diseñar una solución que realmente...",
+                "valor": 4,
+                "totalViews": 685,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Tener seguridad en casa puede ser más accesible de lo que imaginas....",
+                "valor": 1,
+                "totalViews": 1100,
+                "fechaRelativa": "hace 3 sem"
+              }
+            ]
           }
         },
         "audiencia": {
@@ -1854,6 +2010,144 @@
               "ventana": "Últimos 7 días"
             },
             "periodo": "Septiembre 2026"
+          },
+          "2026-10": {
+            "updatedAt": "2026-11-04",
+            "periodo": "Octubre 2026",
+            "espectadores": {
+              "total": 7000,
+              "nuevos": 7000,
+              "ventana": "Ventana de 60 días (5 sep – 3 nov)",
+              "nota": "Casi todo el crecimiento fue a finales de septiembre (pico del 29 de septiembre). En octubre hubo dos picos más pequeños, el 17 y el 20, y entre picos la audiencia vuelve casi a cero. Los seguidores netos de esta ventana (+137) son casi todos de septiembre.",
+              "nuevosDeltaPct": 11950,
+              "totalDeltaPct": 27.77
+            },
+            "seguidores": {
+              "total": 162,
+              "netos": 137,
+              "ventana": "Últimos 60 días (al 3 de noviembre)",
+              "netosDeltaPct": 13600
+            },
+            "sexo": [
+              [
+                "Hombres",
+                83
+              ],
+              [
+                "Mujeres",
+                17
+              ],
+              [
+                "Otro",
+                0
+              ]
+            ],
+            "edad": [
+              [
+                "18-24",
+                12.7
+              ],
+              [
+                "25-34",
+                32.8
+              ],
+              [
+                "35-44",
+                27.7
+              ],
+              [
+                "45-54",
+                17.4
+              ],
+              [
+                "55+",
+                9.4
+              ]
+            ],
+            "ubicaciones": [
+              [
+                "Colombia",
+                91.9
+              ],
+              [
+                "Argentina",
+                2.3
+              ],
+              [
+                "Estados Unidos",
+                1.3
+              ],
+              [
+                "España",
+                1.2
+              ],
+              [
+                "Otros",
+                1.3
+              ]
+            ],
+            "seguidoresPerfil": {
+              "sexo": [
+                [
+                  "Hombres",
+                  80
+                ],
+                [
+                  "Mujeres",
+                  20
+                ],
+                [
+                  "Otro",
+                  0
+                ]
+              ],
+              "edad": [
+                [
+                  "18-24",
+                  9.2
+                ],
+                [
+                  "25-34",
+                  25.5
+                ],
+                [
+                  "35-44",
+                  32
+                ],
+                [
+                  "45-54",
+                  16.3
+                ],
+                [
+                  "55+",
+                  17
+                ]
+              ],
+              "ubicaciones": [
+                [
+                  "Colombia",
+                  78.5
+                ],
+                [
+                  "Estados Unidos",
+                  1.9
+                ],
+                [
+                  "Argentina",
+                  1.2
+                ],
+                [
+                  "Venezuela",
+                  1.2
+                ]
+              ]
+            },
+            "actividadSeguidores": {
+              "dia": "3 de noviembre",
+              "hora": "13:00",
+              "nota": "Durante los últimos 7 días, la mayoría de tus seguidores estuvieron activos el 3 de noviembre a la 1pm.",
+              "ventana": "Últimos 7 días"
+            }
           }
         },
         "contenido": {
@@ -1908,6 +2202,82 @@
               [
                 "Sonido",
                 0
+              ]
+            ]
+          },
+          "2026-10": {
+            "updatedAt": "2026-11-04",
+            "periodo": "Octubre 2026",
+            "ventana": "1 – 31 de octubre",
+            "stats": {
+              "visualizacionesVideos": {
+                "total": 3000,
+                "delta": -3100,
+                "deltaPct": -50.5
+              },
+              "visualizacionesPerfil": {
+                "total": 12,
+                "delta": -21,
+                "deltaPct": -63.6
+              },
+              "meGusta": {
+                "total": 388,
+                "delta": 126,
+                "deltaPct": 48.1
+              },
+              "comentarios": {
+                "total": 0,
+                "delta": 0,
+                "deltaPct": null
+              },
+              "compartidos": {
+                "total": 1,
+                "delta": -1,
+                "deltaPct": -50
+              }
+            },
+            "fuenteTrafico": [
+              [
+                "Para ti",
+                95.6
+              ],
+              [
+                "Perfil personal",
+                2.4
+              ],
+              [
+                "Siguiendo",
+                1
+              ],
+              [
+                "Buscar",
+                1
+              ],
+              [
+                "Sonido",
+                0
+              ]
+            ],
+            "consultasBusqueda": [
+              [
+                "reparadores de cámara cali",
+                1.4
+              ],
+              [
+                "atempi seguridad cali",
+                1.4
+              ],
+              [
+                "camaras de vigilancia cali",
+                1.4
+              ],
+              [
+                "nass remoto",
+                1.4
+              ],
+              [
+                "venta de camarada de seguridad dahua en cali",
+                1.4
               ]
             ]
           }

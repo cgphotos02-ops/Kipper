@@ -1002,6 +1002,60 @@
                 0
               ]
             ]
+          },
+          "2026-10": {
+            "updatedAt": "2026-11-04",
+            "periodo": "Octubre 2026",
+            "ventana": "1 – 31 de octubre",
+            "stats": {
+              "visualizacionesVideos": {
+                "total": 40100,
+                "delta": 10100,
+                "deltaPct": 33.6
+              },
+              "visualizacionesPerfil": {
+                "total": 553,
+                "delta": 142,
+                "deltaPct": 34.5
+              },
+              "meGusta": {
+                "total": 2300,
+                "delta": 1400,
+                "deltaPct": 147.6
+              },
+              "comentarios": {
+                "total": 34,
+                "delta": 3,
+                "deltaPct": 9.7
+              },
+              "compartidos": {
+                "total": 27,
+                "delta": -15,
+                "deltaPct": -35.7
+              }
+            },
+            "fuenteTrafico": [
+              [
+                "Para ti",
+                79
+              ],
+              [
+                "Buscar",
+                15.9
+              ],
+              [
+                "Perfil personal",
+                4.6
+              ],
+              [
+                "Siguiendo",
+                0.5
+              ],
+              [
+                "Sonido",
+                0
+              ]
+            ]
           }
         },
         "topPosts": {
@@ -1088,6 +1142,162 @@
                 "fechaRelativa": "28 ago 2025"
               }
             ]
+          },
+          "2026-10": {
+            "updatedAt": "2026-11-04",
+            "ventana": "Visualizaciones de los últimos 60 días (al 3 de noviembre)",
+            "porVisualizaciones": [
+              {
+                "titulo": "La seguridad no debería empezar por el precio, sino por entender qu...",
+                "valor": 17000,
+                "totalViews": 17000,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "En Proviser diseñamos esquemas de seguridad adaptados a la operació...",
+                "valor": 13000,
+                "totalViews": 13000,
+                "fechaRelativa": "hace 2 meses"
+              },
+              {
+                "titulo": "Primer vistazo a la maleta del Giro de Rigo. 👀 Aquí, en la feria comercial...",
+                "valor": 4100,
+                "totalViews": 4200,
+                "fechaRelativa": "hace 4 d"
+              },
+              {
+                "titulo": "Antes de cada kilómetro, hay una operación que ya está en marcha....",
+                "valor": 4100,
+                "totalViews": 4100,
+                "fechaRelativa": "hace 3 sem"
+              },
+              {
+                "titulo": "Cada riesgo exige una respuesta diferente. En Proviser combinamos...",
+                "valor": 3500,
+                "totalViews": 3500,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Mientras ellos se concentran en llegar más lejos, nosotros nos...",
+                "valor": 3300,
+                "totalViews": 3300,
+                "fechaRelativa": "hace 1 mes"
+              }
+            ],
+            "porNuevosEspectadores": [
+              {
+                "titulo": "La seguridad no debería empezar por el precio, sino por entender qu...",
+                "valor": 9800,
+                "totalViews": 17000,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "En Proviser diseñamos esquemas de seguridad adaptados a la operació...",
+                "valor": 6000,
+                "totalViews": 13000,
+                "fechaRelativa": "hace 2 meses"
+              },
+              {
+                "titulo": "Primer vistazo a la maleta del Giro de Rigo. 👀 Aquí, en la feria comercial...",
+                "valor": 3200,
+                "totalViews": 4200,
+                "fechaRelativa": "hace 4 d"
+              },
+              {
+                "titulo": "Mientras ellos se concentran en llegar más lejos, nosotros nos...",
+                "valor": 2400,
+                "totalViews": 3300,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Confianza y seguridad, el pilar de nuestro servicio en Proviser 🔒 En...",
+                "valor": 1200,
+                "totalViews": 99000,
+                "fechaRelativa": "3 feb 2025"
+              },
+              {
+                "titulo": "Antes de cada kilómetro, hay una operación que ya está en marcha....",
+                "valor": 1100,
+                "totalViews": 4100,
+                "fechaRelativa": "hace 3 sem"
+              }
+            ],
+            "porMeGusta": [
+              {
+                "titulo": "Mientras ellos se concentran en llegar más lejos, nosotros nos...",
+                "valor": 1100,
+                "totalViews": 3300,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Primer vistazo a la maleta del Giro de Rigo. 👀 Aquí, en la feria comercial...",
+                "valor": 800,
+                "totalViews": 4200,
+                "fechaRelativa": "hace 4 d"
+              },
+              {
+                "titulo": "Antes de cada kilómetro, hay una operación que ya está en marcha....",
+                "valor": 556,
+                "totalViews": 4100,
+                "fechaRelativa": "hace 3 sem"
+              },
+              {
+                "titulo": "La seguridad no debería empezar por el precio, sino por entender qu...",
+                "valor": 350,
+                "totalViews": 17000,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "En Proviser conectamos vigilancia, monitoreo, tecnología y gestión del...",
+                "valor": 299,
+                "totalViews": 1200,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "En Proviser diseñamos esquemas de seguridad adaptados a la operació...",
+                "valor": 283,
+                "totalViews": 13000,
+                "fechaRelativa": "hace 2 meses"
+              }
+            ],
+            "porNuevosSeguidores": [
+              {
+                "titulo": "La seguridad no debería empezar por el precio, sino por entender qu...",
+                "valor": 97,
+                "totalViews": 17000,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "En Proviser diseñamos esquemas de seguridad adaptados a la operació...",
+                "valor": 92,
+                "totalViews": 13000,
+                "fechaRelativa": "hace 2 meses"
+              },
+              {
+                "titulo": "Antes de cada kilómetro, hay una operación que ya está en marcha....",
+                "valor": 38,
+                "totalViews": 4100,
+                "fechaRelativa": "hace 3 sem"
+              },
+              {
+                "titulo": "Mientras ellos se concentran en llegar más lejos, nosotros nos...",
+                "valor": 37,
+                "totalViews": 3300,
+                "fechaRelativa": "hace 1 mes"
+              },
+              {
+                "titulo": "Primer vistazo a la maleta del Giro de Rigo. 👀 Aquí, en la feria comercial...",
+                "valor": 20,
+                "totalViews": 4200,
+                "fechaRelativa": "hace 4 d"
+              },
+              {
+                "titulo": "Cada riesgo exige una respuesta diferente. En Proviser combinamos...",
+                "valor": 15,
+                "totalViews": 3500,
+                "fechaRelativa": "hace 1 mes"
+              }
+            ]
           }
         },
         "audiencia": {
@@ -1146,6 +1356,134 @@
               "horaHasta": "14:00",
               "ventana": "Últimos 7 días",
               "nota": "En los últimos 7 días, tus espectadores estuvieron más activos el 29 sep entre la 1pm y las 2pm."
+            }
+          },
+          "2026-10": {
+            "updatedAt": "2026-11-04",
+            "periodo": "Octubre 2026",
+            "espectadores": {
+              "total": 38700,
+              "nuevos": 30600,
+              "ventana": "Ventana de 60 días (5 sep – 3 nov)",
+              "nota": "Picos el 25 de septiembre (el más alto), el 11 y 14 de octubre y un nuevo pico el 2 de noviembre. Después de cada pico baja, pero se mantiene por encima del nivel de agosto.",
+              "nuevosDeltaPct": 263.61,
+              "totalDeltaPct": 104.4
+            },
+            "seguidores": {
+              "total": 5200,
+              "netos": 224,
+              "ventana": "Últimos 60 días (al 3 de noviembre)",
+              "netosDeltaPct": 244.6
+            },
+            "sexo": [
+              [
+                "Hombres",
+                76
+              ],
+              [
+                "Mujeres",
+                24
+              ],
+              [
+                "Otro",
+                0
+              ]
+            ],
+            "edad": [
+              [
+                "18-24",
+                16
+              ],
+              [
+                "25-34",
+                40.2
+              ],
+              [
+                "35-44",
+                26.3
+              ],
+              [
+                "45-54",
+                12.2
+              ],
+              [
+                "55+",
+                5.3
+              ]
+            ],
+            "seguidoresPerfil": {
+              "sexo": [
+                [
+                  "Hombres",
+                  68
+                ],
+                [
+                  "Mujeres",
+                  32
+                ],
+                [
+                  "Otro",
+                  0
+                ]
+              ],
+              "edad": [
+                [
+                  "18-24",
+                  10.5
+                ],
+                [
+                  "25-34",
+                  42.9
+                ],
+                [
+                  "35-44",
+                  31.3
+                ],
+                [
+                  "45-54",
+                  12.1
+                ],
+                [
+                  "55+",
+                  3.2
+                ]
+              ],
+              "ubicaciones": [
+                [
+                  "Colombia",
+                  67.4
+                ],
+                [
+                  "Ecuador",
+                  5.1
+                ],
+                [
+                  "México",
+                  1.9
+                ],
+                [
+                  "Perú",
+                  1.7
+                ],
+                [
+                  "Venezuela",
+                  1.7
+                ],
+                [
+                  "Argentina",
+                  1.1
+                ],
+                [
+                  "Otros",
+                  18.6
+                ]
+              ]
+            },
+            "actividadSeguidores": {
+              "dia": "3 de noviembre",
+              "hora": "18:00",
+              "nota": "Durante los últimos 7 días, la mayoría de tus seguidores estuvieron activos el 3 de noviembre a las 6pm.",
+              "ventana": "Últimos 7 días"
             }
           }
         }

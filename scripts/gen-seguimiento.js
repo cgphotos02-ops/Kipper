@@ -98,7 +98,13 @@ var rows = [];
 sheets.filter(function (s) { return !s.hidden && s.file; }).forEach(function (s) {
   try {
     var got = parseSheet(s.file);
-    got.forEach(function (g) { g.hoja = s.name; });
+    var MESES_HOJA = { enero: '01', febrero: '02', marzo: '03', abril: '04', mayo: '05', junio: '06', julio: '07', agosto: '08', septiembre: '09', octubre: '10', noviembre: '11', diciembre: '12' };
+    var mh = String(s.name || '').toLowerCase().match(/([a-záéíóú]+)\s+(\d{4})/);
+    got.forEach(function (g) {
+      g.hoja = s.name;
+      // pieza sin fecha de publicación en el Excel: se queda en el mes de su hoja
+      if (!g.mes && mh && MESES_HOJA[mh[1]]) g.mes = mh[2] + '-' + MESES_HOJA[mh[1]];
+    });
     rows = rows.concat(got);
     console.log('  hoja "' + s.name + '": ' + got.length + ' piezas');
   } catch (e) { console.log('  hoja "' + s.name + '": (saltada) ' + e.message); }

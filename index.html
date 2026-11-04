@@ -1732,7 +1732,7 @@
     }
     // Solo las pautas de la marca elegida en el selector de arriba
     var brandLabel = accountLabels[currentAccount()];
-    var rows = parsed.rows.filter(function (p) { return p.brand === brandLabel; });
+    var rows = parsed.rows.filter(function (p) { return p.brand === brandLabel && (p.spend > 0 || p.impr > 0); });   // pautas sin gasto ni entrega en el período no se muestran
     if (!rows.length) {
       var otherMonths = pautasMonths().filter(function (mk) {
         return mk !== selectedMonth && PAUTAS_ALL.months[mk].rows.some(function (p) { return p.brand === brandLabel && p.spend > 0; });
@@ -1763,6 +1763,8 @@
     var palette = ['#29abc7', '#1f7fc4', '#9bc93c', '#f8be22'];
     var html = '';
     var untilTxt = parsed.activeUntil ? pautaDateLong(parsed.activeUntil) : '';
+    var hasActive = rows.some(function (p) { return p.status.k === 'active'; });
+    var showAll = !!untilTxt || !hasActive;   // mes cerrado (o sin pautas activas): se muestran todas las que tuvieron gasto
 
     html += '<p class="vc-note" style="text-align:center;margin:0 0 10px">Mostrando solo las pautas de <b>' + kEsc(brandLabel) + '</b>. Cambia de marca en el selector de arriba.</p>';
 
@@ -1782,16 +1784,16 @@
       rows.filter(function (p) { return p.spend > 0; }).sort(function (a, b) { return b.spend - a.spend; }).map(function (p, i) {
         return pautaStatPill('Importe gastado · ' + (p.brand === '—' ? p.name : p.brand), fmtCOP(p.spend), i === 0 ? 'accent' : 'blue');
       }).join('') +
-      (untilTxt ? pautaStatPill('Activas hasta', untilTxt, 'good') : pautaStatPill('Pautas activas', activeCount + ' / ' + rows.length, 'good')) +
+      (untilTxt ? pautaStatPill('Activas hasta', untilTxt, 'good') : (hasActive ? pautaStatPill('Pautas activas', activeCount + ' / ' + rows.length, 'good') : '')) +
       '</div>' +
       '<p class="vc-note" style="margin-top:10px;text-align:center">Importe gastado = lo que Meta cobró por cada pauta dentro del período.</p>';
     html += '</div>';
 
     // ---- Pautas activas ahora ----
     // En un mes cerrado con fecha de fin ("activas hasta el 15"), se muestran las que tuvieron entrega en el mes.
-    var actives = rows.filter(function (p) { return untilTxt ? p.spend > 0 : p.status.k === 'active'; })
+    var actives = rows.filter(function (p) { return showAll ? p.spend > 0 : p.status.k === 'active'; })
       .sort(function (a, b) { return b.spend - a.spend; });
-    html += '<div class="pauta-softcard"><div class="pauta-section-title">' + (untilTxt ? 'Pautas del mes (activas hasta el ' + untilTxt + ')' : 'Pautas activas ahora') + '</div>';
+    html += '<div class="pauta-softcard"><div class="pauta-section-title">' + (untilTxt ? 'Pautas del mes (activas hasta el ' + untilTxt + ')' : (hasActive ? 'Pautas activas ahora' : 'Pautas del mes')) + '</div>';
     if (actives.length) {
       html += '<div class="pauta-active-grid">' + actives.map(renderPautaBigCard).join('') + '</div>';
       if (actives.length >= 2) {
@@ -1832,7 +1834,7 @@
     }
 
     // ---- Tabla completa ----
-    var order = { active: 0, nodeliv: 1, paused: 2, done: 3, archived: 4, other: 5 };
+    var order = { active: 0, nodeliv: 1, paused: 2, done: 3, inactive: 3, archived: 4, other: 5 };
     var sorted = rows.slice().sort(function (a, b) {
       return (order[a.status.k] - order[b.status.k]) || (b.spend - a.spend);
     });
@@ -2638,8 +2640,12 @@
     }
     (M.campanas || []).filter(function (c) { return c.marca === brandLabelM; }).forEach(function (c) {
       // ¿hay dato en vivo para esta campaña? (misma marca + activa)
+      // Se compara solo la campaña de la meta (mismo nombre), no cualquier pauta de la marca: las campañas nuevas tienen otro objetivo y presupuesto.
+      var normN = function (s) { return String(s || '').toLowerCase().replace(/[^a-z0-9áéíóúñ ]+/g, ' ').split(/\s+/).filter(Boolean); };
+      var metaTokens = normN(c.nombre);
       var pr = liveRows.filter(function (r) {
-        return pautaBrand(r.name) === c.marca && (r.status.k === 'active' || (PAUTAS && PAUTAS.activeUntil && r.spend > 0));
+        var rt = normN(r.name);
+        return pautaBrand(r.name) === c.marca && r.spend > 0 && metaTokens.every(function (t) { return rt.indexOf(t) > -1; });
       }).sort(function (a, b) { return b.spend - a.spend; })[0];
 
       var reachNow = pr ? pr.reach : c.base.alcance;
@@ -2665,7 +2671,7 @@
       html += '<div class="meta-goal-card">' +
         '<div class="mg-brand">' + c.marca + '</div>' +
         '<div class="mg-name">' + c.nombre + '</div>' +
-        '<div class="mg-sub">Se mide por: <b>' + c.resultadoTipo + '</b>' + (pr ? ' · datos ' + (fresh ? 'del período cargado' : 'de agosto (línea base)') : ' · sin datos en vivo, se muestra la línea base') + '</div>' +
+        '<div class="mg-sub">Se mide por: <b>' + c.resultadoTipo + '</b>' + (pr ? ' · datos ' + (fresh ? 'del período cargado' : 'de agosto (línea base)') : (liveRows.some(function (r) { return r.spend > 0; }) ? ' · las pautas de este mes son otras campañas: se muestra la línea base de agosto' : ' · sin datos en vivo, se muestra la línea base')) + '</div>' +
         (c.nota ? '<div class="mg-note">ℹ️ ' + c.nota + '</div>' : '') +
 
         '<div class="meta-metric"><div class="mm-head"><span class="mm-name">👀 Alcance</span><span class="mm-val">' + fmtNumCO(reachNow) + ' de ' + fmtNumCO(c.meta.alcance) + ' &nbsp;(' + Math.round((reachNow / c.meta.alcance) * 100) + '%)</span></div>' +

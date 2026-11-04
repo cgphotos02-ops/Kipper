@@ -190,6 +190,157 @@
       ],
       "activeUntil": "2026-09-15",
       "note": "Las pautas estuvieron activas hasta el 15 de septiembre. Las cifras de este mes corresponden solo a esos 15 días de entrega (el informe cubre del 1 al 30 de septiembre)."
+    },
+    "2026-10": {
+      "updatedAt": "2026-11-04T22:32:00.570Z",
+      "source": "PROVISER-_-NASS-Campañas-1-oct-2026---31-oct-2026.xlsx",
+      "period": {
+        "start": "2026-10-01",
+        "end": "2026-10-31"
+      },
+      "rows": [
+        {
+          "name": "Nass Pautas Publicitarias",
+          "brand": "Nass Tecnología",
+          "status": {
+            "k": "inactive",
+            "label": "Inactiva",
+            "cls": "off"
+          },
+          "statusRaw": "inactive",
+          "start": "2026-08-21",
+          "end": "2026-09-15",
+          "reach": 0,
+          "freq": 0,
+          "impr": 0,
+          "results": 0,
+          "resInd": "",
+          "cpr": 0,
+          "budget": 500000,
+          "budgetType": "Total",
+          "spend": 0,
+          "cpm": 0,
+          "linkClicks": 0,
+          "cpcLink": 0,
+          "ctrLink": 0,
+          "igVisits": 0,
+          "igFollows": 0,
+          "interactions": 0
+        },
+        {
+          "name": "PROVISER | WhatsApp | Seguridad | Prospecting",
+          "brand": "Proviser Seguridad",
+          "status": {
+            "k": "inactive",
+            "label": "Inactiva",
+            "cls": "off"
+          },
+          "statusRaw": "inactive",
+          "start": "2026-08-21",
+          "end": "2026-09-15",
+          "reach": 0,
+          "freq": 0,
+          "impr": 0,
+          "results": 0,
+          "resInd": "",
+          "cpr": 0,
+          "budget": 500000,
+          "budgetType": "Total",
+          "spend": 0,
+          "cpm": 0,
+          "linkClicks": 0,
+          "cpcLink": 0,
+          "ctrLink": 0,
+          "igVisits": 0,
+          "igFollows": 0,
+          "interactions": 0
+        },
+        {
+          "name": "Modo vacaciones - Nass - 6/10/26",
+          "brand": "Nass Tecnología",
+          "status": {
+            "k": "inactive",
+            "label": "Inactiva",
+            "cls": "off"
+          },
+          "statusRaw": "inactive",
+          "start": "2026-10-06",
+          "end": "2026-10-31",
+          "reach": 11468,
+          "freq": 1.824032,
+          "impr": 20918,
+          "results": 100,
+          "resInd": "actions:onsite_conversion.messaging_conversation_started_7d",
+          "cpr": 2499.47,
+          "budget": 250000,
+          "budgetType": "Total",
+          "spend": 249947,
+          "cpm": 11948.895688,
+          "linkClicks": 262,
+          "cpcLink": 953.996183,
+          "ctrLink": 1.25251,
+          "igVisits": 7,
+          "igFollows": 0,
+          "interactions": 47
+        },
+        {
+          "name": "Seguridad oficial del Giro de Rigo - Proviser - 6/10/26",
+          "brand": "Proviser Seguridad",
+          "status": {
+            "k": "inactive",
+            "label": "Inactiva",
+            "cls": "off"
+          },
+          "statusRaw": "inactive",
+          "start": "2026-10-06",
+          "end": "2026-10-31",
+          "reach": 6356,
+          "freq": 2.211611,
+          "impr": 14057,
+          "results": 49,
+          "resInd": "actions:onsite_conversion.messaging_conversation_started_7d",
+          "cpr": 1498.40816327,
+          "budget": 250000,
+          "budgetType": "Total",
+          "spend": 73422,
+          "cpm": 5223.162837,
+          "linkClicks": 94,
+          "cpcLink": 781.085106,
+          "ctrLink": 0.668706,
+          "igVisits": 9,
+          "igFollows": 0,
+          "interactions": 121
+        },
+        {
+          "name": "Proviser - Giro de Rigo - Manual - 13/10/26",
+          "brand": "Proviser Seguridad",
+          "status": {
+            "k": "inactive",
+            "label": "Inactiva",
+            "cls": "off"
+          },
+          "statusRaw": "inactive",
+          "start": "2026-10-13",
+          "end": "2026-11-13",
+          "reach": 8234,
+          "freq": 2.554651,
+          "impr": 21035,
+          "results": 25,
+          "resInd": "actions:onsite_conversion.messaging_conversation_started_7d",
+          "cpr": 3889.72,
+          "budget": 0,
+          "budgetType": "0",
+          "spend": 97243,
+          "cpm": 4622.914191,
+          "linkClicks": 45,
+          "cpcLink": 2160.955556,
+          "ctrLink": 0.213929,
+          "igVisits": 6,
+          "igFollows": 0,
+          "interactions": 58
+        }
+      ],
+      "note": "Meta muestra todas las pautas de octubre como inactivas al 4 de noviembre. \"Modo vacaciones\" (Nass) y \"Seguridad oficial del Giro de Rigo\" (Proviser) terminaron el 31 de octubre; \"Giro de Rigo - Manual\" (Proviser) estaba programada hasta el 13 de noviembre."
     }
   }
 }

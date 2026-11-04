@@ -36,6 +36,7 @@ function brand(name) {
 function status(s) {
   s = (s || '').toLowerCase();
   if (s.indexOf('not_deliv') > -1 || s.indexOf('no se est') > -1 || s.indexOf('no entrega') > -1) return { k: 'nodeliv', label: 'No entrega', cls: 'warn' };
+  if (s.indexOf('inactiv') > -1) return { k: 'inactive', label: 'Inactiva', cls: 'off' };   // Meta: "inactive" = sin entrega en este momento (la contiene 'activ', por eso va antes)
   if (s.indexOf('activ') > -1) return { k: 'active', label: 'Activa', cls: 'good' };
   if (s.indexOf('paus') > -1) return { k: 'paused', label: 'Pausada', cls: 'warn' };
   if (s.indexOf('complet') > -1 || s.indexOf('finaliz') > -1) return { k: 'done', label: 'Finalizada', cls: 'off' };
@@ -112,7 +113,7 @@ const C = {
   cpr: findH('costo por resultados', 'costo por resultado', 'cost per result'),
   budget: findH('presupuesto del conjunto de anuncios', 'ad set budget'),
   budgetType: findH('tipo de presupuesto del conjunto de anuncios', 'ad set budget type'),
-  spend: findH('importe gastado', 'amount spent'),
+  spend: findH('importe gastado', 'monto gastado', 'amount spent'),
   cpm: findH('cpm (costo por mil', 'cpm'),
   linkClicks: findH('clics en el enlace', 'link clicks'),
   cpcLink: findH('cpc (costo por clic en el enlace', 'cpc (cost per link click'),

@@ -419,6 +419,152 @@
             "México",
             "Chile"
           ]
+        },
+        "2026-10": {
+          "username": "proviserseguridad",
+          "followers": 4539,
+          "following": 583,
+          "followersDelta": 159,
+          "acquired": 203,
+          "lost": 45,
+          "engagement": 1.76,
+          "engagementNote": "estimado con los posts y reels del período (717 interacciones ÷ 9 piezas ÷ seguidores, misma fórmula que la tabla de competidores)",
+          "views": 53600,
+          "avgDailyReach": 825,
+          "engagedAccounts": 609,
+          "postsInPeriod": 34,
+          "bestTime": null,
+          "audience": {
+            "gender": [
+              [
+                "Hombres",
+                54.13
+              ],
+              [
+                "Mujeres",
+                32.35
+              ],
+              [
+                "Sin especificar",
+                13.53
+              ]
+            ],
+            "age": [
+              [
+                "13-17",
+                0.1
+              ],
+              [
+                "18-24",
+                5.5
+              ],
+              [
+                "25-34",
+                36.7
+              ],
+              [
+                "35-44",
+                34.3
+              ],
+              [
+                "45-54",
+                16.8
+              ],
+              [
+                "55-64",
+                5.1
+              ],
+              [
+                "65+",
+                1.4
+              ]
+            ],
+            "ageApprox": true,
+            "genderApprox": true,
+            "genderNote": "Sin la tabla de octubre: se mantienen los porcentajes de septiembre (la audiencia casi no cambia de un mes a otro)."
+          },
+          "content": {
+            "posts": {
+              "count": 2,
+              "engagement": 104.76,
+              "interactions": 121,
+              "avgReach": 578,
+              "views": 3759,
+              "likes": 118,
+              "saves": 1,
+              "shares": 2
+            },
+            "reels": {
+              "count": 7,
+              "engagement": 42.31,
+              "interactions": 596,
+              "avgReach": 2012,
+              "views": 21900,
+              "likes": 550,
+              "comments": 8,
+              "saves": 15,
+              "shares": 23
+            },
+            "stories": {
+              "count": 25,
+              "impressions": 18410,
+              "avgReach": 684.92
+            }
+          },
+          "topPosts": [],
+          "hashtags": [],
+          "competitors": [
+            {
+              "name": "Grupo Atlas Seguridad",
+              "handle": "@grupoatlasseguridad",
+              "followers": 10700,
+              "posts": 6,
+              "reels": 4,
+              "avgLikes": 37.6,
+              "avgComments": null,
+              "engagement": null
+            },
+            {
+              "name": "Alarmas Telesentinel",
+              "handle": "@telesentinel_colombia",
+              "followers": 10330,
+              "posts": 11,
+              "reels": 4,
+              "avgLikes": 21.07,
+              "avgComments": null,
+              "engagement": null
+            },
+            {
+              "name": "Oszford Seguridad Privada Cali",
+              "handle": "@seguridadprivadaoszford",
+              "followers": 6110,
+              "posts": null,
+              "reels": 10,
+              "avgLikes": 30.6,
+              "avgComments": null,
+              "engagement": null
+            },
+            {
+              "name": "Seguridad Omega",
+              "handle": "@seguridadomegaco",
+              "followers": 2960,
+              "posts": 1,
+              "reels": null,
+              "avgLikes": 25,
+              "avgComments": null,
+              "engagement": null
+            },
+            {
+              "name": "Sotech Seguridad y Tecnología",
+              "handle": "@sotechdecolombia",
+              "followers": 342,
+              "posts": null,
+              "reels": null,
+              "avgLikes": null,
+              "avgComments": null,
+              "engagement": null
+            }
+          ]
         }
       },
       "facebook": {

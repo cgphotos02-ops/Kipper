@@ -2872,11 +2872,7 @@
     if (!GESTION || !GESTION.months) { box.innerHTML = ''; return; }
     var months = Object.keys(GESTION.months).sort();
     var b = GESTION.months[selectedMonth];
-    if (!b) {
-      box.innerHTML = '<div class="card"><h2>📞 Gestión comercial del equipo</h2><div class="leads-empty-state">' + monthJumpHtml('gestión comercial', months) + '</div></div>';
-      wireMonthJumpBtn(box);
-      return;
-    }
+    if (!b) { box.innerHTML = ''; return; }   // sin datos de gestión comercial este mes: no se muestra la tarjeta
     function est(re) { return Object.keys(b.estados).reduce(function (s, k) { return re.test(k) ? s + b.estados[k] : s; }, 0); }
     var vac = est(/vacante/i), noLead = est(/no es un lead/i), noCont = est(/no contesta/i), noInt = est(/no interesado/i);
     var prosp = b.prospectos, avance = prosp - noCont - noInt;

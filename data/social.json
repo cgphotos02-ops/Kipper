@@ -673,6 +673,34 @@
               "count": 5
             }
           }
+        },
+        "2026-10": {
+          "followers": 15490,
+          "followersDelta": -33,
+          "acquired": 41,
+          "lost": 26,
+          "views": 48420,
+          "pageVisits": 1129,
+          "postsInPeriod": 13,
+          "content": {
+            "posts": {
+              "count": 2,
+              "engagement": 157.04,
+              "interactions": 136,
+              "avgReach": 433,
+              "views": 1571
+            },
+            "reels": {
+              "count": 7,
+              "interactions": 139,
+              "videoViews": 6606,
+              "likes": 130,
+              "actions": 9
+            },
+            "stories": {
+              "count": 4
+            }
+          }
         }
       },
       "tiktok": {

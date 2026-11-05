@@ -108,7 +108,7 @@
       ]
     ],
     "contactosError": null,
-    "contactosLeidos": 1341,
+    "contactosLeidos": 1342,
     "fuentes": [
       [
         "fuente 75089",
@@ -135,14 +135,14 @@
     "leadsClasificadosPorTexto": 34,
     "leadsConNombreUtil": 0
   },
-  "generatedAt": "2026-11-04T19:16:15.840Z",
+  "generatedAt": "2026-11-05T00:41:48.176Z",
   "source": "kommo",
   "staleDays": 7,
   "unassigned": 252,
   "descartados": {
     "gestionHumana": 505,
     "internos": 1,
-    "sinPasarPorElBot": 448
+    "sinPasarPorElBot": 449
   },
   "pipelines": [
     "Embudo de ventas",

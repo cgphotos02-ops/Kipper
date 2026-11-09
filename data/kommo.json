@@ -1,7 +1,8 @@
 {
   "diagnostico": {
     "porEmbudo": {
-      "Embudo de ventas": 293
+      "Embudo de ventas": 293,
+      "Agente Dapta": 1
     },
     "etiquetas": [
       [
@@ -63,6 +64,18 @@
       [
         "PROVISER",
         1
+      ],
+      [
+        "prueba_dapta",
+        1
+      ],
+      [
+        "AGENDADO VISITA TECNICA",
+        1
+      ],
+      [
+        "ATENCION DIGITAL",
+        1
       ]
     ],
     "campos": {
@@ -83,10 +96,11 @@
     },
     "notas": {
       "tipos": {
-        "ai_result": 1
+        "ai_result": 1,
+        "common": 9
       },
-      "leadsConNotas": 1,
-      "leadsConTexto": 1,
+      "leadsConNotas": 5,
+      "leadsConTexto": 5,
       "error": null
     },
     "etiquetasContacto": [
@@ -108,18 +122,22 @@
       ]
     ],
     "contactosError": null,
-    "contactosLeidos": 1358,
+    "contactosLeidos": 1388,
     "fuentes": [
       [
         "fuente 75089",
         293
+      ],
+      [
+        "fuente 81647",
+        1
       ]
     ],
     "fuentesError": null,
     "conversaciones": {
-      "total": 1602,
+      "total": 1627,
       "porOrigen": {
-        "facebook": 192,
+        "facebook": 217,
         "waba": 1052,
         "instagram_business": 141,
         "com.amocrm.amocrmwa": 217
@@ -129,20 +147,23 @@
       "75089": {
         "waba": 293,
         "com.amocrm.amocrmwa": 6
+      },
+      "81647": {
+        "sin conversación": 1
       }
     },
     "fuentesDetalle": [],
-    "leadsClasificadosPorTexto": 34,
+    "leadsClasificadosPorTexto": 35,
     "leadsConNombreUtil": 0
   },
-  "generatedAt": "2026-11-07T23:22:35.169Z",
+  "generatedAt": "2026-11-09T21:52:25.703Z",
   "source": "kommo",
   "staleDays": 7,
   "unassigned": 252,
   "descartados": {
-    "gestionHumana": 511,
+    "gestionHumana": 536,
     "internos": 1,
-    "sinPasarPorElBot": 481
+    "sinPasarPorElBot": 487
   },
   "pipelines": [
     "Embudo de ventas",
@@ -403,6 +424,45 @@
             }
           ],
           "byStage": []
+        },
+        "2026-11": {
+          "total": 1,
+          "won": 0,
+          "lost": 1,
+          "open": 0,
+          "stale": 0,
+          "winRate": 0,
+          "lossRate": 100,
+          "closedWinRate": 0,
+          "sales": 0,
+          "avgDaysToWin": null,
+          "byOwner": [
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 1,
+              "open": 0,
+              "sales": 0,
+              "name": "KipperSAS"
+            }
+          ],
+          "byOrigin": [
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 1,
+              "open": 0,
+              "sales": 0,
+              "name": "prueba_dapta"
+            }
+          ],
+          "lostReasons": [
+            {
+              "name": "Sin motivo registrado",
+              "count": 1
+            }
+          ],
+          "byStage": []
         }
       },
       "open": {
@@ -490,6 +550,45 @@
               "open": 0,
               "sales": 0,
               "name": "Sin origen"
+            }
+          ],
+          "lostReasons": [
+            {
+              "name": "Sin motivo registrado",
+              "count": 1
+            }
+          ],
+          "byStage": []
+        },
+        "2026-11": {
+          "total": 1,
+          "won": 0,
+          "lost": 1,
+          "open": 0,
+          "stale": 0,
+          "winRate": 0,
+          "lossRate": 100,
+          "closedWinRate": 0,
+          "sales": 0,
+          "avgDaysToWin": null,
+          "byOwner": [
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 1,
+              "open": 0,
+              "sales": 0,
+              "name": "KipperSAS"
+            }
+          ],
+          "byOrigin": [
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 1,
+              "open": 0,
+              "sales": 0,
+              "name": "prueba_dapta"
             }
           ],
           "lostReasons": [

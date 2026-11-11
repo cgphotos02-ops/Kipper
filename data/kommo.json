@@ -97,10 +97,10 @@
     "notas": {
       "tipos": {
         "ai_result": 1,
-        "common": 9
+        "common": 11
       },
-      "leadsConNotas": 5,
-      "leadsConTexto": 5,
+      "leadsConNotas": 7,
+      "leadsConTexto": 7,
       "error": null
     },
     "etiquetasContacto": [
@@ -122,7 +122,7 @@
       ]
     ],
     "contactosError": null,
-    "contactosLeidos": 1389,
+    "contactosLeidos": 1393,
     "fuentes": [
       [
         "fuente 75089",
@@ -156,14 +156,14 @@
     "leadsClasificadosPorTexto": 35,
     "leadsConNombreUtil": 0
   },
-  "generatedAt": "2026-11-11T00:23:48.735Z",
+  "generatedAt": "2026-11-11T19:10:52.916Z",
   "source": "kommo",
   "staleDays": 7,
   "unassigned": 252,
   "descartados": {
     "gestionHumana": 537,
     "internos": 1,
-    "sinPasarPorElBot": 488
+    "sinPasarPorElBot": 491
   },
   "pipelines": [
     "Embudo de ventas",

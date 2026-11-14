@@ -156,14 +156,14 @@
     "leadsClasificadosPorTexto": 35,
     "leadsConNombreUtil": 0
   },
-  "generatedAt": "2026-11-14T17:36:23.763Z",
+  "generatedAt": "2026-11-14T23:36:00.191Z",
   "source": "kommo",
   "staleDays": 7,
   "unassigned": 252,
   "descartados": {
-    "gestionHumana": 538,
+    "gestionHumana": 539,
     "internos": 1,
-    "sinPasarPorElBot": 496
+    "sinPasarPorElBot": 495
   },
   "pipelines": [
     "Embudo de ventas",

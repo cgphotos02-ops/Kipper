@@ -97,7 +97,7 @@
     "notas": {
       "tipos": {
         "ai_result": 1,
-        "common": 26
+        "common": 27
       },
       "leadsConNotas": 13,
       "leadsConTexto": 13,
@@ -135,9 +135,9 @@
     ],
     "fuentesError": null,
     "conversaciones": {
-      "total": 1648,
+      "total": 1649,
       "porOrigen": {
-        "facebook": 232,
+        "facebook": 233,
         "instagram_business": 147,
         "waba": 1052,
         "com.amocrm.amocrmwa": 217
@@ -156,7 +156,7 @@
     "leadsClasificadosPorTexto": 35,
     "leadsConNombreUtil": 0
   },
-  "generatedAt": "2026-11-20T01:37:11.359Z",
+  "generatedAt": "2026-11-20T19:33:12.386Z",
   "source": "kommo",
   "staleDays": 7,
   "unassigned": 252,

@@ -2,7 +2,7 @@
   "diagnostico": {
     "porEmbudo": {
       "Embudo de ventas": 293,
-      "Agente Dapta": 1
+      "Agente Dapta": 3
     },
     "etiquetas": [
       [
@@ -54,6 +54,10 @@
         5
       ],
       [
+        "Pauta Meta NASS Nov 2026",
+        2
+      ],
+      [
         "5 minutos",
         1
       ],
@@ -76,10 +80,27 @@
       [
         "ATENCION DIGITAL",
         1
+      ],
+      [
+        "dapta-intento-1",
+        1
+      ],
+      [
+        "dapta-encolado",
+        1
+      ],
+      [
+        "fb1678484074014672",
+        1
+      ],
+      [
+        "fb3113694762300062",
+        1
       ]
     ],
     "campos": {
-      "Empresa": 13
+      "Empresa": 13,
+      "Servicio solicitado": 2
     },
     "estados": {},
     "camposOpciones": {
@@ -92,15 +113,19 @@
         "Minimarket": 1,
         "Alta gama": 1,
         "Comercio": 1
+      },
+      "Servicio solicitado": {
+        "sistema_de_alarma": 1,
+        "<test lead: dummy data for ¿qué_te_inter": 1
       }
     },
     "notas": {
       "tipos": {
         "ai_result": 1,
-        "common": 27
+        "common": 30
       },
-      "leadsConNotas": 13,
-      "leadsConTexto": 13,
+      "leadsConNotas": 15,
+      "leadsConTexto": 15,
       "error": null
     },
     "etiquetasContacto": [
@@ -122,7 +147,7 @@
       ]
     ],
     "contactosError": null,
-    "contactosLeidos": 1419,
+    "contactosLeidos": 1422,
     "fuentes": [
       [
         "fuente 75089",
@@ -131,15 +156,23 @@
       [
         "fuente 81647",
         1
+      ],
+      [
+        "fuente 81981",
+        1
+      ],
+      [
+        "fuente 82109",
+        1
       ]
     ],
     "fuentesError": null,
     "conversaciones": {
-      "total": 1651,
+      "total": 1654,
       "porOrigen": {
-        "facebook": 235,
-        "instagram_business": 147,
-        "waba": 1052,
+        "facebook": 236,
+        "waba": 1053,
+        "instagram_business": 148,
         "com.amocrm.amocrmwa": 217
       }
     },
@@ -150,13 +183,19 @@
       },
       "81647": {
         "sin conversación": 1
+      },
+      "81981": {
+        "sin conversación": 1
+      },
+      "82109": {
+        "sin conversación": 1
       }
     },
     "fuentesDetalle": [],
     "leadsClasificadosPorTexto": 35,
     "leadsConNombreUtil": 0
   },
-  "generatedAt": "2026-11-22T00:02:25.298Z",
+  "generatedAt": "2026-11-23T23:17:43.486Z",
   "source": "kommo",
   "staleDays": 7,
   "unassigned": 252,
@@ -426,22 +465,22 @@
           "byStage": []
         },
         "2026-11": {
-          "total": 1,
+          "total": 3,
           "won": 0,
           "lost": 1,
-          "open": 0,
+          "open": 2,
           "stale": 0,
           "winRate": 0,
-          "lossRate": 100,
+          "lossRate": 33.3,
           "closedWinRate": 0,
           "sales": 0,
           "avgDaysToWin": null,
           "byOwner": [
             {
-              "total": 1,
+              "total": 3,
               "won": 0,
               "lost": 1,
-              "open": 0,
+              "open": 2,
               "sales": 0,
               "name": "KipperSAS"
             }
@@ -454,6 +493,22 @@
               "open": 0,
               "sales": 0,
               "name": "prueba_dapta"
+            },
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 0,
+              "open": 1,
+              "sales": 0,
+              "name": "dapta-intento-1"
+            },
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 0,
+              "open": 1,
+              "sales": 0,
+              "name": "fb3113694762300062"
             }
           ],
           "lostReasons": [
@@ -462,14 +517,50 @@
               "count": 1
             }
           ],
-          "byStage": []
+          "byStage": [
+            {
+              "name": "Base por contactar",
+              "pipeline": "Agente Dapta",
+              "sort": 20,
+              "count": 1,
+              "stale": 0
+            },
+            {
+              "name": "En proceso de contacto",
+              "pipeline": "Agente Dapta",
+              "sort": 30,
+              "count": 1,
+              "stale": 0
+            }
+          ]
         }
       },
       "open": {
-        "open": 0,
+        "open": 2,
         "stale": 0,
-        "byStage": [],
-        "byOwner": []
+        "byStage": [
+          {
+            "name": "Base por contactar",
+            "pipeline": "Agente Dapta",
+            "sort": 20,
+            "count": 1,
+            "stale": 0
+          },
+          {
+            "name": "En proceso de contacto",
+            "pipeline": "Agente Dapta",
+            "sort": 30,
+            "count": 1,
+            "stale": 0
+          }
+        ],
+        "byOwner": [
+          {
+            "name": "KipperSAS",
+            "open": 2,
+            "stale": 0
+          }
+        ]
       }
     },
     "proviser": {
@@ -765,13 +856,91 @@
             }
           ],
           "byStage": []
+        },
+        "2026-11": {
+          "total": 2,
+          "won": 0,
+          "lost": 0,
+          "open": 2,
+          "stale": 0,
+          "winRate": 0,
+          "lossRate": 0,
+          "closedWinRate": null,
+          "sales": 0,
+          "avgDaysToWin": null,
+          "byOwner": [
+            {
+              "total": 2,
+              "won": 0,
+              "lost": 0,
+              "open": 2,
+              "sales": 0,
+              "name": "KipperSAS"
+            }
+          ],
+          "byOrigin": [
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 0,
+              "open": 1,
+              "sales": 0,
+              "name": "dapta-intento-1"
+            },
+            {
+              "total": 1,
+              "won": 0,
+              "lost": 0,
+              "open": 1,
+              "sales": 0,
+              "name": "fb3113694762300062"
+            }
+          ],
+          "lostReasons": [],
+          "byStage": [
+            {
+              "name": "Base por contactar",
+              "pipeline": "Agente Dapta",
+              "sort": 20,
+              "count": 1,
+              "stale": 0
+            },
+            {
+              "name": "En proceso de contacto",
+              "pipeline": "Agente Dapta",
+              "sort": 30,
+              "count": 1,
+              "stale": 0
+            }
+          ]
         }
       },
       "open": {
-        "open": 0,
+        "open": 2,
         "stale": 0,
-        "byStage": [],
-        "byOwner": []
+        "byStage": [
+          {
+            "name": "Base por contactar",
+            "pipeline": "Agente Dapta",
+            "sort": 20,
+            "count": 1,
+            "stale": 0
+          },
+          {
+            "name": "En proceso de contacto",
+            "pipeline": "Agente Dapta",
+            "sort": 30,
+            "count": 1,
+            "stale": 0
+          }
+        ],
+        "byOwner": [
+          {
+            "name": "KipperSAS",
+            "open": 2,
+            "stale": 0
+          }
+        ]
       }
     }
   }
